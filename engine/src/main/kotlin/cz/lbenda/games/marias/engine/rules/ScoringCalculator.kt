@@ -1,5 +1,6 @@
 package cz.lbenda.games.marias.engine.rules
 
+import cz.lbenda.games.marias.engine.model.Card
 import cz.lbenda.games.marias.engine.model.Rank
 import cz.lbenda.games.marias.engine.model.Suit
 import cz.lbenda.games.marias.engine.state.GameState
@@ -19,8 +20,8 @@ class ScoringCalculator {
         val declarer = state.declarer ?: error("No declarer")
         val gameType = state.gameType ?: error("No game type")
 
-        val declarerTrickPoints = declarer.pointsInTricks
-        val talonPoints = state.talon.sumOf { it.pointValue }
+        val declarerTrickPoints = calculatePoints(declarer.allWonCards)
+        val talonPoints = calculatePoints(state.talon)
         val totalDeclarerPoints = declarerTrickPoints + talonPoints
 
         val baseScore = gameType.baseValue
@@ -38,7 +39,7 @@ class ScoringCalculator {
                 val lastTrick = state.completedTricks.lastOrNull()
                 val wonWithSeven = lastTrick?.cardsPlayed?.lastOrNull()?.let { played ->
                     played.playerId == declarer.playerId &&
-                        played.card.rank == Rank.SEDMICKA &&
+                        played.card.rank == Rank.SEVEN &&
                         played.card.suit == state.trump
                 } ?: false
 
@@ -78,13 +79,17 @@ class ScoringCalculator {
         )
     }
 
-    fun hasMarriage(hand: List<cz.lbenda.games.marias.engine.model.Card>, suit: Suit): Boolean {
-        val hasKing = hand.any { it.suit == suit && it.rank == Rank.KRAL }
-        val hasQueen = hand.any { it.suit == suit && it.rank == Rank.SVRSEK }
+    fun hasMarriage(hand: List<Card>, suit: Suit): Boolean {
+        val hasKing = hand.any { it.suit == suit && it.rank == Rank.KING }
+        val hasQueen = hand.any { it.suit == suit && it.rank == Rank.QUEEN }
         return hasKing && hasQueen
     }
 
     fun getMarriageValue(suit: Suit, trump: Suit?): Int {
         return if (suit == trump) 40 else 20
+    }
+
+    fun calculatePoints(cards: List<Card>): Int {
+        return cards.sumOf { MariasCardValues.getPointValue(it) }
     }
 }

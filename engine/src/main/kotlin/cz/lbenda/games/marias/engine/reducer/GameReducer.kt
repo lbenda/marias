@@ -65,7 +65,7 @@ class GameReducer(
     }
 
     private fun handleDealCards(state: GameState, action: GameAction.DealCards): GameState {
-        val deck = action.shuffledDeck ?: Card.createShuffledDeck()
+        val deck = action.shuffledDeck ?: DeckUtils.createShuffledDeck()
         val (playerHands, talon) = DeckUtils.dealCards(deck, state.playerOrder)
 
         val newPlayers = state.players.mapValues { (playerId, playerState) ->

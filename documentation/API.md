@@ -117,8 +117,8 @@ Game types: `HRA`, `SEDMA`, `KILO`, `BETL`, `DURCH`
     "type": "exchange_talon",
     "playerId": "player2",
     "cardsToDiscard": [
-      {"suit": "ZELENE", "rank": "SEDMICKA"},
-      {"suit": "KULE", "rank": "OSMICKA"}
+      {"suit": "SPADES", "rank": "SEVEN"},
+      {"suit": "DIAMONDS", "rank": "EIGHT"}
     ]
   }
 }
@@ -130,12 +130,12 @@ Game types: `HRA`, `SEDMA`, `KILO`, `BETL`, `DURCH`
   "action": {
     "type": "select_trump",
     "playerId": "player2",
-    "trump": "SRDCE"
+    "trump": "HEARTS"
   }
 }
 ```
 
-Suits: `ZELENE`, `ZALUDY`, `KULE`, `SRDCE`
+Suits: `SPADES`, `CLUBS`, `DIAMONDS`, `HEARTS`
 
 ### PlayCard
 ```json
@@ -143,12 +143,12 @@ Suits: `ZELENE`, `ZALUDY`, `KULE`, `SRDCE`
   "action": {
     "type": "play_card",
     "playerId": "player2",
-    "card": {"suit": "SRDCE", "rank": "ESO"}
+    "card": {"suit": "HEARTS", "rank": "ACE"}
   }
 }
 ```
 
-Ranks: `SEDMICKA`, `OSMICKA`, `DEVITKA`, `DESITKA`, `SPODEK`, `SVRSEK`, `KRAL`, `ESO`
+Ranks (Mariáš 32-card deck): `SEVEN`, `EIGHT`, `NINE`, `TEN`, `JACK`, `QUEEN`, `KING`, `ACE`
 
 ### StartNewRound
 ```json
@@ -160,20 +160,41 @@ Ranks: `SEDMICKA`, `OSMICKA`, `DEVITKA`, `DESITKA`, `SPODEK`, `SVRSEK`, `KRAL`, 
 }
 ```
 
-## Card Values
+## Card Model
 
-| Rank | Czech Name | Points | Strength |
-|------|------------|--------|----------|
-| SEDMICKA | Sedmička | 0 | 1 |
-| OSMICKA | Osmička | 0 | 2 |
-| DEVITKA | Devítka | 0 | 3 |
-| DESITKA | Desítka | 10 | 4 |
-| SPODEK | Spodek | 2 | 5 |
-| SVRSEK | Svršek | 3 | 6 |
-| KRAL | Král | 4 | 7 |
-| ESO | Eso | 11 | 8 |
+### Suits (French/Bridge style)
+| Enum | Symbol | Description |
+|------|--------|-------------|
+| SPADES | ♠ | Spades |
+| CLUBS | ♣ | Clubs |
+| DIAMONDS | ♦ | Diamonds |
+| HEARTS | ♥ | Hearts |
 
-Total points in deck: 120 (30 per suit × 4 suits)
+### Ranks
+| Enum | Symbol | Mariáš Points | Mariáš Strength |
+|------|--------|---------------|-----------------|
+| SEVEN | 7 | 0 | 1 |
+| EIGHT | 8 | 0 | 2 |
+| NINE | 9 | 0 | 3 |
+| TEN | 10 | 10 | 4 |
+| JACK | J | 2 | 5 |
+| QUEEN | Q | 3 | 6 |
+| KING | K | 4 | 7 |
+| ACE | A | 11 | 8 |
+
+Total points in Mariáš deck: 120 (30 per suit × 4 suits)
+
+### Deck Types
+
+The engine supports multiple deck types for different card games:
+
+| Type | Cards | Description |
+|------|-------|-------------|
+| STANDARD_52 | 52 | Full deck (2-A, all suits) |
+| PIQUET_32 | 32 | Mariáš/Skat deck (7-A) |
+| EUCHRE_24 | 24 | Euchre deck (9-A) |
+| JASS_36 | 36 | Jass deck (6-A) |
+| PINOCHLE_48 | 48 | Pinochle deck (9-A, doubled) |
 
 ## Game Types
 

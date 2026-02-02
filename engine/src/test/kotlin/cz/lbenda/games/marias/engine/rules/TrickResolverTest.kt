@@ -16,9 +16,9 @@ class TrickResolverTest {
     fun `highest card of lead suit wins without trump`() {
         val trick = TrickState(
             cardsPlayed = listOf(
-                PlayedCard("p1", Card(Suit.SRDCE, Rank.DESITKA)),
-                PlayedCard("p2", Card(Suit.SRDCE, Rank.ESO)),
-                PlayedCard("p3", Card(Suit.SRDCE, Rank.KRAL))
+                PlayedCard("p1", Card(Suit.HEARTS, Rank.TEN)),
+                PlayedCard("p2", Card(Suit.HEARTS, Rank.ACE)),
+                PlayedCard("p3", Card(Suit.HEARTS, Rank.KING))
             ),
             leadPlayerId = "p1",
             trickNumber = 1
@@ -32,15 +32,15 @@ class TrickResolverTest {
     fun `trump beats higher card of lead suit`() {
         val trick = TrickState(
             cardsPlayed = listOf(
-                PlayedCard("p1", Card(Suit.SRDCE, Rank.ESO)),
-                PlayedCard("p2", Card(Suit.ZALUDY, Rank.SEDMICKA)), // Trump
-                PlayedCard("p3", Card(Suit.SRDCE, Rank.KRAL))
+                PlayedCard("p1", Card(Suit.HEARTS, Rank.ACE)),
+                PlayedCard("p2", Card(Suit.CLUBS, Rank.SEVEN)), // Trump
+                PlayedCard("p3", Card(Suit.HEARTS, Rank.KING))
             ),
             leadPlayerId = "p1",
             trickNumber = 1
         )
 
-        val winner = resolver.determineTrickWinner(trick, Suit.ZALUDY)
+        val winner = resolver.determineTrickWinner(trick, Suit.CLUBS)
         assertEquals("p2", winner) // Seven of trump beats Ace of hearts
     }
 
@@ -48,15 +48,15 @@ class TrickResolverTest {
     fun `higher trump beats lower trump`() {
         val trick = TrickState(
             cardsPlayed = listOf(
-                PlayedCard("p1", Card(Suit.SRDCE, Rank.ESO)),
-                PlayedCard("p2", Card(Suit.ZALUDY, Rank.SEDMICKA)),
-                PlayedCard("p3", Card(Suit.ZALUDY, Rank.DESITKA))
+                PlayedCard("p1", Card(Suit.HEARTS, Rank.ACE)),
+                PlayedCard("p2", Card(Suit.CLUBS, Rank.SEVEN)),
+                PlayedCard("p3", Card(Suit.CLUBS, Rank.TEN))
             ),
             leadPlayerId = "p1",
             trickNumber = 1
         )
 
-        val winner = resolver.determineTrickWinner(trick, Suit.ZALUDY)
+        val winner = resolver.determineTrickWinner(trick, Suit.CLUBS)
         assertEquals("p3", winner) // Ten of trump beats Seven of trump
     }
 
@@ -64,9 +64,9 @@ class TrickResolverTest {
     fun `off-suit card loses even if higher rank`() {
         val trick = TrickState(
             cardsPlayed = listOf(
-                PlayedCard("p1", Card(Suit.SRDCE, Rank.SEDMICKA)),
-                PlayedCard("p2", Card(Suit.KULE, Rank.ESO)), // Different suit, no trump
-                PlayedCard("p3", Card(Suit.SRDCE, Rank.OSMICKA))
+                PlayedCard("p1", Card(Suit.HEARTS, Rank.SEVEN)),
+                PlayedCard("p2", Card(Suit.DIAMONDS, Rank.ACE)), // Different suit, no trump
+                PlayedCard("p3", Card(Suit.HEARTS, Rank.EIGHT))
             ),
             leadPlayerId = "p1",
             trickNumber = 1
@@ -80,9 +80,9 @@ class TrickResolverTest {
     fun `trick points calculated correctly`() {
         val trick = TrickState(
             cardsPlayed = listOf(
-                PlayedCard("p1", Card(Suit.SRDCE, Rank.DESITKA)), // 10 points
-                PlayedCard("p2", Card(Suit.SRDCE, Rank.ESO)),     // 11 points
-                PlayedCard("p3", Card(Suit.SRDCE, Rank.KRAL))     // 4 points
+                PlayedCard("p1", Card(Suit.HEARTS, Rank.TEN)),  // 10 points
+                PlayedCard("p2", Card(Suit.HEARTS, Rank.ACE)), // 11 points
+                PlayedCard("p3", Card(Suit.HEARTS, Rank.KING)) // 4 points
             ),
             leadPlayerId = "p1",
             trickNumber = 1

@@ -15,16 +15,16 @@ class TrickResolver {
         if (trump != null) {
             val trumpCards = cardsPlayed.filter { it.card.suit == trump }
             if (trumpCards.isNotEmpty()) {
-                return trumpCards.maxByOrNull { it.card.strength }!!.playerId
+                return trumpCards.maxByOrNull { MariasCardValues.getStrength(it.card) }!!.playerId
             }
         }
 
         // Otherwise, highest card of lead suit wins
         val leadSuitCards = cardsPlayed.filter { it.card.suit == leadSuit }
-        return leadSuitCards.maxByOrNull { it.card.strength }!!.playerId
+        return leadSuitCards.maxByOrNull { MariasCardValues.getStrength(it.card) }!!.playerId
     }
 
     fun calculateTrickPoints(trick: TrickState): Int {
-        return trick.cardsPlayed.sumOf { it.card.pointValue }
+        return trick.cardsPlayed.sumOf { MariasCardValues.getPointValue(it.card) }
     }
 }

@@ -1,6 +1,5 @@
 package cz.lbenda.games.marias.engine.rules
 
-import cz.lbenda.games.marias.engine.model.Card
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
@@ -8,7 +7,7 @@ class DeckUtilsTest {
 
     @Test
     fun `deal cards distributes correctly`() {
-        val deck = Card.createDeck()
+        val deck = DeckUtils.createDeck() // Uses Mariáš 32-card deck
         val players = listOf("p1", "p2", "p3")
 
         val (hands, talon) = DeckUtils.dealCards(deck, players)
@@ -28,7 +27,7 @@ class DeckUtilsTest {
 
     @Test
     fun `all cards are dealt without duplicates`() {
-        val deck = Card.createDeck()
+        val deck = DeckUtils.createDeck()
         val players = listOf("p1", "p2", "p3")
 
         val (hands, talon) = DeckUtils.dealCards(deck, players)
@@ -40,7 +39,7 @@ class DeckUtilsTest {
 
     @Test
     fun `deal preserves card order from deck`() {
-        val deck = Card.createDeck()
+        val deck = DeckUtils.createDeck()
         val players = listOf("p1", "p2", "p3")
 
         val (hands, talon) = DeckUtils.dealCards(deck, players)
