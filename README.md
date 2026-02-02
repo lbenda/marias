@@ -1,23 +1,72 @@
-# marias
+# Marias
 
-This project uses [Gradle](https://gradle.org/).
-To build and run the application, use the *Gradle* tool window by clicking the Gradle icon in the right-hand toolbar,
-or run it directly from the terminal:
+# Card Game Engine
 
-* Run `./gradlew run` to build and run the application.
-* Run `./gradlew build` to only build the application.
-* Run `./gradlew check` to run all checks, including tests.
-* Run `./gradlew clean` to clean all build outputs.
+A modular, extensible card game engine with a deterministic core and multiple UI clients.
 
-Note the usage of the Gradle Wrapper (`./gradlew`).
-This is the suggested way to use Gradle in production projects.
+The project is designed around a clear separation between:
+- a **Kotlin-based engine and server**
+- a **React-based web UI**
+- a **Redux-style state model** enabling reproducible state transitions and easy debugging
 
-[Learn more about the Gradle Wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html).
+The architecture allows adding new card games (with different rules and decks) without rewriting the core engine.
 
-[Learn more about Gradle tasks](https://docs.gradle.org/current/userguide/command_line_interface.html#common_tasks).
+---
 
-This project follows the suggested multi-module setup and consists of the `app` and `utils` subprojects.
-The shared build logic was extracted to a convention plugin located in `buildSrc`.
+## Key Features
 
-This project uses a version catalog (see `gradle/libs.versions.toml`) to declare and version dependencies
-and both a build cache and a configuration cache (see `gradle.properties`).
+- **Deterministic game engine**
+  - Redux-style state container
+  - Pure state transitions driven by actions
+  - Suitable for replay, debugging, and testing
+
+- **Extensible card game architecture**
+  - Support for multiple card games
+  - Pluggable rules, decks, and win conditions
+  - Core mechanics shared across games
+
+- **Multi-client UI approach**
+  - Web UI implemented in React
+  - Android client planned (WebView or native UI – TBD)
+
+- **Kotlin-first backend**
+  - Strong domain modeling
+  - Test-friendly architecture
+  - Natural fit for Android
+
+---
+
+## Architecture Overview
+
+The engine acts as the single source of truth.  
+All clients render state and interact with the engine by dispatching actions.
+
+---
+
+## Project Structure (high level)
+```
+.
+├── engine/ # Game engine
+├── server/ # Kotlin server
+├── ui/web/ # React web UI
+├── docs/
+│ ├── adr/ # Architectural Decision Records
+│ ├── api-tests.http # test examples
+│ └── API.md # API description
+├── work/ 
+│ └── tickets/ # Tickets descibe part of works
+├── build.gradle.kts
+└── settings.gradle.kts
+```
+
+---
+
+## Running the Server
+
+The server is started using **Gradle**.
+
+From the project root, run:
+
+```bash
+./gradlew :server:run
+```
