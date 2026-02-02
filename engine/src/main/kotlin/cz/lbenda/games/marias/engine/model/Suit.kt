@@ -3,17 +3,14 @@ package cz.lbenda.games.marias.engine.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-enum class Suit(
-    val czechName: String,
-    val germanName: String,
-    val symbol: String
-) {
-    ZELENE("Zelené", "Laub", "♠"),
-    ZALUDY("Žaludy", "Eichel", "♣"),
-    KULE("Kule", "Schellen", "♦"),
-    SRDCE("Srdce", "Herz", "♥");
+enum class Suit(val symbol: String) {
+    SPADES("♠"),
+    CLUBS("♣"),
+    DIAMONDS("♦"),
+    HEARTS("♥");
 
     companion object {
-        fun fromCzechName(name: String): Suit? = entries.find { it.czechName.equals(name, ignoreCase = true) }
+        val FRENCH_ORDER = listOf(SPADES, CLUBS, DIAMONDS, HEARTS)
+        val GERMAN_ORDER = listOf(SPADES, CLUBS, DIAMONDS, HEARTS) // Laub, Eichel, Schellen, Herz
     }
 }

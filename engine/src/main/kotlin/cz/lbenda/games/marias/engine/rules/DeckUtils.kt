@@ -5,8 +5,8 @@ import cz.lbenda.games.marias.engine.model.Card
 object DeckUtils {
 
     /**
-     * Deals cards according to Mariáš pattern: 7-5-5-2-3-5-5
-     * First 7 to each player, then 2 to talon, then 5 more to each player
+     * Deals cards according to Mariáš pattern: 7-3-3-2-3-3-3-3-3
+     * First 7 to each player, then 2 to talon, then 3 more to each player
      * Returns map of player hands and talon
      */
     fun dealCards(
@@ -41,7 +41,7 @@ object DeckUtils {
         return hands.mapValues { it.value.toList() } to talon
     }
 
-    fun createShuffledDeck(): List<Card> = Card.createShuffledDeck()
+    fun createShuffledDeck(): List<Card> = MariasCardValues.createShuffledDeck()
 
-    fun createDeck(): List<Card> = Card.createDeck()
+    fun createDeck(): List<Card> = MariasCardValues.createDeck()
 }

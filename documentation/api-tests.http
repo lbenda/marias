@@ -167,8 +167,8 @@ Content-Type: application/json
     "type": "exchange_talon",
     "playerId": "player2",
     "cardsToDiscard": [
-      {"suit": "ZELENE", "rank": "SEDMICKA"},
-      {"suit": "ZELENE", "rank": "OSMICKA"}
+      {"suit": "SPADES", "rank": "SEVEN"},
+      {"suit": "SPADES", "rank": "EIGHT"}
     ]
   }
 }
@@ -185,7 +185,7 @@ Content-Type: application/json
   "action": {
     "type": "select_trump",
     "playerId": "player2",
-    "trump": "SRDCE"
+    "trump": "HEARTS"
   }
 }
 
@@ -201,7 +201,7 @@ Content-Type: application/json
   "action": {
     "type": "play_card",
     "playerId": "player2",
-    "card": {"suit": "SRDCE", "rank": "ESO"}
+    "card": {"suit": "HEARTS", "rank": "ACE"}
   }
 }
 
@@ -213,7 +213,7 @@ Content-Type: application/json
   "action": {
     "type": "play_card",
     "playerId": "player3",
-    "card": {"suit": "SRDCE", "rank": "DESITKA"}
+    "card": {"suit": "HEARTS", "rank": "TEN"}
   }
 }
 
@@ -225,7 +225,7 @@ Content-Type: application/json
   "action": {
     "type": "play_card",
     "playerId": "player1",
-    "card": {"suit": "SRDCE", "rank": "KRAL"}
+    "card": {"suit": "HEARTS", "rank": "KING"}
   }
 }
 
@@ -254,21 +254,25 @@ Content-Type: application/json
 # DURCH  - Declarer must win all tricks
 
 ### ===========================================
-### Reference: Available Suits
+### Reference: Available Suits (French/Bridge style)
 ### ===========================================
-# ZELENE - Leaves (Spades)
-# ZALUDY - Acorns (Clubs)
-# KULE   - Bells (Diamonds)
-# SRDCE  - Hearts
+# SPADES   - ♠
+# CLUBS    - ♣
+# DIAMONDS - ♦
+# HEARTS   - ♥
 
 ### ===========================================
 ### Reference: Available Ranks
 ### ===========================================
-# SEDMICKA - 7 (0 points)
-# OSMICKA  - 8 (0 points)
-# DEVITKA  - 9 (0 points)
-# DESITKA  - 10 (10 points)
-# SPODEK   - Jack (2 points)
-# SVRSEK   - Queen (3 points)
-# KRAL     - King (4 points)
-# ESO      - Ace (11 points)
+# For Mariáš (32-card Piquet deck, 7-A only):
+# SEVEN  - 7 (0 points in Mariáš)
+# EIGHT  - 8 (0 points in Mariáš)
+# NINE   - 9 (0 points in Mariáš)
+# TEN    - 10 (10 points in Mariáš)
+# JACK   - J (2 points in Mariáš)
+# QUEEN  - Q (3 points in Mariáš)
+# KING   - K (4 points in Mariáš)
+# ACE    - A (11 points in Mariáš)
+#
+# Additional ranks for 52-card deck:
+# TWO, THREE, FOUR, FIVE, SIX

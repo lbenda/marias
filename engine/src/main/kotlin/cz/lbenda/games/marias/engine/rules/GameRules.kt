@@ -156,8 +156,8 @@ class GameRules {
             return "Cannot declare marriage: not in playing phase"
         }
         val player = state.players[action.playerId]!!
-        val hasKing = player.hand.any { it.suit == action.suit && it.rank == cz.lbenda.games.marias.engine.model.Rank.KRAL }
-        val hasQueen = player.hand.any { it.suit == action.suit && it.rank == cz.lbenda.games.marias.engine.model.Rank.SVRSEK }
+        val hasKing = player.hand.any { it.suit == action.suit && it.rank == cz.lbenda.games.marias.engine.model.Rank.KING }
+        val hasQueen = player.hand.any { it.suit == action.suit && it.rank == cz.lbenda.games.marias.engine.model.Rank.QUEEN }
         if (!hasKing || !hasQueen) {
             return "Cannot declare marriage: you need both King and Queen of the suit"
         }

@@ -1,6 +1,7 @@
 package cz.lbenda.games.marias.engine.state
 
 import cz.lbenda.games.marias.engine.model.Card
+import cz.lbenda.games.marias.engine.model.Suit
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -16,10 +17,9 @@ data class PlayerState(
 ) {
     val tricksWonCount: Int get() = wonTricks.size
 
-    val pointsInTricks: Int get() = wonTricks.flatten().sumOf { it.pointValue }
+    val allWonCards: List<Card> get() = wonTricks.flatten()
 
     fun hasCard(card: Card): Boolean = hand.contains(card)
 
-    fun hasCardsOfSuit(suit: cz.lbenda.games.marias.engine.model.Suit): Boolean =
-        hand.any { it.suit == suit }
+    fun hasCardsOfSuit(suit: Suit): Boolean = hand.any { it.suit == suit }
 }

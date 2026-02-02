@@ -3,6 +3,7 @@ package cz.lbenda.games.marias.server.dto
 import cz.lbenda.games.marias.engine.action.GameAction
 import cz.lbenda.games.marias.engine.model.Card
 import cz.lbenda.games.marias.engine.model.Suit
+import cz.lbenda.games.marias.engine.rules.MariasCardValues
 import cz.lbenda.games.marias.engine.state.*
 import kotlinx.serialization.Serializable
 
@@ -135,7 +136,7 @@ object DtoMapper {
             name = player.name,
             cardCount = player.hand.size,
             tricksWonCount = player.tricksWonCount,
-            pointsInTricks = player.pointsInTricks,
+            pointsInTricks = player.allWonCards.sumOf { MariasCardValues.getPointValue(it) },
             hasPassed = player.hasPassed,
             isDealer = player.isDealer,
             seatPosition = player.seatPosition
