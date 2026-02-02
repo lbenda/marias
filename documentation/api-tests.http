@@ -1,0 +1,274 @@
+### Mariáš Game Engine API Tests
+### Run these requests from IntelliJ IDEA
+
+### ===========================================
+### Health Check
+### ===========================================
+
+### Check server health
+GET http://localhost:8080/health
+Accept: application/json
+
+### ===========================================
+### Game Management
+### ===========================================
+
+### Create a new game (Player 1 creates and joins)
+POST http://localhost:8080/games
+Content-Type: application/json
+
+{
+  "creatorPlayerId": "player1",
+  "creatorPlayerName": "Alice"
+}
+
+> {%
+    client.global.set("gameId", response.body.gameId);
+    client.log("Created game: " + response.body.gameId);
+%}
+
+### List all games
+GET http://localhost:8080/games
+Accept: application/json
+
+### Get specific game state (replace {{gameId}} or use variable from create)
+GET http://localhost:8080/games/{{gameId}}
+Accept: application/json
+
+### Delete a game
+DELETE http://localhost:8080/games/{{gameId}}
+
+### ===========================================
+### Player Actions - Join Game
+### ===========================================
+
+### Player 2 joins the game
+POST http://localhost:8080/games/{{gameId}}/actions
+Content-Type: application/json
+
+{
+  "action": {
+    "type": "join_game",
+    "playerId": "player2",
+    "playerName": "Bob"
+  }
+}
+
+### Player 3 joins the game
+POST http://localhost:8080/games/{{gameId}}/actions
+Content-Type: application/json
+
+{
+  "action": {
+    "type": "join_game",
+    "playerId": "player3",
+    "playerName": "Charlie"
+  }
+}
+
+### ===========================================
+### Game Flow - Start and Deal
+### ===========================================
+
+### Start the game (any player can start when 3 players joined)
+POST http://localhost:8080/games/{{gameId}}/actions
+Content-Type: application/json
+
+{
+  "action": {
+    "type": "start_game",
+    "playerId": "player1"
+  }
+}
+
+### Deal cards
+POST http://localhost:8080/games/{{gameId}}/actions
+Content-Type: application/json
+
+{
+  "action": {
+    "type": "deal_cards",
+    "playerId": "player1"
+  }
+}
+
+### ===========================================
+### Player Hand and Bidding State
+### ===========================================
+
+### Get Player 1's hand
+GET http://localhost:8080/games/{{gameId}}/players/player1/hand
+Accept: application/json
+
+### Get Player 2's hand
+GET http://localhost:8080/games/{{gameId}}/players/player2/hand
+Accept: application/json
+
+### Get Player 3's hand
+GET http://localhost:8080/games/{{gameId}}/players/player3/hand
+Accept: application/json
+
+### Get current bidding state
+GET http://localhost:8080/games/{{gameId}}/bidding
+Accept: application/json
+
+### ===========================================
+### Bidding Actions
+### ===========================================
+
+### Place a bid (HRA) - use current player from game state
+POST http://localhost:8080/games/{{gameId}}/actions
+Content-Type: application/json
+
+{
+  "action": {
+    "type": "place_bid",
+    "playerId": "player2",
+    "gameType": "HRA"
+  }
+}
+
+### Pass (next player)
+POST http://localhost:8080/games/{{gameId}}/actions
+Content-Type: application/json
+
+{
+  "action": {
+    "type": "pass",
+    "playerId": "player3"
+  }
+}
+
+### Pass (next player) - bidding completes, declarer wins
+POST http://localhost:8080/games/{{gameId}}/actions
+Content-Type: application/json
+
+{
+  "action": {
+    "type": "pass",
+    "playerId": "player1"
+  }
+}
+
+### ===========================================
+### Talon Exchange (Declarer Only)
+### ===========================================
+
+### Get talon (only declarer can see)
+GET http://localhost:8080/games/{{gameId}}/talon?playerId=player2
+Accept: application/json
+
+### Exchange talon - discard 2 cards (use actual cards from hand + talon)
+POST http://localhost:8080/games/{{gameId}}/actions
+Content-Type: application/json
+
+{
+  "action": {
+    "type": "exchange_talon",
+    "playerId": "player2",
+    "cardsToDiscard": [
+      {"suit": "ZELENE", "rank": "SEDMICKA"},
+      {"suit": "ZELENE", "rank": "OSMICKA"}
+    ]
+  }
+}
+
+### ===========================================
+### Trump Selection
+### ===========================================
+
+### Select trump suit (declarer only, for HRA/SEDMA/KILO)
+POST http://localhost:8080/games/{{gameId}}/actions
+Content-Type: application/json
+
+{
+  "action": {
+    "type": "select_trump",
+    "playerId": "player2",
+    "trump": "SRDCE"
+  }
+}
+
+### ===========================================
+### Playing Cards
+### ===========================================
+
+### Play a card (current player)
+POST http://localhost:8080/games/{{gameId}}/actions
+Content-Type: application/json
+
+{
+  "action": {
+    "type": "play_card",
+    "playerId": "player2",
+    "card": {"suit": "SRDCE", "rank": "ESO"}
+  }
+}
+
+### Play a card (next player)
+POST http://localhost:8080/games/{{gameId}}/actions
+Content-Type: application/json
+
+{
+  "action": {
+    "type": "play_card",
+    "playerId": "player3",
+    "card": {"suit": "SRDCE", "rank": "DESITKA"}
+  }
+}
+
+### Play a card (next player)
+POST http://localhost:8080/games/{{gameId}}/actions
+Content-Type: application/json
+
+{
+  "action": {
+    "type": "play_card",
+    "playerId": "player1",
+    "card": {"suit": "SRDCE", "rank": "KRAL"}
+  }
+}
+
+### ===========================================
+### New Round
+### ===========================================
+
+### Start a new round (after scoring phase)
+POST http://localhost:8080/games/{{gameId}}/actions
+Content-Type: application/json
+
+{
+  "action": {
+    "type": "start_new_round",
+    "playerId": "player1"
+  }
+}
+
+### ===========================================
+### Reference: Available Game Types
+### ===========================================
+# HRA    - Basic game, declarer needs >50 points
+# SEDMA  - Must win last trick with 7 of trumps
+# KILO   - Declarer needs 100+ points
+# BETL   - Declarer must not win any trick
+# DURCH  - Declarer must win all tricks
+
+### ===========================================
+### Reference: Available Suits
+### ===========================================
+# ZELENE - Leaves (Spades)
+# ZALUDY - Acorns (Clubs)
+# KULE   - Bells (Diamonds)
+# SRDCE  - Hearts
+
+### ===========================================
+### Reference: Available Ranks
+### ===========================================
+# SEDMICKA - 7 (0 points)
+# OSMICKA  - 8 (0 points)
+# DEVITKA  - 9 (0 points)
+# DESITKA  - 10 (10 points)
+# SPODEK   - Jack (2 points)
+# SVRSEK   - Queen (3 points)
+# KRAL     - King (4 points)
+# ESO      - Ace (11 points)
