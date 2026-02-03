@@ -1,7 +1,7 @@
 # T-003: Server — basic REST API over engine
 
-Status: Done
-Owner: Server
+- Status: Done
+- Owner: Server
 
 ## Goal
 Expose a minimal REST API for executing basic engine operations in client/server mode.

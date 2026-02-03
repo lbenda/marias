@@ -1,7 +1,7 @@
 # T-005: OpenAPI generation and API documentation
 
-Status: Done
-Owner: Server
+- Status: Done
+- Owner: Server
 
 ## Goal
 Establish a code-first OpenAPI workflow for the server module and provide

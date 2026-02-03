@@ -1,7 +1,7 @@
 # T-004: Engine — Redux-style state container
 
-Status: Done
-Owner: Engine
+- Status: Done
+- Owner: Engine
 
 ## Goal
 Introduce a Redux-style state container in the engine to ensure deterministic, testable, replayable state transitions.
