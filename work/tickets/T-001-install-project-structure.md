@@ -1,7 +1,7 @@
 # T-001: Install project structure
-
-Status: Done
-Owner: Initial setup
+ 
+- Status: Done
+- Owner: Initial setup
 
 ## Summary
 The project repository was initialized with the main modules and basic structure.

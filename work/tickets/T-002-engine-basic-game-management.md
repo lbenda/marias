@@ -1,7 +1,7 @@
 # T-002: Engine — basic game management
 
-Status: Done
-Owner: Engine
+- Status: Done
+- Owner: Engine
 
 ## Goal
 Implement the first usable slice of the game engine:

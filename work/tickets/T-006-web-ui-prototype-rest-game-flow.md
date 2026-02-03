@@ -1,9 +1,9 @@
 # T-006: Web UI prototype — REST game flow (create/join/start/show hand)
 
-Status: Ready
-Owner: ui/web
-Related modules: ui/web, server, engine
-Related ADRs: ADR-0002, ADR-0004, ADR-0006
+- Status: Done
+- Owner: ui/web
+- Related modules: ui/web, server, engine
+- Related ADRs: ADR-0002, ADR-0004, ADR-0006
 
 ## Goal
 Create a minimal React UI that exercises the existing server REST API:
