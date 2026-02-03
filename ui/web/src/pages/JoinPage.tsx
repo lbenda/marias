@@ -1,26 +1,39 @@
 import React, { useState } from "react";
 import { apiRequest } from "../api/client";
 import { useNavigate } from "react-router-dom";
-import type { JoinGameResponse } from "../api/types";
+import type { GameResponse } from "../types";
 
 export default function JoinPage() {
     const nav = useNavigate();
     const [gameId, setGameId] = useState("");
-    const [name, setName] = useState("Player");
+    const [playerName, setPlayerName] = useState("Player");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     async function onJoin() {
+        if (!gameId.trim()) {
+            setError("Game ID is required");
+            return;
+        }
+        if (!playerName.trim()) {
+            setError("Player name is required");
+            return;
+        }
         setError(null);
         setLoading(true);
         try {
-            // TODO: adjust endpoint/path/payload to match your server
-            const resp = await apiRequest<JoinGameResponse>(`/api/games/${gameId}/players`, "POST", { name });
-            // store playerId locally for now (prototype)
-            localStorage.setItem(`playerId:${gameId}`, resp.playerId);
-            nav(`/game/${gameId}`);
-        } catch (e: any) {
-            setError(e?.message ?? String(e));
+            const playerId = `p-${Date.now()}`;
+            await apiRequest<GameResponse>(`/games/${gameId.trim()}/actions`, "POST", {
+                action: {
+                    type: "join",
+                    playerId,
+                    playerName: playerName.trim()
+                }
+            });
+            localStorage.setItem(`playerId:${gameId.trim()}`, playerId);
+            nav(`/game/${gameId.trim()}`);
+        } catch (e: unknown) {
+            setError(e instanceof Error ? e.message : String(e));
         } finally {
             setLoading(false);
         }
@@ -32,13 +45,21 @@ export default function JoinPage() {
             <div style={{ display: "grid", gap: 8, maxWidth: 360 }}>
                 <label>
                     Game ID
-                    <input value={gameId} onChange={(e) => setGameId(e.target.value)} style={{ width: "100%" }} />
+                    <input
+                        value={gameId}
+                        onChange={(e) => setGameId(e.target.value)}
+                        style={{ width: "100%" }}
+                    />
                 </label>
                 <label>
-                    Name
-                    <input value={name} onChange={(e) => setName(e.target.value)} style={{ width: "100%" }} />
+                    Your name
+                    <input
+                        value={playerName}
+                        onChange={(e) => setPlayerName(e.target.value)}
+                        style={{ width: "100%" }}
+                    />
                 </label>
-                <button onClick={onJoin} disabled={loading || !gameId}>
+                <button onClick={onJoin} disabled={loading || !gameId.trim()}>
                     {loading ? "Joining..." : "Join"}
                 </button>
             </div>

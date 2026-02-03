@@ -1,22 +1,31 @@
 import React, { useState } from "react";
 import { apiRequest } from "../api/client";
 import { useNavigate } from "react-router-dom";
-import type { CreateGameResponse } from "../api/types";
+import type { GameResponse } from "../types";
 
 export default function HomePage() {
     const nav = useNavigate();
+    const [playerName, setPlayerName] = useState("Player1");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     async function onCreate() {
+        if (!playerName.trim()) {
+            setError("Player name is required");
+            return;
+        }
         setError(null);
         setLoading(true);
         try {
-            // TODO: adjust endpoint/path/payload to match your server
-            const resp = await apiRequest<CreateGameResponse>("/api/games", "POST", {});
+            const playerId = `p-${Date.now()}`;
+            const resp = await apiRequest<GameResponse>("/games", "POST", {
+                playerId,
+                playerName: playerName.trim()
+            });
+            localStorage.setItem(`playerId:${resp.gameId}`, playerId);
             nav(`/game/${resp.gameId}`);
-        } catch (e: any) {
-            setError(e?.message ?? String(e));
+        } catch (e: unknown) {
+            setError(e instanceof Error ? e.message : String(e));
         } finally {
             setLoading(false);
         }
@@ -25,13 +34,20 @@ export default function HomePage() {
     return (
         <div>
             <h2>Create a game</h2>
-            <button onClick={onCreate} disabled={loading}>
-                {loading ? "Creating..." : "Create"}
-            </button>
+            <div style={{ display: "grid", gap: 8, maxWidth: 360 }}>
+                <label>
+                    Your name
+                    <input
+                        value={playerName}
+                        onChange={(e) => setPlayerName(e.target.value)}
+                        style={{ width: "100%" }}
+                    />
+                </label>
+                <button onClick={onCreate} disabled={loading}>
+                    {loading ? "Creating..." : "Create Game"}
+                </button>
+            </div>
             {error && <p style={{ color: "crimson" }}>{error}</p>}
-            <p style={{ marginTop: 12, opacity: 0.75 }}>
-                Note: endpoint paths are placeholders — wire them to docs/API.md.
-            </p>
         </div>
     );
 }
