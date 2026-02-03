@@ -70,3 +70,14 @@ From the project root, run:
 ```bash
 ./gradlew :server:run
 ```
+
+## Running web ui
+
+The DEV ui is running in **NodeJS** and build with **vita**..js
+
+```bash
+cd ui/web
+npm install
+cp .env.example .env
+npm run dev
+```

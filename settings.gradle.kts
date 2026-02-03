@@ -23,5 +23,8 @@ include(":app")
 include(":utils")
 include(":engine")
 include(":server")
+include(":ui-web")
+
+project(":ui-web").projectDir = file("ui/web")
 
 rootProject.name = "marias"
