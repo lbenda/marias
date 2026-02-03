@@ -1,105 +1,78 @@
 # Mariáš Game Engine - Implementation Progress
 
+## NOTE (2026-02-03):
+This file is a historical progress log / milestone summary.
+Active work is tracked as Markdown tickets under `work/tickets/`.
+For current architecture and project map see `PROJECT_CONTEXT.md`.
+For decisions see `docs/adr/`.
+
 ## Status: COMPLETE
 
-## What's Done
+## Branches
 
-### 1. Gradle Configuration (Complete)
-- `settings.gradle.kts` - Added `:engine` and `:server` modules
-- `gradle/libs.versions.toml` - Added Ktor 3.1.0, Logback, JUnit dependencies
-- `~/.gradle/gradle.properties` - Set `org.gradle.java.home=C:/Users/lukbe/.jdks/openjdk-24`
+- `master` - Initial commit
+- `feature/universal-card-deck` - English enums, universal deck types
+- `feature/simplify-code` - Simplified/refactored code (current)
 
-### 2. Engine Module (Complete)
-**Build file:** `engine/build.gradle.kts`
+## Simplifications Made
 
-**Model classes:**
-- `engine/src/main/kotlin/cz/lbenda/games/marias/engine/model/Suit.kt` - 4 suits (Zelené, Žaludy, Kule, Srdce)
-- `engine/src/main/kotlin/cz/lbenda/games/marias/engine/model/Rank.kt` - 8 ranks with point values
-- `engine/src/main/kotlin/cz/lbenda/games/marias/engine/model/Card.kt` - Card data class, deck creation
+### Model Layer
+- **Rank enum** - Points and strength directly on enum (no separate lookup)
+- **Card** - Simple data class with `points` and `strength` properties
+- **Removed DeckType** - Only 32-card Mariáš deck supported
+- **Top-level functions** - `createDeck()`, `createShuffledDeck()`
 
-**State classes:**
-- `engine/src/main/kotlin/cz/lbenda/games/marias/engine/state/GamePhase.kt` - Game phases enum
-- `engine/src/main/kotlin/cz/lbenda/games/marias/engine/state/GameType.kt` - Hra, Sedma, Kilo, Betl, Durch
-- `engine/src/main/kotlin/cz/lbenda/games/marias/engine/state/PlayerState.kt` - Player hand, tricks, score
-- `engine/src/main/kotlin/cz/lbenda/games/marias/engine/state/TrickState.kt` - Current trick state
-- `engine/src/main/kotlin/cz/lbenda/games/marias/engine/state/BiddingState.kt` - Bidding state
-- `engine/src/main/kotlin/cz/lbenda/games/marias/engine/state/GameState.kt` - Complete game state
+### State Layer
+- **PlayerState** - Flat `wonCards: List<Card>` instead of nested `wonTricks`
+- **TrickState** - `cards: List<Pair<String, Card>>` instead of separate PlayedCard class
+- **BiddingState** - Only essential fields: `currentBid`, `bidderId`, `passedPlayers`
+- **GameState** - Removed computed properties, shorter field names
 
-**Actions:**
-- `engine/src/main/kotlin/cz/lbenda/games/marias/engine/action/GameAction.kt` - Sealed class with all actions
+### Rules Layer
+- **Top-level functions** - `validate()`, `validCards()`, `determineTrickWinner()`, `dealCards()`
+- **Removed MariasCardValues** - Logic moved to Rank enum
+- **Removed TrickResolver class** - Just functions now
 
-**Reducer:**
-- `engine/src/main/kotlin/cz/lbenda/games/marias/engine/reducer/GameReducer.kt` - Redux-like reducer
+### Actions
+- **Shorter type names** - `join`, `bid`, `play` instead of `join_game`, `place_bid`, `play_card`
 
-**Store:**
-- `engine/src/main/kotlin/cz/lbenda/games/marias/engine/store/GameStore.kt` - StateFlow-based store
+### Server
+- **Simplified DTOs** - Extension functions for mapping instead of DtoMapper object
+- **Cleaner routes** - Less verbose response handling
 
-**Rules:**
-- `engine/src/main/kotlin/cz/lbenda/games/marias/engine/rules/GameRules.kt` - Action validation
-- `engine/src/main/kotlin/cz/lbenda/games/marias/engine/rules/TrickResolver.kt` - Trick winner logic
-- `engine/src/main/kotlin/cz/lbenda/games/marias/engine/rules/ScoringCalculator.kt` - Round scoring
-- `engine/src/main/kotlin/cz/lbenda/games/marias/engine/rules/DeckUtils.kt` - Deck shuffle/deal
+## Project Structure
 
-**Tests:**
-- `engine/src/test/kotlin/cz/lbenda/games/marias/engine/model/CardTest.kt`
-- `engine/src/test/kotlin/cz/lbenda/games/marias/engine/rules/DeckUtilsTest.kt`
-- `engine/src/test/kotlin/cz/lbenda/games/marias/engine/rules/TrickResolverTest.kt`
-- `engine/src/test/kotlin/cz/lbenda/games/marias/engine/reducer/GameReducerTest.kt`
-- `engine/src/test/kotlin/cz/lbenda/games/marias/engine/store/GameStoreTest.kt`
+```
+engine/
+  model/     Suit, Rank, Card (with createDeck functions)
+  state/     GamePhase, GameType, PlayerState, TrickState, BiddingState, GameState
+  action/    GameAction sealed class
+  reducer/   reduce() function
+  store/     GameStore class
+  rules/     validate, validCards, determineTrickWinner, dealCards, calculateScore
 
-### 3. Server Module (Complete)
-**Build file:** `server/build.gradle.kts`
-
-**Files:**
-- `server/src/main/kotlin/cz/lbenda/games/marias/server/Application.kt` - Ktor entry point
-- `server/src/main/kotlin/cz/lbenda/games/marias/server/routes/GameRoutes.kt` - REST API routes
-- `server/src/main/kotlin/cz/lbenda/games/marias/server/service/GameService.kt` - Game management
-- `server/src/main/kotlin/cz/lbenda/games/marias/server/dto/GameDtos.kt` - DTOs and mappers
-- `server/src/main/resources/logback.xml` - Logging config
+server/
+  dto/       Request/Response classes with extension mappers
+  service/   GameService
+  routes/    gameRoutes()
+  Application.kt
+```
 
 ## How to Run
 
-### Run Tests
 ```bash
-./gradlew :engine:test
+./gradlew :engine:test     # Run tests
+./gradlew :server:run      # Start server on port 8080
 ```
-
-### Run Server
-```bash
-./gradlew :server:run
-```
-Server starts on port 8080.
-
-## Bug Fix Notes
-
-Fixed bidding logic in `GameReducer.kt`:
-- In `handlePlaceBid`: Was using `nextBidderId` instead of getting player at `nextBidderIndex`
-- In `handlePass`: Was calculating `nextBidderIndex` with old `passedPlayers` set
-
-The fix ensures proper player rotation during bidding phase.
-
-## API Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | /games | Create new game |
-| GET | /games | List all games |
-| GET | /games/{id} | Get game state |
-| POST | /games/{id}/actions | Dispatch action |
-| GET | /games/{id}/players/{playerId}/hand | Get player's hand |
-| GET | /games/{id}/talon?playerId=X | Get talon (declarer only) |
-| GET | /games/{id}/bidding | Get bidding state |
-| DELETE | /games/{id} | Delete game |
-| GET | /health | Health check |
 
 ## Documentation
 
-- `documentation/API.md` - Full API documentation
-- `documentation/api-tests.http` - IntelliJ IDEA HTTP client tests
+- `docs/API.md` - API reference
+- `docs/api-tests.http` - IntelliJ HTTP client tests
 
-## Task List Status
-
-All tasks complete:
-- All implementation tasks finished
-- All tests passing
-- Documentation created
+## Completed work items (tickets)
+- work/tickets/T-001-install-project-structure.md
+- work/tickets/T-002-engine-basic-game-management.md
+- work/tickets/T-003-server-basic-api.md
+- work/tickets/T-004-engine-redux-state-container.md
+- work/tickets/T-005-openapi-generation-and-docs.md

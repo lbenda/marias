@@ -1,9 +1,6 @@
 package cz.lbenda.games.marias.engine.reducer
 
 import cz.lbenda.games.marias.engine.action.GameAction
-import cz.lbenda.games.marias.engine.model.Card
-import cz.lbenda.games.marias.engine.model.Rank
-import cz.lbenda.games.marias.engine.model.Suit
 import cz.lbenda.games.marias.engine.state.GamePhase
 import cz.lbenda.games.marias.engine.state.GameState
 import cz.lbenda.games.marias.engine.state.GameType
@@ -15,131 +12,85 @@ import kotlin.test.assertTrue
 
 class GameReducerTest {
 
-    private val reducer = GameReducer()
-
     @Test
-    fun `players can join game`() {
-        val state = GameState(gameId = "test-game")
+    fun `players join game`() {
+        var state = GameState(gameId = "test")
+        state = reduce(state, GameAction.JoinGame("p1", "Alice"))
+        state = reduce(state, GameAction.JoinGame("p2", "Bob"))
+        state = reduce(state, GameAction.JoinGame("p3", "Charlie"))
 
-        val state1 = reducer.reduce(state, GameAction.JoinGame("p1", "Player 1"))
-        assertEquals(1, state1.players.size)
-        assertEquals("Player 1", state1.players["p1"]?.name)
-
-        val state2 = reducer.reduce(state1, GameAction.JoinGame("p2", "Player 2"))
-        assertEquals(2, state2.players.size)
-
-        val state3 = reducer.reduce(state2, GameAction.JoinGame("p3", "Player 3"))
-        assertEquals(3, state3.players.size)
-        assertTrue(state3.isGameFull)
+        assertEquals(3, state.players.size)
+        assertEquals(listOf("p1", "p2", "p3"), state.playerOrder)
     }
 
     @Test
     fun `cannot join full game`() {
-        var state = GameState(gameId = "test-game")
-        state = reducer.reduce(state, GameAction.JoinGame("p1", "Player 1"))
-        state = reducer.reduce(state, GameAction.JoinGame("p2", "Player 2"))
-        state = reducer.reduce(state, GameAction.JoinGame("p3", "Player 3"))
+        var state = GameState(gameId = "test")
+        state = reduce(state, GameAction.JoinGame("p1", "A"))
+        state = reduce(state, GameAction.JoinGame("p2", "B"))
+        state = reduce(state, GameAction.JoinGame("p3", "C"))
+        state = reduce(state, GameAction.JoinGame("p4", "D"))
 
-        val finalState = reducer.reduce(state, GameAction.JoinGame("p4", "Player 4"))
-        assertNotNull(finalState.errorMessage)
-        assertEquals(3, finalState.players.size)
+        assertEquals(3, state.players.size)
+        assertNotNull(state.error)
     }
 
     @Test
-    fun `game starts with 3 players`() {
-        var state = GameState(gameId = "test-game")
-        state = reducer.reduce(state, GameAction.JoinGame("p1", "Player 1"))
-        state = reducer.reduce(state, GameAction.JoinGame("p2", "Player 2"))
-        state = reducer.reduce(state, GameAction.JoinGame("p3", "Player 3"))
-
-        state = reducer.reduce(state, GameAction.StartGame("p1"))
+    fun `game starts and deals`() {
+        var state = setupPlayers()
+        state = reduce(state, GameAction.StartGame("p1"))
         assertEquals(GamePhase.DEALING, state.phase)
-    }
 
-    @Test
-    fun `cards are dealt correctly`() {
-        var state = setupGameWithPlayers()
-        state = reducer.reduce(state, GameAction.StartGame("p1"))
-        state = reducer.reduce(state, GameAction.DealCards("p1"))
-
+        state = reduce(state, GameAction.DealCards("p1"))
         assertEquals(GamePhase.BIDDING, state.phase)
-
-        // Each player has 10 cards
-        state.players.values.forEach { player ->
-            assertEquals(10, player.hand.size, "Player ${player.name} should have 10 cards")
-        }
-
-        // Talon has 2 cards
+        state.players.values.forEach { assertEquals(10, it.hand.size) }
         assertEquals(2, state.talon.size)
     }
 
     @Test
-    fun `bidding advances to next player`() {
-        var state = setupGameWithDealtCards()
+    fun `bidding flow`() {
+        var state = setupDealt()
 
-        val currentPlayer = state.currentPlayerId!!
-        state = reducer.reduce(state, GameAction.PlaceBid(currentPlayer, GameType.HRA))
+        val bidder = state.playerOrder[state.currentPlayerIndex]
+        state = reduce(state, GameAction.PlaceBid(bidder, GameType.HRA))
+        assertNull(state.error)
 
-        assertNull(state.errorMessage)
-        assertTrue(state.currentPlayerId != currentPlayer || state.biddingState.passedPlayers.isNotEmpty())
-    }
+        val passer1 = state.playerOrder[state.currentPlayerIndex]
+        state = reduce(state, GameAction.Pass(passer1))
+        assertNull(state.error)
 
-    @Test
-    fun `passing works correctly`() {
-        var state = setupGameWithDealtCards()
-
-        val firstBidder = state.currentPlayerId!!
-        state = reducer.reduce(state, GameAction.Pass(firstBidder))
-
-        assertNull(state.errorMessage)
-        assertTrue(firstBidder in state.biddingState.passedPlayers)
-    }
-
-    @Test
-    fun `bidding completes when two players pass`() {
-        var state = setupGameWithDealtCards()
-
-        // First player bids
-        val p1 = state.currentPlayerId!!
-        state = reducer.reduce(state, GameAction.PlaceBid(p1, GameType.HRA))
-
-        // Second player passes
-        val p2 = state.currentPlayerId!!
-        state = reducer.reduce(state, GameAction.Pass(p2))
-
-        // Third player passes
-        val p3 = state.currentPlayerId!!
-        state = reducer.reduce(state, GameAction.Pass(p3))
+        val passer2 = state.playerOrder[state.currentPlayerIndex]
+        state = reduce(state, GameAction.Pass(passer2))
 
         assertEquals(GamePhase.TALON_EXCHANGE, state.phase)
-        assertEquals(p1, state.declarerPlayerId)
+        assertEquals(bidder, state.declarerId)
         assertEquals(GameType.HRA, state.gameType)
     }
 
     @Test
-    fun `version increments on each action`() {
-        var state = GameState(gameId = "test-game")
+    fun `version increments`() {
+        var state = GameState(gameId = "test")
         assertEquals(0, state.version)
 
-        state = reducer.reduce(state, GameAction.JoinGame("p1", "Player 1"))
+        state = reduce(state, GameAction.JoinGame("p1", "A"))
         assertEquals(1, state.version)
 
-        state = reducer.reduce(state, GameAction.JoinGame("p2", "Player 2"))
+        state = reduce(state, GameAction.JoinGame("p2", "B"))
         assertEquals(2, state.version)
     }
 
-    private fun setupGameWithPlayers(): GameState {
-        var state = GameState(gameId = "test-game")
-        state = reducer.reduce(state, GameAction.JoinGame("p1", "Player 1"))
-        state = reducer.reduce(state, GameAction.JoinGame("p2", "Player 2"))
-        state = reducer.reduce(state, GameAction.JoinGame("p3", "Player 3"))
+    private fun setupPlayers(): GameState {
+        var state = GameState(gameId = "test")
+        state = reduce(state, GameAction.JoinGame("p1", "A"))
+        state = reduce(state, GameAction.JoinGame("p2", "B"))
+        state = reduce(state, GameAction.JoinGame("p3", "C"))
         return state
     }
 
-    private fun setupGameWithDealtCards(): GameState {
-        var state = setupGameWithPlayers()
-        state = reducer.reduce(state, GameAction.StartGame("p1"))
-        state = reducer.reduce(state, GameAction.DealCards("p1"))
+    private fun setupDealt(): GameState {
+        var state = setupPlayers()
+        state = reduce(state, GameAction.StartGame("p1"))
+        state = reduce(state, GameAction.DealCards("p1"))
         return state
     }
 }

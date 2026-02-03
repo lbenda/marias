@@ -29,6 +29,18 @@ Business logic is isolated from transport and presentation layers.
 - Designed to be extensible for multiple card games:
   - each game defines its own rules, deck, actions, reducers, and win conditions
 
+### Module Structure
+
+```
+engine/
+  model/     Suit, Rank, Card (with createDeck functions)
+  state/     GamePhase, GameType, PlayerState, TrickState, BiddingState, GameState
+  action/    GameAction sealed class
+  reducer/   reduce() function
+  store/     GameStore class
+  rules/     validate, validCards, determineTrickWinner, dealCards, calculateScore
+``` 
+
 ### server
 - REST API exposing engine capabilities for client/server play
 - Thin adapter over the engine
@@ -37,10 +49,48 @@ Business logic is isolated from transport and presentation layers.
   - docs/API.md — human-readable API reference
   - api-test.http — executable API examples
 
+### Module Structure
+
+```
+server/
+  dto/       Request/Response classes with extension mappers
+  service/   GameService
+  routes/    gameRoutes()
+  Application.kt
+```
+
 ### ui/web
 - React-based web UI
+- Separate frontend build (npm + Vite, not part of Gradle build) 
 - Communicates with the system exclusively via the server REST API
+- Written in TypeScript
 - Renders state and dispatches actions derived from the engine model
+- Purpose: fast REST-based prototype UI
+  - create game
+  - join player
+  - start/init game
+  - display player hand
+
+### Module Structure
+
+```
+ui/web/
+  package.json
+  vite.config.ts
+  tsconfig.json
+  index.html
+  .env.example
+  src/
+    main.tsx
+    App.tsx
+  api/
+    client.ts REST client wrapper (fetch + error handling)
+  types.ts API DTO types (mirrors server JSON)
+  pages/
+    HomePage.tsx create game
+    JoinPage.tsx join/add player
+    GamePage.tsx start/init + show player hand (card tiles)
+```
 
 ### ui/android
 - Android client

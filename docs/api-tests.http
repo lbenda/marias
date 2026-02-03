@@ -5,274 +5,162 @@
 ### Health Check
 ### ===========================================
 
-### Check server health
 GET http://localhost:8080/health
-Accept: application/json
 
 ### ===========================================
 ### Game Management
 ### ===========================================
 
-### Create a new game (Player 1 creates and joins)
+### Create a new game (creator joins automatically)
 POST http://localhost:8080/games
 Content-Type: application/json
 
-{
-  "creatorPlayerId": "player1",
-  "creatorPlayerName": "Alice"
-}
+{"playerId": "p1", "playerName": "Alice"}
 
-> {%
-    client.global.set("gameId", response.body.gameId);
-    client.log("Created game: " + response.body.gameId);
-%}
+> {% client.global.set("gameId", response.body.gameId); %}
 
 ### List all games
 GET http://localhost:8080/games
-Accept: application/json
 
-### Get specific game state (replace {{gameId}} or use variable from create)
+### Get game state
 GET http://localhost:8080/games/{{gameId}}
-Accept: application/json
 
 ### Delete a game
 DELETE http://localhost:8080/games/{{gameId}}
 
 ### ===========================================
-### Player Actions - Join Game
+### Join Game
 ### ===========================================
 
-### Player 2 joins the game
+### Player 2 joins
 POST http://localhost:8080/games/{{gameId}}/actions
 Content-Type: application/json
 
-{
-  "action": {
-    "type": "join_game",
-    "playerId": "player2",
-    "playerName": "Bob"
-  }
-}
+{"action": {"type": "join", "playerId": "p2", "playerName": "Bob"}}
 
-### Player 3 joins the game
+### Player 3 joins
 POST http://localhost:8080/games/{{gameId}}/actions
 Content-Type: application/json
 
-{
-  "action": {
-    "type": "join_game",
-    "playerId": "player3",
-    "playerName": "Charlie"
-  }
-}
+{"action": {"type": "join", "playerId": "p3", "playerName": "Charlie"}}
 
 ### ===========================================
-### Game Flow - Start and Deal
+### Start and Deal
 ### ===========================================
 
-### Start the game (any player can start when 3 players joined)
+### Start game
 POST http://localhost:8080/games/{{gameId}}/actions
 Content-Type: application/json
 
-{
-  "action": {
-    "type": "start_game",
-    "playerId": "player1"
-  }
-}
+{"action": {"type": "start", "playerId": "p1"}}
 
 ### Deal cards
 POST http://localhost:8080/games/{{gameId}}/actions
 Content-Type: application/json
 
-{
-  "action": {
-    "type": "deal_cards",
-    "playerId": "player1"
-  }
-}
+{"action": {"type": "deal", "playerId": "p1"}}
 
 ### ===========================================
-### Player Hand and Bidding State
+### Player Hands
 ### ===========================================
 
-### Get Player 1's hand
-GET http://localhost:8080/games/{{gameId}}/players/player1/hand
-Accept: application/json
+### Get player 1's hand
+GET http://localhost:8080/games/{{gameId}}/players/p1/hand
 
-### Get Player 2's hand
-GET http://localhost:8080/games/{{gameId}}/players/player2/hand
-Accept: application/json
+### Get player 2's hand
+GET http://localhost:8080/games/{{gameId}}/players/p2/hand
 
-### Get Player 3's hand
-GET http://localhost:8080/games/{{gameId}}/players/player3/hand
-Accept: application/json
+### Get player 3's hand
+GET http://localhost:8080/games/{{gameId}}/players/p3/hand
 
-### Get current bidding state
+### Get bidding state
 GET http://localhost:8080/games/{{gameId}}/bidding
-Accept: application/json
 
 ### ===========================================
-### Bidding Actions
+### Bidding
 ### ===========================================
 
-### Place a bid (HRA) - use current player from game state
+### Place bid (HRA)
 POST http://localhost:8080/games/{{gameId}}/actions
 Content-Type: application/json
 
-{
-  "action": {
-    "type": "place_bid",
-    "playerId": "player2",
-    "gameType": "HRA"
-  }
-}
+{"action": {"type": "bid", "playerId": "p2", "gameType": "HRA"}}
 
-### Pass (next player)
+### Pass
 POST http://localhost:8080/games/{{gameId}}/actions
 Content-Type: application/json
 
-{
-  "action": {
-    "type": "pass",
-    "playerId": "player3"
-  }
-}
+{"action": {"type": "pass", "playerId": "p3"}}
 
-### Pass (next player) - bidding completes, declarer wins
+### Pass (bidding ends)
 POST http://localhost:8080/games/{{gameId}}/actions
 Content-Type: application/json
 
-{
-  "action": {
-    "type": "pass",
-    "playerId": "player1"
-  }
-}
+{"action": {"type": "pass", "playerId": "p1"}}
 
 ### ===========================================
-### Talon Exchange (Declarer Only)
+### Talon Exchange
 ### ===========================================
 
-### Get talon (only declarer can see)
-GET http://localhost:8080/games/{{gameId}}/talon?playerId=player2
-Accept: application/json
+### Get talon (declarer only)
+GET http://localhost:8080/games/{{gameId}}/talon?playerId=p2
 
-### Exchange talon - discard 2 cards (use actual cards from hand + talon)
+### Exchange talon
 POST http://localhost:8080/games/{{gameId}}/actions
 Content-Type: application/json
 
-{
-  "action": {
-    "type": "exchange_talon",
-    "playerId": "player2",
-    "cardsToDiscard": [
-      {"suit": "SPADES", "rank": "SEVEN"},
-      {"suit": "SPADES", "rank": "EIGHT"}
-    ]
-  }
-}
+{"action": {"type": "exchange", "playerId": "p2", "cardsToDiscard": [
+  {"suit": "SPADES", "rank": "SEVEN"},
+  {"suit": "SPADES", "rank": "EIGHT"}
+]}}
 
 ### ===========================================
 ### Trump Selection
 ### ===========================================
 
-### Select trump suit (declarer only, for HRA/SEDMA/KILO)
+### Select trump
 POST http://localhost:8080/games/{{gameId}}/actions
 Content-Type: application/json
 
-{
-  "action": {
-    "type": "select_trump",
-    "playerId": "player2",
-    "trump": "HEARTS"
-  }
-}
+{"action": {"type": "trump", "playerId": "p2", "trump": "HEARTS"}}
 
 ### ===========================================
 ### Playing Cards
 ### ===========================================
 
-### Play a card (current player)
+### Play a card
 POST http://localhost:8080/games/{{gameId}}/actions
 Content-Type: application/json
 
-{
-  "action": {
-    "type": "play_card",
-    "playerId": "player2",
-    "card": {"suit": "HEARTS", "rank": "ACE"}
-  }
-}
+{"action": {"type": "play", "playerId": "p2", "card": {"suit": "HEARTS", "rank": "ACE"}}}
 
-### Play a card (next player)
+### Play next card
 POST http://localhost:8080/games/{{gameId}}/actions
 Content-Type: application/json
 
-{
-  "action": {
-    "type": "play_card",
-    "playerId": "player3",
-    "card": {"suit": "HEARTS", "rank": "TEN"}
-  }
-}
+{"action": {"type": "play", "playerId": "p3", "card": {"suit": "HEARTS", "rank": "TEN"}}}
 
-### Play a card (next player)
+### Play next card
 POST http://localhost:8080/games/{{gameId}}/actions
 Content-Type: application/json
 
-{
-  "action": {
-    "type": "play_card",
-    "playerId": "player1",
-    "card": {"suit": "HEARTS", "rank": "KING"}
-  }
-}
+{"action": {"type": "play", "playerId": "p1", "card": {"suit": "HEARTS", "rank": "KING"}}}
 
 ### ===========================================
 ### New Round
 ### ===========================================
 
-### Start a new round (after scoring phase)
+### Start new round
 POST http://localhost:8080/games/{{gameId}}/actions
 Content-Type: application/json
 
-{
-  "action": {
-    "type": "start_new_round",
-    "playerId": "player1"
-  }
-}
+{"action": {"type": "newround", "playerId": "p1"}}
 
 ### ===========================================
-### Reference: Available Game Types
+### Reference
 ### ===========================================
-# HRA    - Basic game, declarer needs >50 points
-# SEDMA  - Must win last trick with 7 of trumps
-# KILO   - Declarer needs 100+ points
-# BETL   - Declarer must not win any trick
-# DURCH  - Declarer must win all tricks
-
-### ===========================================
-### Reference: Available Suits (French/Bridge style)
-### ===========================================
-# SPADES   - ♠
-# CLUBS    - ♣
-# DIAMONDS - ♦
-# HEARTS   - ♥
-
-### ===========================================
-### Reference: Available Ranks
-### ===========================================
-# For Mariáš (32-card Piquet deck, 7-A only):
-# SEVEN  - 7 (0 points in Mariáš)
-# EIGHT  - 8 (0 points in Mariáš)
-# NINE   - 9 (0 points in Mariáš)
-# TEN    - 10 (10 points in Mariáš)
-# JACK   - J (2 points in Mariáš)
-# QUEEN  - Q (3 points in Mariáš)
-# KING   - K (4 points in Mariáš)
-# ACE    - A (11 points in Mariáš)
-#
-# Additional ranks for 52-card deck:
-# TWO, THREE, FOUR, FIVE, SIX
+# Action types: join, leave, start, deal, bid, pass, exchange, trump, play, marriage, newround
+# Game types: HRA, SEDMA, KILO, BETL, DURCH
+# Suits: SPADES, CLUBS, DIAMONDS, HEARTS
+# Ranks: SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING, ACE
+# Points: 7,8,9=0  J=2  Q=3  K=4  10=10  A=11

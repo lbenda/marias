@@ -1,299 +1,157 @@
 package cz.lbenda.games.marias.engine.reducer
 
 import cz.lbenda.games.marias.engine.action.GameAction
-import cz.lbenda.games.marias.engine.model.Card
-import cz.lbenda.games.marias.engine.rules.DeckUtils
-import cz.lbenda.games.marias.engine.rules.GameRules
-import cz.lbenda.games.marias.engine.rules.TrickResolver
+import cz.lbenda.games.marias.engine.model.createShuffledDeck
+import cz.lbenda.games.marias.engine.rules.dealCards
+import cz.lbenda.games.marias.engine.rules.determineTrickWinner
+import cz.lbenda.games.marias.engine.rules.validate
 import cz.lbenda.games.marias.engine.state.*
 
-class GameReducer(
-    private val rules: GameRules = GameRules(),
-    private val trickResolver: TrickResolver = TrickResolver()
-) {
-    fun reduce(state: GameState, action: GameAction): GameState {
-        val validationError = rules.validateAction(state, action)
-        if (validationError != null) {
-            return state.copy(errorMessage = validationError).withIncrementedVersion()
-        }
+fun reduce(state: GameState, action: GameAction): GameState {
+    validate(state, action)?.let { return state.copy(error = it, version = state.version + 1) }
 
-        val newState = when (action) {
-            is GameAction.JoinGame -> handleJoinGame(state, action)
-            is GameAction.LeaveGame -> handleLeaveGame(state, action)
-            is GameAction.StartGame -> handleStartGame(state, action)
-            is GameAction.DealCards -> handleDealCards(state, action)
-            is GameAction.PlaceBid -> handlePlaceBid(state, action)
-            is GameAction.Pass -> handlePass(state, action)
-            is GameAction.ExchangeTalon -> handleExchangeTalon(state, action)
-            is GameAction.SelectTrump -> handleSelectTrump(state, action)
-            is GameAction.PlayCard -> handlePlayCard(state, action)
-            is GameAction.DeclareMarriage -> handleDeclareMarriage(state, action)
-            is GameAction.StartNewRound -> handleStartNewRound(state, action)
-        }
-
-        return newState.copy(errorMessage = null).withIncrementedVersion()
-    }
-
-    private fun handleJoinGame(state: GameState, action: GameAction.JoinGame): GameState {
-        val newPlayer = PlayerState(
-            playerId = action.playerId,
-            name = action.playerName,
-            seatPosition = state.players.size
+    val next = when (action) {
+        is GameAction.JoinGame -> state.copy(
+            players = state.players + (action.playerId to PlayerState(action.playerId, action.playerName)),
+            playerOrder = state.playerOrder + action.playerId
         )
-        val newPlayers = state.players + (action.playerId to newPlayer)
-        val newPlayerOrder = state.playerOrder + action.playerId
-
-        return state.copy(
-            players = newPlayers,
-            playerOrder = newPlayerOrder
+        is GameAction.LeaveGame -> state.copy(
+            players = state.players - action.playerId,
+            playerOrder = state.playerOrder - action.playerId,
+            phase = if (state.players.size == 1) GamePhase.FINISHED else state.phase
         )
-    }
-
-    private fun handleLeaveGame(state: GameState, action: GameAction.LeaveGame): GameState {
-        val newPlayers = state.players - action.playerId
-        val newPlayerOrder = state.playerOrder - action.playerId
-
-        return state.copy(
-            players = newPlayers,
-            playerOrder = newPlayerOrder,
-            phase = if (newPlayers.isEmpty()) GamePhase.FINISHED else state.phase
-        )
-    }
-
-    private fun handleStartGame(state: GameState, action: GameAction.StartGame): GameState {
-        return state.copy(phase = GamePhase.DEALING)
-    }
-
-    private fun handleDealCards(state: GameState, action: GameAction.DealCards): GameState {
-        val deck = action.shuffledDeck ?: DeckUtils.createShuffledDeck()
-        val (playerHands, talon) = DeckUtils.dealCards(deck, state.playerOrder)
-
-        val newPlayers = state.players.mapValues { (playerId, playerState) ->
-            val hand = playerHands[playerId] ?: emptyList()
-            val isDealer = state.playerOrder.indexOf(playerId) == state.dealerIndex
-            playerState.copy(hand = hand.sorted(), isDealer = isDealer)
-        }
-
-        val biddingOrder = buildList {
-            for (i in 0 until 3) {
-                add(state.playerOrder[(state.dealerIndex + 1 + i) % 3])
-            }
-        }
-
-        return state.copy(
-            players = newPlayers,
-            talon = talon,
-            phase = GamePhase.BIDDING,
-            biddingState = BiddingState(
-                biddingOrder = biddingOrder,
-                currentBidderIndex = 0
-            ),
-            currentPlayerIndex = (state.dealerIndex + 1) % 3
-        )
-    }
-
-    private fun handlePlaceBid(state: GameState, action: GameAction.PlaceBid): GameState {
-        val nextBidderIndex = state.biddingState.nextBidderIndex
-        val newBiddingState = state.biddingState.copy(
-            currentBid = action.gameType,
-            currentBidder = action.playerId,
-            currentBidderIndex = nextBidderIndex
-        )
-
-        // Get the player at the new current bidder index
-        val nextPlayerId = state.biddingState.biddingOrder[nextBidderIndex]
-        val nextPlayerIndex = state.playerOrder.indexOf(nextPlayerId)
-
-        return state.copy(
-            biddingState = newBiddingState,
-            currentPlayerIndex = nextPlayerIndex
-        )
-    }
-
-    private fun handlePass(state: GameState, action: GameAction.Pass): GameState {
-        val newPassedPlayers = state.biddingState.passedPlayers + action.playerId
-        val biddingOrder = state.biddingState.biddingOrder
-
-        // Find next bidder who hasn't passed (including the one who just passed)
-        fun findNextBidderIndex(): Int {
-            var next = (state.biddingState.currentBidderIndex + 1) % biddingOrder.size
-            var attempts = 0
-            while (newPassedPlayers.contains(biddingOrder[next]) && attempts < biddingOrder.size) {
-                next = (next + 1) % biddingOrder.size
-                attempts++
-            }
-            return next
-        }
-
-        val nextBidderIndex = findNextBidderIndex()
-        val newBiddingState = state.biddingState.copy(
-            passedPlayers = newPassedPlayers,
-            currentBidderIndex = nextBidderIndex
-        )
-
-        // Check if bidding is complete (only one active bidder left or all passed)
-        val activeBidders = biddingOrder.filter { it !in newPassedPlayers }
-
-        if (activeBidders.size == 1 && newBiddingState.currentBid != null) {
-            // Bidding complete, one winner
-            val declarer = activeBidders.first()
-            val declarerIndex = state.playerOrder.indexOf(declarer)
-
-            return state.copy(
-                biddingState = newBiddingState,
-                declarerPlayerId = declarer,
-                gameType = newBiddingState.currentBid,
-                phase = GamePhase.TALON_EXCHANGE,
-                currentPlayerIndex = declarerIndex
-            )
-        } else if (activeBidders.isEmpty() || (activeBidders.size == 1 && newBiddingState.currentBid == null)) {
-            // All passed without a bid - dealer must play "Hra"
-            val dealer = state.playerOrder[state.dealerIndex]
-
-            return state.copy(
-                biddingState = newBiddingState,
-                declarerPlayerId = dealer,
-                gameType = GameType.HRA,
-                phase = GamePhase.TALON_EXCHANGE,
-                currentPlayerIndex = state.dealerIndex
-            )
-        }
-
-        val nextPlayerId = biddingOrder[nextBidderIndex]
-        val nextPlayerIndex = state.playerOrder.indexOf(nextPlayerId)
-
-        return state.copy(
-            biddingState = newBiddingState,
-            currentPlayerIndex = nextPlayerIndex
-        )
-    }
-
-    private fun handleExchangeTalon(state: GameState, action: GameAction.ExchangeTalon): GameState {
-        val declarer = state.players[action.playerId] ?: return state
-
-        // Add talon to declarer's hand, then remove discarded cards
-        val newHand = (declarer.hand + state.talon)
-            .filterNot { it in action.cardsToDiscard }
-            .sorted()
-
-        val newPlayers = state.players + (action.playerId to declarer.copy(hand = newHand))
-
-        val nextPhase = if (state.gameType?.requiresTrump == true) {
-            GamePhase.TRUMP_SELECTION
-        } else {
-            GamePhase.PLAYING
-        }
-
-        return state.copy(
-            players = newPlayers,
-            talon = action.cardsToDiscard, // Store discarded cards as new talon (won by declarer at end)
-            phase = nextPhase
-        )
-    }
-
-    private fun handleSelectTrump(state: GameState, action: GameAction.SelectTrump): GameState {
-        // First player after dealer leads
-        val leadPlayerIndex = (state.dealerIndex + 1) % 3
-
-        return state.copy(
+        is GameAction.StartGame -> state.copy(phase = GamePhase.DEALING)
+        is GameAction.DealCards -> dealCardsReducer(state, action)
+        is GameAction.PlaceBid -> placeBidReducer(state, action)
+        is GameAction.Pass -> passReducer(state, action)
+        is GameAction.ExchangeTalon -> exchangeTalonReducer(state, action)
+        is GameAction.SelectTrump -> state.copy(
             trump = action.trump,
             phase = GamePhase.PLAYING,
-            currentPlayerIndex = leadPlayerIndex,
-            currentTrick = TrickState(
-                leadPlayerId = state.playerOrder[leadPlayerIndex],
-                trickNumber = 1
-            )
+            currentPlayerIndex = (state.dealerIndex + 1) % 3,
+            trick = TrickState(leadPlayerId = state.playerOrder[(state.dealerIndex + 1) % 3])
         )
-    }
-
-    private fun handlePlayCard(state: GameState, action: GameAction.PlayCard): GameState {
-        val player = state.players[action.playerId] ?: return state
-
-        // Remove card from player's hand
-        val newHand = player.hand.filterNot { it == action.card }
-        val updatedPlayer = player.copy(hand = newHand)
-
-        // Add card to current trick
-        val playedCard = PlayedCard(action.playerId, action.card)
-        val newTrick = state.currentTrick.copy(
-            cardsPlayed = state.currentTrick.cardsPlayed + playedCard,
-            leadPlayerId = state.currentTrick.leadPlayerId ?: action.playerId
-        )
-
-        var newPlayers = state.players + (action.playerId to updatedPlayer)
-        var newCurrentTrick = newTrick
-        var newCompletedTricks = state.completedTricks
-        var newPhase = state.phase
-        var newCurrentPlayerIndex = state.nextPlayerIndex()
-
-        // Check if trick is complete
-        if (newTrick.isComplete) {
-            val winnerId = trickResolver.determineTrickWinner(newTrick, state.trump)
-            val winnerIndex = state.playerOrder.indexOf(winnerId)
-
-            // Award trick to winner
-            val winner = newPlayers[winnerId]!!
-            val wonCards = newTrick.cardsPlayed.map { it.card }
-            val updatedWinner = winner.copy(wonTricks = winner.wonTricks + listOf(wonCards))
-            newPlayers = newPlayers + (winnerId to updatedWinner)
-
-            newCompletedTricks = newCompletedTricks + newTrick
-
-            // Check if round is complete (10 tricks played)
-            if (newCompletedTricks.size == 10) {
-                newPhase = GamePhase.SCORING
-                newCurrentTrick = TrickState()
-            } else {
-                // Start new trick with winner leading
-                newCurrentTrick = TrickState(
-                    leadPlayerId = winnerId,
-                    trickNumber = newCompletedTricks.size + 1
-                )
-                newCurrentPlayerIndex = winnerIndex
-            }
-        }
-
-        return state.copy(
-            players = newPlayers,
-            currentTrick = newCurrentTrick,
-            completedTricks = newCompletedTricks,
-            phase = newPhase,
-            currentPlayerIndex = newCurrentPlayerIndex
-        )
-    }
-
-    private fun handleDeclareMarriage(state: GameState, action: GameAction.DeclareMarriage): GameState {
-        // Marriage declaration adds points - handled in scoring
-        // For now, just record it (could add to player state if needed)
-        return state
-    }
-
-    private fun handleStartNewRound(state: GameState, action: GameAction.StartNewRound): GameState {
-        // Reset for new round, rotate dealer
-        val newDealerIndex = (state.dealerIndex + 1) % 3
-
-        val resetPlayers = state.players.mapValues { (_, playerState) ->
-            playerState.copy(
-                hand = emptyList(),
-                wonTricks = emptyList(),
-                hasPassed = false,
-                isDealer = false
-            )
-        }
-
-        return state.copy(
-            players = resetPlayers,
-            dealerIndex = newDealerIndex,
-            currentPlayerIndex = newDealerIndex,
+        is GameAction.PlayCard -> playCardReducer(state, action)
+        is GameAction.DeclareMarriage -> state // TODO: track marriages
+        is GameAction.StartNewRound -> state.copy(
+            players = state.players.mapValues { it.value.copy(hand = emptyList(), wonCards = emptyList(), hasPassed = false, isDealer = false) },
+            dealerIndex = (state.dealerIndex + 1) % 3,
+            currentPlayerIndex = (state.dealerIndex + 2) % 3,
             talon = emptyList(),
             trump = null,
             gameType = null,
-            declarerPlayerId = null,
-            biddingState = BiddingState(),
-            currentTrick = TrickState(),
-            completedTricks = emptyList(),
+            declarerId = null,
+            bidding = BiddingState(),
+            trick = TrickState(),
+            tricksPlayed = 0,
             phase = GamePhase.DEALING,
             roundNumber = state.roundNumber + 1
         )
     }
+    return next.copy(error = null, version = state.version + 1)
+}
+
+private fun dealCardsReducer(state: GameState, action: GameAction.DealCards): GameState {
+    val deck = action.deck ?: createShuffledDeck()
+    val (hands, talon) = dealCards(deck, state.playerOrder)
+
+    return state.copy(
+        players = state.players.mapValues { (id, p) ->
+            p.copy(hand = hands[id]!!.sorted(), isDealer = state.playerOrder.indexOf(id) == state.dealerIndex)
+        },
+        talon = talon,
+        phase = GamePhase.BIDDING,
+        currentPlayerIndex = (state.dealerIndex + 1) % 3
+    )
+}
+
+private fun placeBidReducer(state: GameState, action: GameAction.PlaceBid): GameState {
+    val nextIndex = nextActiveBidder(state.playerOrder, state.currentPlayerIndex, state.bidding.passedPlayers)
+    return state.copy(
+        bidding = state.bidding.copy(currentBid = action.gameType, bidderId = action.playerId),
+        currentPlayerIndex = nextIndex
+    )
+}
+
+private fun passReducer(state: GameState, action: GameAction.Pass): GameState {
+    val newPassed = state.bidding.passedPlayers + action.playerId
+    val active = state.playerOrder.filter { it !in newPassed }
+
+    // Bidding ends when only one active player remains
+    if (active.size == 1) {
+        val declarer = if (state.bidding.currentBid != null) active.first() else state.playerOrder[state.dealerIndex]
+        val gameType = state.bidding.currentBid ?: GameType.HRA
+        return state.copy(
+            bidding = state.bidding.copy(passedPlayers = newPassed),
+            declarerId = declarer,
+            gameType = gameType,
+            phase = GamePhase.TALON_EXCHANGE,
+            currentPlayerIndex = state.playerOrder.indexOf(declarer)
+        )
+    }
+
+    return state.copy(
+        bidding = state.bidding.copy(passedPlayers = newPassed),
+        currentPlayerIndex = nextActiveBidder(state.playerOrder, state.currentPlayerIndex, newPassed)
+    )
+}
+
+private fun nextActiveBidder(order: List<String>, current: Int, passed: Set<String>): Int {
+    var next = (current + 1) % order.size
+    repeat(order.size) {
+        if (order[next] !in passed) return next
+        next = (next + 1) % order.size
+    }
+    return current
+}
+
+private fun exchangeTalonReducer(state: GameState, action: GameAction.ExchangeTalon): GameState {
+    val declarer = state.players[action.playerId]!!
+    val newHand = (declarer.hand + state.talon).filterNot { it in action.cardsToDiscard }.sorted()
+    val nextPhase = if (state.gameType?.requiresTrump == true) GamePhase.TRUMP_SELECTION else GamePhase.PLAYING
+
+    return state.copy(
+        players = state.players + (action.playerId to declarer.copy(hand = newHand)),
+        talon = action.cardsToDiscard,
+        phase = nextPhase
+    )
+}
+
+private fun playCardReducer(state: GameState, action: GameAction.PlayCard): GameState {
+    val player = state.players[action.playerId]!!
+    val newHand = player.hand - action.card
+    val newTrick = state.trick.copy(
+        cards = state.trick.cards + (action.playerId to action.card),
+        leadPlayerId = state.trick.leadPlayerId ?: action.playerId
+    )
+
+    var newPlayers = state.players + (action.playerId to player.copy(hand = newHand))
+    var trick = newTrick
+    var tricksPlayed = state.tricksPlayed
+    var nextPlayer = (state.currentPlayerIndex + 1) % 3
+    var phase = state.phase
+
+    // Trick complete
+    if (newTrick.isComplete) {
+        val winnerId = determineTrickWinner(newTrick, state.trump)
+        val winner = newPlayers[winnerId]!!
+        newPlayers = newPlayers + (winnerId to winner.copy(wonCards = winner.wonCards + newTrick.cards.map { it.second }))
+        tricksPlayed++
+
+        if (tricksPlayed == 10) {
+            phase = GamePhase.SCORING
+            trick = TrickState()
+        } else {
+            trick = TrickState(leadPlayerId = winnerId)
+            nextPlayer = state.playerOrder.indexOf(winnerId)
+        }
+    }
+
+    return state.copy(
+        players = newPlayers,
+        trick = trick,
+        tricksPlayed = tricksPlayed,
+        phase = phase,
+        currentPlayerIndex = nextPlayer
+    )
 }
