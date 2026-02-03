@@ -28,3 +28,5 @@ replay_pid*
 .idea/
 .gradle/
 **/build/
+/ui/web/.env
+/ui/web/node_modules/

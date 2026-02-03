@@ -6,90 +6,30 @@ import cz.lbenda.games.marias.engine.model.Suit
 import cz.lbenda.games.marias.engine.state.GameState
 import cz.lbenda.games.marias.engine.state.GameType
 
-class ScoringCalculator {
+data class RoundResult(
+    val declarerPoints: Int,
+    val won: Boolean,
+    val score: Int
+)
 
-    data class RoundResult(
-        val declarerPoints: Int,
-        val declarerWon: Boolean,
-        val baseScore: Int,
-        val finalScore: Int,
-        val bonuses: List<String>
-    )
+fun calculateScore(state: GameState): RoundResult {
+    val declarer = state.players[state.declarerId]!!
+    val gameType = state.gameType!!
+    val points = declarer.wonCards.sumOf { it.points } + state.talon.sumOf { it.points }
 
-    fun calculateRoundScore(state: GameState): RoundResult {
-        val declarer = state.declarer ?: error("No declarer")
-        val gameType = state.gameType ?: error("No game type")
-
-        val declarerTrickPoints = calculatePoints(declarer.allWonCards)
-        val talonPoints = calculatePoints(state.talon)
-        val totalDeclarerPoints = declarerTrickPoints + talonPoints
-
-        val baseScore = gameType.baseValue
-        val bonuses = mutableListOf<String>()
-
-        val (declarerWon, finalScore) = when (gameType) {
-            GameType.HRA -> {
-                // Declarer needs more than 50 points to win
-                val won = totalDeclarerPoints > 50
-                val score = if (won) baseScore else -baseScore
-                won to score
-            }
-            GameType.SEDMA -> {
-                // Declarer must win last trick with 7 of trumps
-                val lastTrick = state.completedTricks.lastOrNull()
-                val wonWithSeven = lastTrick?.cardsPlayed?.lastOrNull()?.let { played ->
-                    played.playerId == declarer.playerId &&
-                        played.card.rank == Rank.SEVEN &&
-                        played.card.suit == state.trump
-                } ?: false
-
-                val trickResolver = TrickResolver()
-                val lastTrickWinner = lastTrick?.let { trickResolver.determineTrickWinner(it, state.trump) }
-                val won = wonWithSeven && lastTrickWinner == declarer.playerId
-
-                if (won) bonuses.add("Sedma")
-                won to (if (won) baseScore else -baseScore)
-            }
-            GameType.KILO -> {
-                // Declarer needs 100+ points
-                val won = totalDeclarerPoints >= 100
-                if (won) bonuses.add("Kilo")
-                won to (if (won) baseScore else -baseScore)
-            }
-            GameType.BETL -> {
-                // Declarer must not win any trick
-                val won = declarer.wonTricks.isEmpty()
-                if (won) bonuses.add("Betl")
-                won to (if (won) baseScore else -baseScore)
-            }
-            GameType.DURCH -> {
-                // Declarer must win all tricks
-                val won = declarer.wonTricks.size == 10
-                if (won) bonuses.add("Durch")
-                won to (if (won) baseScore else -baseScore)
-            }
+    val won = when (gameType) {
+        GameType.HRA -> points > 50
+        GameType.SEDMA -> false // TODO: check last trick
+        GameType.KILO -> points >= 100
+        GameType.BETL -> declarer.wonCards.isEmpty()
+        GameType.DURCH -> state.tricksPlayed == 10 && state.players.values.all {
+            it.playerId == state.declarerId || it.wonCards.isEmpty()
         }
-
-        return RoundResult(
-            declarerPoints = totalDeclarerPoints,
-            declarerWon = declarerWon,
-            baseScore = baseScore,
-            finalScore = finalScore,
-            bonuses = bonuses
-        )
     }
 
-    fun hasMarriage(hand: List<Card>, suit: Suit): Boolean {
-        val hasKing = hand.any { it.suit == suit && it.rank == Rank.KING }
-        val hasQueen = hand.any { it.suit == suit && it.rank == Rank.QUEEN }
-        return hasKing && hasQueen
-    }
-
-    fun getMarriageValue(suit: Suit, trump: Suit?): Int {
-        return if (suit == trump) 40 else 20
-    }
-
-    fun calculatePoints(cards: List<Card>): Int {
-        return cards.sumOf { MariasCardValues.getPointValue(it) }
-    }
+    return RoundResult(points, won, if (won) gameType.baseValue else -gameType.baseValue)
 }
+
+fun hasMarriage(hand: List<Card>, suit: Suit): Boolean =
+    hand.any { it.suit == suit && it.rank == Rank.KING } &&
+    hand.any { it.suit == suit && it.rank == Rank.QUEEN }

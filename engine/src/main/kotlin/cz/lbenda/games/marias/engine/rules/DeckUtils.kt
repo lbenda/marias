@@ -1,47 +1,21 @@
 package cz.lbenda.games.marias.engine.rules
 
 import cz.lbenda.games.marias.engine.model.Card
+import cz.lbenda.games.marias.engine.model.createShuffledDeck
 
-object DeckUtils {
+// Deal: 7 cards to each player, 2 to talon, 3 more to each player
+fun dealCards(deck: List<Card>, players: List<String>): Pair<Map<String, List<Card>>, List<Card>> {
+    var i = 0
+    val hands = players.associateWith { mutableListOf<Card>() }
 
-    /**
-     * Deals cards according to Mariáš pattern: 7-3-3-2-3-3-3-3-3
-     * First 7 to each player, then 2 to talon, then 3 more to each player
-     * Returns map of player hands and talon
-     */
-    fun dealCards(
-        deck: List<Card>,
-        playerOrder: List<String>
-    ): Pair<Map<String, List<Card>>, List<Card>> {
-        require(deck.size == 32) { "Deck must have exactly 32 cards" }
-        require(playerOrder.size == 3) { "Must have exactly 3 players" }
+    // First round: 7 cards each
+    players.forEach { p -> repeat(7) { hands[p]!!.add(deck[i++]) } }
 
-        val hands = mutableMapOf<String, MutableList<Card>>()
-        playerOrder.forEach { hands[it] = mutableListOf() }
+    // Talon: 2 cards
+    val talon = listOf(deck[i++], deck[i++])
 
-        var cardIndex = 0
+    // Second round: 3 cards each
+    players.forEach { p -> repeat(3) { hands[p]!!.add(deck[i++]) } }
 
-        // First round: 7 cards to each player
-        for (player in playerOrder) {
-            repeat(7) {
-                hands[player]!!.add(deck[cardIndex++])
-            }
-        }
-
-        // Talon: 2 cards
-        val talon = listOf(deck[cardIndex++], deck[cardIndex++])
-
-        // Second round: 3 cards to each player
-        for (player in playerOrder) {
-            repeat(3) {
-                hands[player]!!.add(deck[cardIndex++])
-            }
-        }
-
-        return hands.mapValues { it.value.toList() } to talon
-    }
-
-    fun createShuffledDeck(): List<Card> = MariasCardValues.createShuffledDeck()
-
-    fun createDeck(): List<Card> = MariasCardValues.createDeck()
+    return hands.mapValues { it.value.toList() } to talon
 }

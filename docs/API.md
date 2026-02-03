@@ -1,178 +1,110 @@
 # Mariáš Game Engine REST API
 
-## Overview
-
-The Mariáš Game Engine provides a REST API for playing the Czech card game Mariáš (Licitovaný). The engine uses Redux-like state management with immutable state and actions.
-
 ## Base URL
-
 ```
 http://localhost:8080
 ```
 
 ## Endpoints
 
-### Health Check
-
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/health` | Check server status |
-
-### Game Management
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/games` | Create a new game |
-| GET | `/games` | List all games |
-| GET | `/games/{gameId}` | Get game state |
-| DELETE | `/games/{gameId}` | Delete a game |
-
-### Game Actions
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/games/{gameId}/actions` | Dispatch an action |
-
-### Player Information
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/games/{gameId}/players/{playerId}/hand` | Get player's hand and valid cards |
-| GET | `/games/{gameId}/talon?playerId={id}` | Get talon (declarer only) |
-| GET | `/games/{gameId}/bidding` | Get current bidding state |
+| GET | `/health` | Health check |
+| POST | `/games` | Create game |
+| GET | `/games` | List games |
+| GET | `/games/{id}` | Get game state |
+| DELETE | `/games/{id}` | Delete game |
+| POST | `/games/{id}/actions` | Dispatch action |
+| GET | `/games/{id}/players/{playerId}/hand` | Get player's hand |
+| GET | `/games/{id}/talon?playerId={id}` | Get talon (declarer only) |
+| GET | `/games/{id}/bidding` | Get bidding state |
 
 ## Game Flow
 
 ```
-1. WAITING_FOR_PLAYERS  →  3 players join
-2. DEALING              →  Cards are dealt (7+3 to each player, 2 to talon)
-3. BIDDING              →  Players bid or pass
-4. TALON_EXCHANGE       →  Declarer exchanges cards with talon
-5. TRUMP_SELECTION      →  Declarer selects trump (for HRA/SEDMA/KILO)
-6. PLAYING              →  10 tricks are played
-7. SCORING              →  Points are calculated
-8. FINISHED             →  Game ends or new round starts
+WAITING_FOR_PLAYERS → DEALING → BIDDING → TALON_EXCHANGE → TRUMP_SELECTION → PLAYING → SCORING
+```
+
+## Create Game
+
+```http
+POST /games
+Content-Type: application/json
+
+{"playerId": "p1", "playerName": "Alice"}
 ```
 
 ## Actions
 
-### JoinGame
+All actions are sent to `POST /games/{id}/actions` with body `{"action": {...}}`.
+
+### Join
 ```json
-{
-  "action": {
-    "type": "join_game",
-    "playerId": "player1",
-    "playerName": "Alice"
-  }
-}
+{"type": "join", "playerId": "p2", "playerName": "Bob"}
 ```
 
-### StartGame
+### Leave
 ```json
-{
-  "action": {
-    "type": "start_game",
-    "playerId": "player1"
-  }
-}
+{"type": "leave", "playerId": "p2"}
 ```
 
-### DealCards
+### Start
 ```json
-{
-  "action": {
-    "type": "deal_cards",
-    "playerId": "player1"
-  }
-}
+{"type": "start", "playerId": "p1"}
 ```
 
-### PlaceBid
+### Deal
 ```json
-{
-  "action": {
-    "type": "place_bid",
-    "playerId": "player2",
-    "gameType": "HRA"
-  }
-}
+{"type": "deal", "playerId": "p1"}
 ```
 
+### Bid
+```json
+{"type": "bid", "playerId": "p2", "gameType": "HRA"}
+```
 Game types: `HRA`, `SEDMA`, `KILO`, `BETL`, `DURCH`
 
 ### Pass
 ```json
-{
-  "action": {
-    "type": "pass",
-    "playerId": "player3"
-  }
-}
+{"type": "pass", "playerId": "p3"}
 ```
 
-### ExchangeTalon
+### Exchange Talon
 ```json
-{
-  "action": {
-    "type": "exchange_talon",
-    "playerId": "player2",
-    "cardsToDiscard": [
-      {"suit": "SPADES", "rank": "SEVEN"},
-      {"suit": "DIAMONDS", "rank": "EIGHT"}
-    ]
-  }
-}
+{"type": "exchange", "playerId": "p2", "cardsToDiscard": [
+  {"suit": "SPADES", "rank": "SEVEN"},
+  {"suit": "DIAMONDS", "rank": "EIGHT"}
+]}
 ```
 
-### SelectTrump
+### Select Trump
 ```json
-{
-  "action": {
-    "type": "select_trump",
-    "playerId": "player2",
-    "trump": "HEARTS"
-  }
-}
+{"type": "trump", "playerId": "p2", "trump": "HEARTS"}
 ```
 
-Suits: `SPADES`, `CLUBS`, `DIAMONDS`, `HEARTS`
-
-### PlayCard
+### Play Card
 ```json
-{
-  "action": {
-    "type": "play_card",
-    "playerId": "player2",
-    "card": {"suit": "HEARTS", "rank": "ACE"}
-  }
-}
+{"type": "play", "playerId": "p2", "card": {"suit": "HEARTS", "rank": "ACE"}}
 ```
 
-Ranks (Mariáš 32-card deck): `SEVEN`, `EIGHT`, `NINE`, `TEN`, `JACK`, `QUEEN`, `KING`, `ACE`
-
-### StartNewRound
+### Declare Marriage
 ```json
-{
-  "action": {
-    "type": "start_new_round",
-    "playerId": "player1"
-  }
-}
+{"type": "marriage", "playerId": "p2", "suit": "HEARTS"}
 ```
 
-## Card Model
+### New Round
+```json
+{"type": "newround", "playerId": "p1"}
+```
 
-### Suits (French/Bridge style)
-| Enum | Symbol | Description |
-|------|--------|-------------|
-| SPADES | ♠ | Spades |
-| CLUBS | ♣ | Clubs |
-| DIAMONDS | ♦ | Diamonds |
-| HEARTS | ♥ | Hearts |
+## Card Reference
 
-### Ranks
-| Enum | Symbol | Mariáš Points | Mariáš Strength |
-|------|--------|---------------|-----------------|
+### Suits
+`SPADES` ♠, `CLUBS` ♣, `DIAMONDS` ♦, `HEARTS` ♥
+
+### Ranks (32-card deck)
+| Rank | Symbol | Points | Strength |
+|------|--------|--------|----------|
 | SEVEN | 7 | 0 | 1 |
 | EIGHT | 8 | 0 | 2 |
 | NINE | 9 | 0 | 3 |
@@ -182,38 +114,21 @@ Ranks (Mariáš 32-card deck): `SEVEN`, `EIGHT`, `NINE`, `TEN`, `JACK`, `QUEEN`,
 | KING | K | 4 | 7 |
 | ACE | A | 11 | 8 |
 
-Total points in Mariáš deck: 120 (30 per suit × 4 suits)
-
-### Deck Types
-
-The engine supports multiple deck types for different card games:
-
-| Type | Cards | Description |
-|------|-------|-------------|
-| STANDARD_52 | 52 | Full deck (2-A, all suits) |
-| PIQUET_32 | 32 | Mariáš/Skat deck (7-A) |
-| EUCHRE_24 | 24 | Euchre deck (9-A) |
-| JASS_36 | 36 | Jass deck (6-A) |
-| PINOCHLE_48 | 48 | Pinochle deck (9-A, doubled) |
+Total deck points: 120
 
 ## Game Types
 
-| Type | Czech Name | Base Value | Description |
-|------|------------|------------|-------------|
-| HRA | Hra | 1 | Declarer needs >50 points |
-| SEDMA | Sedma | 2 | Win last trick with 7 of trumps |
-| KILO | Kilo | 4 | Declarer needs 100+ points |
-| BETL | Betl | 5 | Declarer must not win any trick |
-| DURCH | Durch | 6 | Declarer must win all tricks |
+| Type | Description |
+|------|-------------|
+| HRA | Declarer needs >50 points |
+| SEDMA | Win last trick with 7 of trumps |
+| KILO | Declarer needs 100+ points |
+| BETL | Declarer must not win any trick |
+| DURCH | Declarer must win all tricks |
 
-## Running the Server
+## Running
 
 ```bash
 ./gradlew :server:run
 ```
-
 Server starts on port 8080.
-
-## Testing
-
-Use the `api-tests.http` file in IntelliJ IDEA to run interactive API tests.

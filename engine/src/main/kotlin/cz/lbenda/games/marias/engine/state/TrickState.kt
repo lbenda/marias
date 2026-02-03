@@ -1,24 +1,13 @@
 package cz.lbenda.games.marias.engine.state
 
 import cz.lbenda.games.marias.engine.model.Card
-import cz.lbenda.games.marias.engine.model.Suit
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class TrickState(
-    val cardsPlayed: List<PlayedCard> = emptyList(),
-    val leadPlayerId: String? = null,
-    val trickNumber: Int = 0
+    val cards: List<Pair<String, Card>> = emptyList(),  // playerId to card
+    val leadPlayerId: String? = null
 ) {
-    val leadSuit: Suit? get() = cardsPlayed.firstOrNull()?.card?.suit
-
-    val isComplete: Boolean get() = cardsPlayed.size == 3
-
-    val isEmpty: Boolean get() = cardsPlayed.isEmpty()
+    val leadSuit get() = cards.firstOrNull()?.second?.suit
+    val isComplete get() = cards.size == 3
 }
-
-@Serializable
-data class PlayedCard(
-    val playerId: String,
-    val card: Card
-)

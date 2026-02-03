@@ -1,42 +1,27 @@
 package cz.lbenda.games.marias.engine.store
 
 import cz.lbenda.games.marias.engine.action.GameAction
-import cz.lbenda.games.marias.engine.reducer.GameReducer
+import cz.lbenda.games.marias.engine.reducer.reduce
 import cz.lbenda.games.marias.engine.state.GameState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-class GameStore(
-    initialState: GameState,
-    private val reducer: GameReducer = GameReducer()
-) {
-    private val _state = MutableStateFlow(initialState)
-    val state: StateFlow<GameState> = _state.asStateFlow()
+class GameStore(initial: GameState) {
+    private val _state = MutableStateFlow(initial)
+    val state: StateFlow<GameState> = _state
+    val current: GameState get() = _state.value
 
     private val mutex = Mutex()
 
-    val currentState: GameState get() = _state.value
-
-    suspend fun dispatch(action: GameAction): GameState {
-        return mutex.withLock {
-            val newState = reducer.reduce(_state.value, action)
-            _state.value = newState
-            newState
-        }
+    suspend fun dispatch(action: GameAction): GameState = mutex.withLock {
+        _state.value = reduce(_state.value, action)
+        _state.value
     }
 
     fun dispatchSync(action: GameAction): GameState {
-        val newState = reducer.reduce(_state.value, action)
-        _state.value = newState
-        return newState
-    }
-
-    companion object {
-        fun create(gameId: String): GameStore {
-            return GameStore(GameState(gameId = gameId))
-        }
+        _state.value = reduce(_state.value, action)
+        return _state.value
     }
 }
