@@ -1,5 +1,6 @@
 # T-010: Server REST for chooser decision and deal continuation
 
+- Parent: F-007
 - Status: Planned  
 - Owner: server  
 - Related modules: server  

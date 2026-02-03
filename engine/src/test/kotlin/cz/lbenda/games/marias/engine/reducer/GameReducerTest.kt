@@ -41,7 +41,8 @@ class GameReducerTest {
         state = reduce(state, GameAction.StartGame("p1"))
         assertEquals(GamePhase.DEALING, state.phase)
 
-        state = reduce(state, GameAction.DealCards("p1"))
+        // Use non-two-phase dealing for backward compatibility
+        state = reduce(state, GameAction.DealCards("p1", twoPhase = false))
         assertEquals(GamePhase.BIDDING, state.phase)
         state.players.values.forEach { assertEquals(10, it.hand.size) }
         assertEquals(2, state.talon.size)
@@ -90,7 +91,8 @@ class GameReducerTest {
     private fun setupDealt(): GameState {
         var state = setupPlayers()
         state = reduce(state, GameAction.StartGame("p1"))
-        state = reduce(state, GameAction.DealCards("p1"))
+        // Use non-two-phase dealing for backward compatibility
+        state = reduce(state, GameAction.DealCards("p1", twoPhase = false))
         return state
     }
 }

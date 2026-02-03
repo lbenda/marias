@@ -1,5 +1,6 @@
 # T-008: Generic chooser decision gate in engine
 
+- Parent: F-007
 - Status: Planned  
 - Owner: engine  
 - Related modules: engine

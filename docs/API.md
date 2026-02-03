@@ -25,6 +25,17 @@ http://localhost:8080
 WAITING_FOR_PLAYERS → DEALING → BIDDING → TALON_EXCHANGE → TRUMP_SELECTION → PLAYING → SCORING
 ```
 
+### Two-Phase Dealing
+
+When `twoPhase: true` (default), dealing pauses after the chooser (player after dealer) receives 7 cards.
+The chooser can then:
+- Select trump early with `choosetrump` action → becomes declarer, skips bidding
+- Pass with `chooserpass` action → proceeds to normal bidding
+
+```
+DEALING (Phase A) → [chooser has 7 cards] → WAITING_FOR_TRUMP → [chooser decision] → DEALING (Phase B) → ...
+```
+
 ## Create Game
 
 ```http
@@ -55,8 +66,21 @@ All actions are sent to `POST /games/{id}/actions` with body `{"action": {...}}`
 
 ### Deal
 ```json
-{"type": "deal", "playerId": "p1"}
+{"type": "deal", "playerId": "p1", "twoPhase": true}
 ```
+- `twoPhase` (optional, default: `true`): Enable two-phase dealing with pause for trump selection
+
+### Choose Trump (during dealing pause)
+```json
+{"type": "choosetrump", "playerId": "p2", "trump": "HEARTS"}
+```
+Only valid when `dealing.isWaitingForChooser` is `true`. Makes chooser the declarer.
+
+### Chooser Pass (during dealing pause)
+```json
+{"type": "chooserpass", "playerId": "p2"}
+```
+Only valid when `dealing.isWaitingForChooser` is `true`. Proceeds to normal bidding.
 
 ### Bid
 ```json

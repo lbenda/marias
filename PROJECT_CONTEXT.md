@@ -34,7 +34,7 @@ Business logic is isolated from transport and presentation layers.
 ```
 engine/
   model/     Suit, Rank, Card (with createDeck functions)
-  state/     GamePhase, GameType, PlayerState, TrickState, BiddingState, GameState
+  state/     GamePhase, GameType, PlayerState, TrickState, BiddingState, DealingState, GameState
   action/    GameAction sealed class
   reducer/   reduce() function
   store/     GameStore class
@@ -47,7 +47,7 @@ engine/
 - OpenAPI is generated code-first
 - HTTP API documentation:
   - docs/API.md — human-readable API reference
-  - api-test.http — executable API examples
+  - api-tests.http — executable API examples
 
 ### Module Structure
 

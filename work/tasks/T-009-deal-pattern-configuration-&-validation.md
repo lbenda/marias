@@ -1,5 +1,6 @@
 # T-009: Deal pattern configuration and validation
 
+- Parent: F-007
 - Status: Planned  
 - Owner: engine  
 - Related modules: engine  

@@ -1,5 +1,6 @@
 # T-012: Web UI – paused deal, trump selection, and pending cards
 
+- Parent: F-007
 - Status: Planned  
 - Owner: web  
 - Related modules: web-ui  

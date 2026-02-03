@@ -1,5 +1,6 @@
 # T-011: Deal order visibility and deal event stream
 
+- Parent: F-007
 - Status: Planned  
 - Owner: engine / server  
 - Related modules: engine, server  

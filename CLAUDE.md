@@ -72,20 +72,22 @@ When implementing:
 - Preserve public APIs and behavior unless explicitly told otherwise.
 
 After implementing:
-- Change the ticket:
-  - Set ticket Status to Done
+- Update the task:
+  - Set task Status to Done
   - Summarize what changed and why (5–10 bullets).
   - Add a short "Result" and "Verification" section if missing
 - If an architectural decision is introduced or changed:
   - add or update an ADR in docs/adr/
   - reflect the resulting state in PROJECT_CONTEXT.md
-- If the HTTP API changed, update `docs/API.md` and `docs/api-test.http`
+- If the HTTP API changed, update `docs/API.md` and `docs/api-tests.http`
 
 ### Work tracking
-- Active work is defined and tracked in Markdown tickets under /work/tickets/.
-- For any task, read the referenced ticket and write progress updates into that ticket.
-- Always read the referenced ticket before starting implementation.
-- Follow the ticket workflow and constraints exactly.
+- Features are defined in /work/features/ as high-level requirements.
+- Tasks are defined in /work/tasks/ as implementable work items.
+- Tasks may have a parent feature.
+- For any task, read the referenced task file and write progress updates into it.
+- Always read the referenced task before starting implementation.
+- Follow the task workflow and constraints exactly.
 - Do NOT write step-by-step progress into IMPLEMENTATION_PROGRESS.md.
 - IMPLEMENTATION_PROGRESS.md is used only for occasional milestone summaries (when explicitly requested).
 
@@ -94,7 +96,7 @@ After implementing:
 ## 7) API changes
 If you change anything in the HTTP API (endpoints, payloads, status codes, auth, error format), you MUST update:
 - docs/API.md
-- api-test.http
+- api-tests.http
 
 Treat these files as part of the API contract.
 

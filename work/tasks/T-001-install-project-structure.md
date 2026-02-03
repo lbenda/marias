@@ -1,5 +1,5 @@
 # T-001: Install project structure
- 
+
 - Status: Done
 - Owner: Initial setup
 

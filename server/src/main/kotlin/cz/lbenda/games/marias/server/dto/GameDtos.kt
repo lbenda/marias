@@ -24,10 +24,19 @@ data class GameResponse(
     val trump: Suit?,
     val gameType: GameType?,
     val declarerId: String?,
+    val dealing: DealingDto?,
     val trick: TrickDto,
     val tricksPlayed: Int,
     val roundNumber: Int,
     val error: String?
+)
+
+@Serializable
+data class DealingDto(
+    val phase: DealingPhase,
+    val chooserId: String?,
+    val pendingCardsCount: Int,
+    val isWaitingForChooser: Boolean
 )
 
 @Serializable
@@ -71,10 +80,18 @@ fun GameState.toResponse() = GameResponse(
     trump = trump,
     gameType = gameType,
     declarerId = declarerId,
+    dealing = dealing.toDto(),
     trick = trick.toDto(),
     tricksPlayed = tricksPlayed,
     roundNumber = roundNumber,
     error = error
+)
+
+fun DealingState.toDto() = DealingDto(
+    phase = phase,
+    chooserId = chooserId,
+    pendingCardsCount = pendingCards.size,
+    isWaitingForChooser = isWaitingForChooser
 )
 
 fun PlayerState.toDto() = PlayerDto(

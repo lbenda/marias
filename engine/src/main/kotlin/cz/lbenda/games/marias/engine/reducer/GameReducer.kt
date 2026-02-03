@@ -1,8 +1,8 @@
 package cz.lbenda.games.marias.engine.reducer
 
 import cz.lbenda.games.marias.engine.action.GameAction
+import cz.lbenda.games.marias.engine.model.Card
 import cz.lbenda.games.marias.engine.model.createShuffledDeck
-import cz.lbenda.games.marias.engine.rules.dealCards
 import cz.lbenda.games.marias.engine.rules.determineTrickWinner
 import cz.lbenda.games.marias.engine.rules.validate
 import cz.lbenda.games.marias.engine.state.*
@@ -22,6 +22,8 @@ fun reduce(state: GameState, action: GameAction): GameState {
         )
         is GameAction.StartGame -> state.copy(phase = GamePhase.DEALING)
         is GameAction.DealCards -> dealCardsReducer(state, action)
+        is GameAction.ChooseTrump -> chooseTrumpReducer(state, action)
+        is GameAction.ChooserPass -> chooserPassReducer(state, action)
         is GameAction.PlaceBid -> placeBidReducer(state, action)
         is GameAction.Pass -> passReducer(state, action)
         is GameAction.ExchangeTalon -> exchangeTalonReducer(state, action)
@@ -41,6 +43,7 @@ fun reduce(state: GameState, action: GameAction): GameState {
             trump = null,
             gameType = null,
             declarerId = null,
+            dealing = DealingState(),
             bidding = BiddingState(),
             trick = TrickState(),
             tricksPlayed = 0,
@@ -53,15 +56,161 @@ fun reduce(state: GameState, action: GameAction): GameState {
 
 private fun dealCardsReducer(state: GameState, action: GameAction.DealCards): GameState {
     val deck = action.deck ?: createShuffledDeck()
-    val (hands, talon) = dealCards(deck, state.playerOrder)
+    val pattern = action.pattern ?: if (action.twoPhase) DealPattern.TWO_PHASE else DealPattern.STANDARD
+    val chooserId = state.playerOrder[(state.dealerIndex + 1) % 3]
 
+    return executeDealingPhaseA(state, deck, pattern, chooserId, action.twoPhase)
+}
+
+/**
+ * Execute dealing: deal all cards, but for two-phase mode, keep chooser's remaining
+ * cards as pending (on table) until the chooser makes a decision.
+ */
+private fun executeDealingPhaseA(
+    state: GameState,
+    deck: List<Card>,
+    pattern: DealPattern,
+    chooserId: String,
+    twoPhase: Boolean
+): GameState {
+    val hands = state.playerOrder.associateWith { mutableListOf<Card>() }
+    val dealOrder = state.playerOrder.associateWith { mutableListOf<Card>() }
+    val talon = mutableListOf<Card>()
+    val pendingCards = mutableListOf<Card>()
+
+    var deckPos = 0
+    var chooserCardCount = 0
+
+    // Execute all dealing steps
+    for (step in pattern.steps) {
+        val targetId = when (step.playerOffset) {
+            -1 -> null // talon
+            else -> state.playerOrder[(state.dealerIndex + step.playerOffset) % 3]
+        }
+
+        repeat(step.cardCount) {
+            val card = deck[deckPos++]
+            when {
+                targetId == null -> talon.add(card)
+                twoPhase && targetId == chooserId -> {
+                    dealOrder[targetId]!!.add(card)
+                    if (chooserCardCount < pattern.previewCardsForChooser) {
+                        // First N cards go to hand
+                        hands[targetId]!!.add(card)
+                        chooserCardCount++
+                    } else {
+                        // Remaining cards go to pending (on table)
+                        pendingCards.add(card)
+                    }
+                }
+                else -> {
+                    hands[targetId]!!.add(card)
+                    dealOrder[targetId]!!.add(card)
+                }
+            }
+        }
+    }
+
+    // For two-phase dealing, pause and wait for chooser decision
+    if (twoPhase && pendingCards.isNotEmpty()) {
+        return state.copy(
+            players = state.players.mapValues { (id, p) ->
+                p.copy(
+                    hand = hands[id]!!.sorted(),
+                    isDealer = state.playerOrder.indexOf(id) == state.dealerIndex
+                )
+            },
+            talon = talon.toList(),
+            dealing = DealingState(
+                phase = DealingPhase.WAITING_FOR_TRUMP,
+                pattern = pattern,
+                currentStepIndex = pattern.steps.size,
+                deckPosition = deckPos,
+                deck = deck,
+                chooserId = chooserId,
+                pendingCards = pendingCards.toList(),
+                dealOrder = dealOrder.mapValues { it.value.toList() }
+            ),
+            currentPlayerIndex = state.playerOrder.indexOf(chooserId)
+        )
+    }
+
+    // Complete dealing (non-two-phase or no pending cards)
     return state.copy(
         players = state.players.mapValues { (id, p) ->
-            p.copy(hand = hands[id]!!.sorted(), isDealer = state.playerOrder.indexOf(id) == state.dealerIndex)
+            p.copy(
+                hand = hands[id]!!.sorted(),
+                isDealer = state.playerOrder.indexOf(id) == state.dealerIndex
+            )
         },
-        talon = talon,
+        talon = talon.toList(),
+        dealing = DealingState(
+            phase = DealingPhase.COMPLETE,
+            pattern = pattern,
+            currentStepIndex = pattern.steps.size,
+            deckPosition = deckPos,
+            deck = deck,
+            chooserId = chooserId,
+            dealOrder = dealOrder.mapValues { it.value.toList() }
+        ),
         phase = GamePhase.BIDDING,
         currentPlayerIndex = (state.dealerIndex + 1) % 3
+    )
+}
+
+/**
+ * Chooser selects trump during dealing pause.
+ * Moves pending cards to chooser's hand and makes chooser the declarer.
+ */
+private fun chooseTrumpReducer(state: GameState, action: GameAction.ChooseTrump): GameState {
+    val dealing = state.dealing
+    val chooserId = dealing.chooserId!!
+
+    // Move pending cards to chooser's hand
+    val stateAfterDeal = movePendingCardsToHand(state)
+
+    // Move to talon exchange (chooser is declarer, trump already selected)
+    return stateAfterDeal.copy(
+        trump = action.trump,
+        gameType = GameType.HRA, // Default game type when choosing trump early
+        declarerId = chooserId,
+        phase = GamePhase.TALON_EXCHANGE,
+        currentPlayerIndex = state.playerOrder.indexOf(chooserId)
+    )
+}
+
+/**
+ * Chooser passes during dealing pause.
+ * Moves pending cards to chooser's hand and proceeds to normal bidding.
+ */
+private fun chooserPassReducer(state: GameState, action: GameAction.ChooserPass): GameState {
+    // Move pending cards to chooser's hand
+    val stateAfterDeal = movePendingCardsToHand(state)
+
+    // Continue to bidding without setting trump
+    return stateAfterDeal.copy(
+        phase = GamePhase.BIDDING,
+        currentPlayerIndex = (state.dealerIndex + 1) % 3
+    )
+}
+
+/**
+ * Move pending cards (on table) to chooser's hand.
+ */
+private fun movePendingCardsToHand(state: GameState): GameState {
+    val dealing = state.dealing
+    val chooserId = dealing.chooserId!!
+    val chooser = state.players[chooserId]!!
+
+    // Add pending cards to chooser's hand
+    val newHand = (chooser.hand + dealing.pendingCards).sorted()
+
+    return state.copy(
+        players = state.players + (chooserId to chooser.copy(hand = newHand)),
+        dealing = dealing.copy(
+            phase = DealingPhase.COMPLETE,
+            pendingCards = emptyList()
+        )
     )
 }
 
@@ -108,12 +257,23 @@ private fun nextActiveBidder(order: List<String>, current: Int, passed: Set<Stri
 private fun exchangeTalonReducer(state: GameState, action: GameAction.ExchangeTalon): GameState {
     val declarer = state.players[action.playerId]!!
     val newHand = (declarer.hand + state.talon).filterNot { it in action.cardsToDiscard }.sorted()
-    val nextPhase = if (state.gameType?.requiresTrump == true) GamePhase.TRUMP_SELECTION else GamePhase.PLAYING
+    val nextPhase = if (state.gameType?.requiresTrump == true && state.trump == null) {
+        GamePhase.TRUMP_SELECTION
+    } else {
+        GamePhase.PLAYING
+    }
 
+    val leadPlayerId = state.playerOrder[(state.dealerIndex + 1) % 3]
     return state.copy(
         players = state.players + (action.playerId to declarer.copy(hand = newHand)),
         talon = action.cardsToDiscard,
-        phase = nextPhase
+        phase = nextPhase,
+        trick = if (nextPhase == GamePhase.PLAYING) TrickState(leadPlayerId = leadPlayerId) else state.trick,
+        currentPlayerIndex = if (nextPhase == GamePhase.PLAYING) {
+            state.playerOrder.indexOf(leadPlayerId)
+        } else {
+            state.currentPlayerIndex
+        }
     )
 }
 

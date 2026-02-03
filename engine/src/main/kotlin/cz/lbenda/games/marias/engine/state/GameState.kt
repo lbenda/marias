@@ -17,9 +17,13 @@ data class GameState(
     val trump: Suit? = null,
     val gameType: GameType? = null,
     val declarerId: String? = null,
+    val dealing: DealingState = DealingState(),
     val bidding: BiddingState = BiddingState(),
     val trick: TrickState = TrickState(),
     val tricksPlayed: Int = 0,
     val roundNumber: Int = 1,
     val error: String? = null
-)
+) {
+    /** The player who chooses trump first (player after dealer) */
+    val chooserId: String? get() = playerOrder.getOrNull((dealerIndex + 1) % playerOrder.size)
+}

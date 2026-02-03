@@ -3,6 +3,7 @@ package cz.lbenda.games.marias.engine.rules
 import cz.lbenda.games.marias.engine.action.GameAction
 import cz.lbenda.games.marias.engine.model.Card
 import cz.lbenda.games.marias.engine.model.Rank
+import cz.lbenda.games.marias.engine.state.DealingPhase
 import cz.lbenda.games.marias.engine.state.GamePhase
 import cz.lbenda.games.marias.engine.state.GameState
 
@@ -20,7 +21,23 @@ fun validate(state: GameState, action: GameAction): String? = when (action) {
         state.players.size != 3 -> "Need 3 players"
         else -> null
     }
-    is GameAction.DealCards -> if (state.phase != GamePhase.DEALING) "Not dealing phase" else null
+    is GameAction.DealCards -> when {
+        state.phase != GamePhase.DEALING -> "Not dealing phase"
+        state.dealing.phase != DealingPhase.NOT_STARTED -> "Already dealing"
+        else -> null
+    }
+    is GameAction.ChooseTrump -> when {
+        state.phase != GamePhase.DEALING -> "Not dealing phase"
+        state.dealing.phase != DealingPhase.WAITING_FOR_TRUMP -> "Not waiting for trump selection"
+        action.playerId != state.dealing.chooserId -> "Not chooser"
+        else -> null
+    }
+    is GameAction.ChooserPass -> when {
+        state.phase != GamePhase.DEALING -> "Not dealing phase"
+        state.dealing.phase != DealingPhase.WAITING_FOR_TRUMP -> "Not waiting for trump selection"
+        action.playerId != state.dealing.chooserId -> "Not chooser"
+        else -> null
+    }
     is GameAction.PlaceBid -> when {
         state.phase != GamePhase.BIDDING -> "Not bidding phase"
         state.playerOrder[state.currentPlayerIndex] != action.playerId -> "Not your turn"

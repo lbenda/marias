@@ -95,6 +95,12 @@ cp .env.example .env
 npm run dev
 ```
 
+or
+
+```bash
+./gradlew :ui-web:dev
+```
+
 ---
 
 ## Game Types

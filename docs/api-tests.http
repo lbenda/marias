@@ -54,11 +54,35 @@ Content-Type: application/json
 
 {"action": {"type": "start", "playerId": "p1"}}
 
-### Deal cards
+### Deal cards (two-phase mode - default)
 POST http://localhost:8080/games/{{gameId}}/actions
 Content-Type: application/json
 
 {"action": {"type": "deal", "playerId": "p1"}}
+
+### Deal cards (non-two-phase mode)
+POST http://localhost:8080/games/{{gameId}}/actions
+Content-Type: application/json
+
+{"action": {"type": "deal", "playerId": "p1", "twoPhase": false}}
+
+### ===========================================
+### Two-Phase Dealing (chooser actions)
+### ===========================================
+
+### Choose trump during dealing pause (chooser only)
+### Makes chooser the declarer, skips bidding
+POST http://localhost:8080/games/{{gameId}}/actions
+Content-Type: application/json
+
+{"action": {"type": "choosetrump", "playerId": "p2", "trump": "HEARTS"}}
+
+### Chooser pass during dealing pause (chooser only)
+### Proceeds to normal bidding
+POST http://localhost:8080/games/{{gameId}}/actions
+Content-Type: application/json
+
+{"action": {"type": "chooserpass", "playerId": "p2"}}
 
 ### ===========================================
 ### Player Hands
@@ -159,8 +183,9 @@ Content-Type: application/json
 ### ===========================================
 ### Reference
 ### ===========================================
-# Action types: join, leave, start, deal, bid, pass, exchange, trump, play, marriage, newround
+# Action types: join, leave, start, deal, choosetrump, chooserpass, bid, pass, exchange, trump, play, marriage, newround
 # Game types: HRA, SEDMA, KILO, BETL, DURCH
 # Suits: SPADES, CLUBS, DIAMONDS, HEARTS
 # Ranks: SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING, ACE
 # Points: 7,8,9=0  J=2  Q=3  K=4  10=10  A=11
+# Two-phase dealing: deal with twoPhase=true (default) pauses after chooser gets 7 cards
