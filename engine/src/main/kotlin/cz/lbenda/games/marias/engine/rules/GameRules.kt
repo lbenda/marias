@@ -25,6 +25,7 @@ fun validate(state: GameState, action: GameAction): String? = when (action) {
     is GameAction.DealCards -> when {
         state.phase != GamePhase.DEALING -> "Not dealing phase"
         state.dealing.phase != DealingPhase.NOT_STARTED -> "Already dealing"
+        action.pattern != null && action.pattern.validate() != null -> action.pattern.validate()
         else -> null
     }
     is GameAction.ChooseTrump -> when {

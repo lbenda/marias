@@ -192,7 +192,8 @@ class TwoPhaseDealingTest {
 
         val error = invalidPattern.validate()
         assertNotNull(error)
-        assertTrue(error.contains("10 cards") || error.contains("Talon"))
+        // Pattern has 15 cards total (5+5+5), no talon - should fail validation
+        assertTrue(error.contains("32") || error.contains("10 cards") || error.contains("Talon"))
     }
 
     @Test
@@ -200,6 +201,87 @@ class TwoPhaseDealingTest {
         assertNull(DealPattern.STANDARD.validate())
         assertNull(DealPattern.TWO_PHASE.validate())
         assertNull(DealPattern.oneByOne().validate())
+    }
+
+    @Test
+    fun `pattern validation - invalid player offset`() {
+        val invalidPattern = DealPattern(
+            steps = listOf(
+                DealPattern.DealStep(1, 10),
+                DealPattern.DealStep(2, 10),
+                DealPattern.DealStep(3, 10), // Invalid offset
+                DealPattern.DealStep(-1, 2)
+            ),
+            previewCardsForChooser = 7
+        )
+        val error = invalidPattern.validate()
+        assertNotNull(error)
+        assertTrue(error.contains("Invalid player offset"))
+    }
+
+    @Test
+    fun `pattern validation - negative card count`() {
+        val invalidPattern = DealPattern(
+            steps = listOf(
+                DealPattern.DealStep(1, -5), // Invalid negative count
+                DealPattern.DealStep(2, 10),
+                DealPattern.DealStep(0, 10),
+                DealPattern.DealStep(-1, 2)
+            ),
+            previewCardsForChooser = 7
+        )
+        val error = invalidPattern.validate()
+        assertNotNull(error)
+        assertTrue(error.contains("positive"))
+    }
+
+    @Test
+    fun `pattern validation - invalid preview cards threshold`() {
+        val invalidPattern = DealPattern(
+            steps = listOf(
+                DealPattern.DealStep(1, 10),
+                DealPattern.DealStep(2, 10),
+                DealPattern.DealStep(0, 10),
+                DealPattern.DealStep(-1, 2)
+            ),
+            previewCardsForChooser = 0 // Invalid - must be 1-10
+        )
+        val error = invalidPattern.validate()
+        assertNotNull(error)
+        assertTrue(error.contains("Preview cards"))
+    }
+
+    @Test
+    fun `pattern validation - empty steps`() {
+        val invalidPattern = DealPattern(
+            steps = emptyList(),
+            previewCardsForChooser = 7
+        )
+        val error = invalidPattern.validate()
+        assertNotNull(error)
+        assertTrue(error.contains("at least one step"))
+    }
+
+    @Test
+    fun `pattern validation rejects invalid pattern during deal action`() {
+        var state = setupPlayers()
+        val deck = createOrderedDeck()
+
+        val invalidPattern = DealPattern(
+            steps = listOf(
+                DealPattern.DealStep(1, 5),
+                DealPattern.DealStep(2, 5),
+                DealPattern.DealStep(0, 5)
+            ),
+            previewCardsForChooser = 5
+        )
+
+        state = reduce(state, GameAction.DealCards("p1", deck, pattern = invalidPattern))
+
+        // Should have error due to invalid pattern
+        val error = state.error
+        assertNotNull(error)
+        assertTrue(error.contains("32"))
     }
 
     @Test
