@@ -2,34 +2,46 @@
 
 * Type: Feature
 * Status: In Progress
+* Source: Article II, rules 1-13 of https://www.talon.cz/pravidla/mariáš_pravidla_licitovaný_2014.pdf
 
 ## Description
-Introduce mariáš-style two-phase dealing where the chooser receives
-a partial hand, selects trump by placing a specific card face-down,
+Implement mariash-style two-phase dealing where the chooser receives
+a partial hand (7 cards), selects trump by placing a specific card face-down,
 and then receives remaining cards.
 
-**Trump selection mechanic (per authentic mariáš rules):**
-1. Chooser places a trump card face-down on desk (card leaves hand temporarily)
-2. Chooser receives 5 more cards (total 11 in hand)
-3. Chooser discards 2 cards to talon (9 in hand)
-4. Chooser asks "Barva?" - others say "Dobrá" or take talon for Betl/Durch
-5. If "Dobrá": Chooser flips trump card, announces game type, takes card back (10 in hand)
-6. Chooser leads first trick
+**Trump selection mechanic (per official rules):**
+1. Chooser receives 7 cards (Phase A)
+2. Chooser places a trump card face-down on desk (card leaves hand, 6 in hand)
+3. Chooser receives 5 more cards (total 11 in hand + trump on desk = 12)
+4. Chooser discards 2 cards to talon (9 in hand + trump on desk)
+5. Chooser asks **"Trump?"** - others say **"Good"** or take talon for Misère/Slam
+6. If "Good": Chooser flips trump card, announces game type, takes card back (10 in hand)
+7. Chooser leads first trick
 
 The trump card (not just suit) is revealed to all players - this is strategically important information.
 
+**Card count verification:**
+- After Phase A: Chooser 7, others 10 each, talon 2, pending 3 = 32
+- After trump placed: Chooser 6 + trump on desk + pending 5 = 12
+- After discard: Chooser 9 + trump = 10, talon 2
+- After reveal: Chooser 10 in hand
+
 ## Success Criteria
-- Engine supports paused dealing with trump card placement
-- Trump selection uses specific card (not just suit)
-- Trump card visibility tracked in game state
-- Server exposes decision endpoints with card information
+- Engine supports paused dealing with trump card placement ✓
+- Trump selection uses specific card (not just suit) ✓
+- Trump card visibility tracked in game state ✓
+- Server exposes decision endpoints with card information ✓
 - UI shows trump card to all players after reveal
 
 ## Related Tasks
-- T-007 Engine + server basic support
-- T-008 Generic chooser decision gate
-- T-009 Deal pattern validation
-- T-010 REST API cleanup
-- T-011 Deal order visibility
-- T-012 Web UI
-- T-013 Trump card selection and reveal
+- T-007 Engine + server basic support ✓ (Done)
+- T-008 Generic chooser decision gate (Planned)
+- T-009 Deal pattern validation (Planned)
+- T-010 REST API cleanup (Planned)
+- T-011 Deal order visibility (Planned)
+- T-012 Web UI (Planned)
+- T-013 Trump card selection and reveal ✓ (Done)
+
+## Related Documentation
+- T-016: Rules - Dealing and Talon (documents the rules this feature implements)
+- T-018: Rules - Trump Selection and Doubling (documents trump selection rules)

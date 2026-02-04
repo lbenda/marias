@@ -75,7 +75,7 @@ class TwoPhaseDealingTest {
         assertEquals(trumpCard.suit, state.trump)
         assertEquals(trumpCard, state.trumpCard)
         assertEquals("p2", state.declarerId)
-        assertEquals(GameType.HRA, state.gameType)
+        assertEquals(GameType.GAME, state.gameType)
 
         // All players should now have 10 cards (trump card returned to hand)
         assertEquals(10, state.players["p1"]!!.hand.size)

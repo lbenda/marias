@@ -12,10 +12,12 @@ Document trump selection and the doubling system in docs/RULES.md.
 ## Scope
 
 ### Trump Selection
-- Chooser places trump card face-down (already implemented in T-013)
-- After "Good" responses, trump card is revealed
-- Trump card returns to hand after reveal
-- Declarer announces contract with trump suit
+- Chooser places trump card face-down (implemented in T-013, F-007)
+- Chooser asks **"Trump?"** - others respond **"Good"** or take talon
+- After all say "Good", trump card is flipped face-up
+- Declarer announces game type with trump suit (e.g., "Game in Hearts")
+- Trump card returns to declarer's hand
+- Declarer leads first trick
 
 ### Doubling System
 From Article II rules 14-18:

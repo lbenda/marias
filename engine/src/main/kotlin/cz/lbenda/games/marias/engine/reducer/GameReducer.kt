@@ -188,7 +188,7 @@ private fun chooseTrumpReducer(state: GameState, action: GameAction.ChooseTrump)
         players = state.players + (chooserId to chooser.copy(hand = finalHand)),
         trump = trumpCard.suit, // Derive suit from card
         trumpCard = trumpCard,  // Store the specific card (visible to all)
-        gameType = GameType.HRA, // Default game type when choosing trump early
+        gameType = GameType.GAME, // Default game type when choosing trump early
         declarerId = chooserId,
         dealing = dealing.copy(
             phase = DealingPhase.COMPLETE,
@@ -249,7 +249,7 @@ private fun passReducer(state: GameState, action: GameAction.Pass): GameState {
     // Bidding ends when only one active player remains
     if (active.size == 1) {
         val declarer = if (state.bidding.currentBid != null) active.first() else state.playerOrder[state.dealerIndex]
-        val gameType = state.bidding.currentBid ?: GameType.HRA
+        val gameType = state.bidding.currentBid ?: GameType.GAME
         return state.copy(
             bidding = state.bidding.copy(passedPlayers = newPassed),
             declarerId = declarer,

@@ -1,4 +1,4 @@
-### Mariáš Game Engine API Tests
+### Mariash Game Engine API Tests
 ### Run these requests from IntelliJ IDEA
 
 ### ===========================================
@@ -131,11 +131,11 @@ GET http://localhost:8080/games/{{gameId}}/bidding
 ### Bidding
 ### ===========================================
 
-### Place bid (HRA)
+### Place bid (GAME)
 POST http://localhost:8080/games/{{gameId}}/actions
 Content-Type: application/json
 
-{"action": {"type": "bid", "playerId": "p2", "gameType": "HRA"}}
+{"action": {"type": "bid", "playerId": "p2", "gameType": "GAME"}}
 
 ### Pass
 POST http://localhost:8080/games/{{gameId}}/actions
@@ -211,7 +211,7 @@ Content-Type: application/json
 ### Reference
 ### ===========================================
 # Action types: join, leave, start, deal, choosetrump, chooserpass, bid, pass, exchange, trump, play, marriage, newround, reorderhand
-# Game types: HRA, SEDMA, KILO, BETL, DURCH
+# Game types: GAME, SEVEN, HUNDRED, HUNDRED_SEVEN, MISERE, SLAM, TWO_SEVENS
 # Suits: SPADES, CLUBS, DIAMONDS, HEARTS
 # Ranks: SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING, ACE
 # Points: 7,8,9=0  J=2  Q=3  K=4  10=10  A=11

@@ -2,19 +2,25 @@ package cz.lbenda.games.marias.engine.state
 
 import kotlinx.serialization.Serializable
 
+/**
+ * Game contract types in mariash.
+ * See docs/VOCABULARY.md for terminology.
+ */
 @Serializable
 enum class GameType(
-    val czechName: String,
+    val displayName: String,
     val baseValue: Int,
     val requiresTrump: Boolean
 ) {
-    HRA("Hra", 1, true),
-    SEDMA("Sedma", 2, true),
-    KILO("Kilo", 4, true),
-    BETL("Betl", 5, false),
-    DURCH("Durch", 6, false);
+    GAME("Game", 1, true),
+    SEVEN("Seven", 2, true),
+    HUNDRED("Hundred", 4, true),
+    HUNDRED_SEVEN("Hundred-Seven", 6, true),
+    MISERE("Misere", 5, false),
+    SLAM("Slam", 6, false),
+    TWO_SEVENS("Two Sevens", 8, true);
 
     companion object {
-        fun fromCzechName(name: String): GameType? = entries.find { it.czechName.equals(name, ignoreCase = true) }
+        fun fromName(name: String): GameType? = entries.find { it.displayName.equals(name, ignoreCase = true) }
     }
 }

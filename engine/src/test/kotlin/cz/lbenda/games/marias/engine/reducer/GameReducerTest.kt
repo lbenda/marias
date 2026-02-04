@@ -53,7 +53,7 @@ class GameReducerTest {
         var state = setupDealt()
 
         val bidder = state.playerOrder[state.currentPlayerIndex]
-        state = reduce(state, GameAction.PlaceBid(bidder, GameType.HRA))
+        state = reduce(state, GameAction.PlaceBid(bidder, GameType.GAME))
         assertNull(state.error)
 
         val passer1 = state.playerOrder[state.currentPlayerIndex]
@@ -65,7 +65,7 @@ class GameReducerTest {
 
         assertEquals(GamePhase.TALON_EXCHANGE, state.phase)
         assertEquals(bidder, state.declarerId)
-        assertEquals(GameType.HRA, state.gameType)
+        assertEquals(GameType.GAME, state.gameType)
     }
 
     @Test

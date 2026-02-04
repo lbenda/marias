@@ -88,9 +88,9 @@ Only valid when `dealing.isWaitingForChooser` is `true`. Proceeds to normal bidd
 
 ### Bid
 ```json
-{"type": "bid", "playerId": "p2", "gameType": "HRA"}
+{"type": "bid", "playerId": "p2", "gameType": "GAME"}
 ```
-Game types: `HRA` (Game), `SEDMA` (Seven), `KILO` (Hundred), `BETL` (Misère), `DURCH` (Slam)
+Game types: `GAME`, `SEVEN`, `HUNDRED`, `HUNDRED_SEVEN`, `MISERE`, `SLAM`, `TWO_SEVENS`
 
 ### Pass
 ```json
@@ -188,15 +188,15 @@ Total deck points: 120
 
 ## Game Types
 
-> **Note:** Code values will be renamed per [VOCABULARY.md](VOCABULARY.md) in T-024.
-
-| Code | English | Description |
-|------|---------|-------------|
-| HRA | Game | Declarer needs >50 points |
-| SEDMA | Seven | Win last trick with 7 of trumps |
-| KILO | Hundred | Declarer needs 100+ points |
-| BETL | Misère | Declarer must not win any trick |
-| DURCH | Slam | Declarer must win all tricks |
+| Code | Description |
+|------|-------------|
+| GAME | Declarer needs >50 points |
+| SEVEN | Win last trick with 7 of trumps |
+| HUNDRED | Declarer needs 100+ points |
+| HUNDRED_SEVEN | Combined Hundred and Seven |
+| MISERE | Declarer must not win any trick |
+| SLAM | Declarer must win all tricks |
+| TWO_SEVENS | Control both trump 7s |
 
 ## Running
 

@@ -18,13 +18,15 @@ fun calculateScore(state: GameState): RoundResult {
     val points = declarer.wonCards.sumOf { it.points } + state.talon.sumOf { it.points }
 
     val won = when (gameType) {
-        GameType.HRA -> points > 50
-        GameType.SEDMA -> false // TODO: check last trick
-        GameType.KILO -> points >= 100
-        GameType.BETL -> declarer.wonCards.isEmpty()
-        GameType.DURCH -> state.tricksPlayed == 10 && state.players.values.all {
+        GameType.GAME -> points > 50
+        GameType.SEVEN -> false // TODO: check last trick
+        GameType.HUNDRED -> points >= 100
+        GameType.HUNDRED_SEVEN -> points >= 100 // TODO: also check last trick with trump 7
+        GameType.MISERE -> declarer.wonCards.isEmpty()
+        GameType.SLAM -> state.tricksPlayed == 10 && state.players.values.all {
             it.playerId == state.declarerId || it.wonCards.isEmpty()
         }
+        GameType.TWO_SEVENS -> false // TODO: check both trump 7s
     }
 
     return RoundResult(points, won, if (won) gameType.baseValue else -gameType.baseValue)
