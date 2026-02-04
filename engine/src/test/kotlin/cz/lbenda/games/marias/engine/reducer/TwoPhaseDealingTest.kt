@@ -65,20 +65,26 @@ class TwoPhaseDealingTest {
         state = reduce(state, GameAction.DealCards("p1", deck, twoPhase = true))
         assertEquals(DealingPhase.WAITING_FOR_TRUMP, state.dealing.phase)
 
-        state = reduce(state, GameAction.ChooseTrump("p2", Suit.HEARTS))
+        // Chooser selects trump by placing a card from hand
+        val trumpCard = state.players["p2"]!!.hand.first() // First card in hand
+        state = reduce(state, GameAction.ChooseTrump("p2", trumpCard))
 
         // Should complete dealing and move to TALON_EXCHANGE
         assertEquals(GamePhase.TALON_EXCHANGE, state.phase)
         assertEquals(DealingPhase.COMPLETE, state.dealing.phase)
-        assertEquals(Suit.HEARTS, state.trump)
+        assertEquals(trumpCard.suit, state.trump)
+        assertEquals(trumpCard, state.trumpCard)
         assertEquals("p2", state.declarerId)
         assertEquals(GameType.HRA, state.gameType)
 
-        // All players should now have 10 cards
+        // All players should now have 10 cards (trump card returned to hand)
         assertEquals(10, state.players["p1"]!!.hand.size)
         assertEquals(10, state.players["p2"]!!.hand.size)
         assertEquals(10, state.players["p3"]!!.hand.size)
         assertEquals(2, state.talon.size)
+
+        // Trump card should be in chooser's hand
+        assertTrue(trumpCard in state.players["p2"]!!.hand)
     }
 
     @Test
@@ -109,7 +115,9 @@ class TwoPhaseDealingTest {
         val deck = createOrderedDeck()
 
         state = reduce(state, GameAction.DealCards("p1", deck, twoPhase = true))
-        state = reduce(state, GameAction.ChooseTrump("p1", Suit.HEARTS))
+        // p1 (not chooser) tries to select trump with a card from their hand
+        val card = state.players["p1"]!!.hand.first()
+        state = reduce(state, GameAction.ChooseTrump("p1", card))
 
         // Should have error
         assertEquals("Not chooser", state.error)
@@ -125,7 +133,9 @@ class TwoPhaseDealingTest {
         state = reduce(state, GameAction.DealCards("p1", deck, twoPhase = false))
         assertEquals(GamePhase.BIDDING, state.phase)
 
-        state = reduce(state, GameAction.ChooseTrump("p2", Suit.HEARTS))
+        // Try to choose trump with any card (will fail because not in dealing phase)
+        val card = state.players["p2"]!!.hand.first()
+        state = reduce(state, GameAction.ChooseTrump("p2", card))
         assertEquals("Not dealing phase", state.error)
     }
 
@@ -250,9 +260,116 @@ class TwoPhaseDealingTest {
         state = reduce(state, GameAction.DealCards("p1", deck, twoPhase = true))
         val dealOrderBeforeTrump = state.dealing.dealOrder.toMap()
 
-        state = reduce(state, GameAction.ChooseTrump("p2", Suit.DIAMONDS))
+        // Select trump with a card from chooser's hand
+        val trumpCard = state.players["p2"]!!.hand.first()
+        state = reduce(state, GameAction.ChooseTrump("p2", trumpCard))
 
         // Deal order should still be preserved
         assertEquals(10, state.dealing.dealOrder["p2"]!!.size)
+        // Trump card should be recorded
+        assertEquals(trumpCard, state.trumpCard)
+        assertEquals(trumpCard, state.dealing.trumpCard)
+    }
+
+    @Test
+    fun `hands are returned in deal order not sorted`() {
+        var state = setupPlayers()
+        val deck = createOrderedDeck()
+
+        state = reduce(state, GameAction.DealCards("p1", deck, twoPhase = false))
+
+        // Hand should be in deal order, not sorted
+        val hand = state.players["p2"]!!.hand
+        val dealOrder = state.dealing.dealOrder["p2"]!!
+
+        // Hand should match deal order exactly
+        assertEquals(dealOrder, hand)
+    }
+
+    @Test
+    fun `reorder hand changes card order`() {
+        var state = setupPlayers()
+        val deck = createOrderedDeck()
+
+        state = reduce(state, GameAction.DealCards("p1", deck, twoPhase = false))
+
+        val originalHand = state.players["p1"]!!.hand
+        val reversedHand = originalHand.reversed()
+
+        state = reduce(state, GameAction.ReorderHand("p1", reversedHand))
+
+        assertNull(state.error)
+        assertEquals(reversedHand, state.players["p1"]!!.hand)
+    }
+
+    @Test
+    fun `reorder hand fails with wrong cards`() {
+        var state = setupPlayers()
+        val deck = createOrderedDeck()
+
+        state = reduce(state, GameAction.DealCards("p1", deck, twoPhase = false))
+
+        // Try to reorder with completely different cards
+        val wrongCards = listOf(
+            Card(Suit.HEARTS, Rank.ACE),
+            Card(Suit.HEARTS, Rank.KING)
+        )
+
+        state = reduce(state, GameAction.ReorderHand("p1", wrongCards))
+
+        assertEquals("Card count mismatch", state.error)
+    }
+
+    @Test
+    fun `reorder hand fails with mismatched cards`() {
+        var state = setupPlayers()
+        val deck = createOrderedDeck()
+
+        state = reduce(state, GameAction.DealCards("p1", deck, twoPhase = false))
+
+        val hand = state.players["p1"]!!.hand.toMutableList()
+        // Replace one card with a card not in hand
+        hand[0] = Card(Suit.HEARTS, Rank.SEVEN)
+
+        state = reduce(state, GameAction.ReorderHand("p1", hand))
+
+        assertEquals("Cards don't match current hand", state.error)
+    }
+
+    @Test
+    fun `choose trump fails with card not in hand`() {
+        var state = setupPlayers()
+        val deck = createOrderedDeck()
+
+        state = reduce(state, GameAction.DealCards("p1", deck, twoPhase = true))
+        assertEquals(DealingPhase.WAITING_FOR_TRUMP, state.dealing.phase)
+
+        // Try to choose trump with a card not in chooser's hand
+        val cardNotInHand = Card(Suit.HEARTS, Rank.ACE)
+        assertFalse(cardNotInHand in state.players["p2"]!!.hand)
+
+        state = reduce(state, GameAction.ChooseTrump("p2", cardNotInHand))
+
+        assertEquals("Card not in hand", state.error)
+        assertEquals(DealingPhase.WAITING_FOR_TRUMP, state.dealing.phase)
+    }
+
+    @Test
+    fun `trump card is visible to all players after selection`() {
+        var state = setupPlayers()
+        val deck = createOrderedDeck()
+
+        state = reduce(state, GameAction.DealCards("p1", deck, twoPhase = true))
+
+        val trumpCard = state.players["p2"]!!.hand.first()
+        state = reduce(state, GameAction.ChooseTrump("p2", trumpCard))
+
+        // Trump card should be visible in game state (for all players)
+        assertNotNull(state.trumpCard)
+        assertEquals(trumpCard, state.trumpCard)
+        assertEquals(trumpCard.suit, state.trump)
+
+        // Trump card should also be stored in dealing state
+        assertEquals(trumpCard, state.dealing.trumpCard)
     }
 }

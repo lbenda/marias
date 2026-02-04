@@ -30,6 +30,7 @@ fun validate(state: GameState, action: GameAction): String? = when (action) {
         state.phase != GamePhase.DEALING -> "Not dealing phase"
         state.dealing.phase != DealingPhase.WAITING_FOR_TRUMP -> "Not waiting for trump selection"
         action.playerId != state.dealing.chooserId -> "Not chooser"
+        action.card !in (state.players[action.playerId]?.hand ?: emptyList()) -> "Card not in hand"
         else -> null
     }
     is GameAction.ChooserPass -> when {
@@ -72,6 +73,18 @@ fun validate(state: GameState, action: GameAction): String? = when (action) {
         state.phase != GamePhase.SCORING && state.phase != GamePhase.FINISHED -> "Round not finished"
         else -> null
     }
+    is GameAction.ReorderHand -> validateReorderHand(state, action)
+}
+
+private fun validateReorderHand(state: GameState, action: GameAction.ReorderHand): String? {
+    val player = state.players[action.playerId] ?: return "Player not in game"
+    val currentHand = player.hand
+    val newOrder = action.cards
+
+    if (newOrder.size != currentHand.size) return "Card count mismatch"
+    if (newOrder.toSet() != currentHand.toSet()) return "Cards don't match current hand"
+
+    return null
 }
 
 private fun validatePlayCard(state: GameState, action: GameAction.PlayCard): String? {

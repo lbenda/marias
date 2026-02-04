@@ -41,6 +41,7 @@ fun reduce(state: GameState, action: GameAction): GameState {
             currentPlayerIndex = (state.dealerIndex + 2) % 3,
             talon = emptyList(),
             trump = null,
+            trumpCard = null,
             gameType = null,
             declarerId = null,
             dealing = DealingState(),
@@ -50,6 +51,12 @@ fun reduce(state: GameState, action: GameAction): GameState {
             phase = GamePhase.DEALING,
             roundNumber = state.roundNumber + 1
         )
+        is GameAction.ReorderHand -> {
+            val player = state.players[action.playerId]!!
+            state.copy(
+                players = state.players + (action.playerId to player.copy(hand = action.cards))
+            )
+        }
     }
     return next.copy(error = null, version = state.version + 1)
 }
@@ -159,21 +166,35 @@ private fun executeDealingPhaseA(
 }
 
 /**
- * Chooser selects trump during dealing pause.
- * Moves pending cards to chooser's hand and makes chooser the declarer.
+ * Chooser selects trump by placing a card face-down.
+ * Card is removed from hand, pending cards added, then card returned after reveal.
  */
 private fun chooseTrumpReducer(state: GameState, action: GameAction.ChooseTrump): GameState {
     val dealing = state.dealing
     val chooserId = dealing.chooserId!!
+    val chooser = state.players[chooserId]!!
+    val trumpCard = action.card
 
-    // Move pending cards to chooser's hand
-    val stateAfterDeal = movePendingCardsToHand(state)
+    // Remove trump card from hand temporarily (placed on desk)
+    val handWithoutTrump = chooser.hand - trumpCard
 
-    // Move to talon exchange (chooser is declarer, trump already selected)
-    return stateAfterDeal.copy(
-        trump = action.trump,
+    // Add pending cards to hand (chooser now has: 7 - 1 + pending cards)
+    val newHand = handWithoutTrump + dealing.pendingCards
+
+    // Return trump card to hand (after reveal) - now has full 10 cards
+    val finalHand = newHand + trumpCard
+
+    return state.copy(
+        players = state.players + (chooserId to chooser.copy(hand = finalHand)),
+        trump = trumpCard.suit, // Derive suit from card
+        trumpCard = trumpCard,  // Store the specific card (visible to all)
         gameType = GameType.HRA, // Default game type when choosing trump early
         declarerId = chooserId,
+        dealing = dealing.copy(
+            phase = DealingPhase.COMPLETE,
+            pendingCards = emptyList(),
+            trumpCard = trumpCard
+        ),
         phase = GamePhase.TALON_EXCHANGE,
         currentPlayerIndex = state.playerOrder.indexOf(chooserId)
     )
@@ -203,8 +224,7 @@ private fun movePendingCardsToHand(state: GameState): GameState {
     val chooser = state.players[chooserId]!!
 
     // Add pending cards to chooser's hand
-    val newHand = (chooser.hand + dealing.pendingCards).sorted()
-
+    val newHand = (chooser.hand + dealing.pendingCards)
     return state.copy(
         players = state.players + (chooserId to chooser.copy(hand = newHand)),
         dealing = dealing.copy(
@@ -256,7 +276,7 @@ private fun nextActiveBidder(order: List<String>, current: Int, passed: Set<Stri
 
 private fun exchangeTalonReducer(state: GameState, action: GameAction.ExchangeTalon): GameState {
     val declarer = state.players[action.playerId]!!
-    val newHand = (declarer.hand + state.talon).filterNot { it in action.cardsToDiscard }.sorted()
+    val newHand = (declarer.hand + state.talon).filterNot { it in action.cardsToDiscard }
     val nextPhase = if (state.gameType?.requiresTrump == true && state.trump == null) {
         GamePhase.TRUMP_SELECTION
     } else {

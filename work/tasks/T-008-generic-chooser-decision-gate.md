@@ -23,11 +23,13 @@ IN:
     - block game progression
     - specify which player must act
     - specify allowed decision types
-- Initial supported decision:
-    - `SELECT_TRUMP`
+- Initial supported decisions:
+    - `SELECT_TRUMP` - requires a Card (not just Suit), see T-013
+    - `PASS` - decline to choose trump
 - Engine state should expose:
     - decision type(s) available
     - whether decision is mandatory or optional
+    - for trump selection: the placed card (face-down until reveal)
 
 OUT:
 - Full Betl/Durch scoring or trick logic
@@ -38,10 +40,12 @@ OUT:
     - decisionType (enum)
     - chooserSeat
     - payload schema (engine-level, not REST)
+    - for SELECT_TRUMP: payload contains Card (derives suit automatically)
 - Replace hard dependency on `chooseTrump()` with:
     - `submitChooserDecision(decision)`
 - Keep backward compatibility:
     - trump selection uses this gate internally
+    - trump suit derived from trump card
 
 ## Definition of Done
 - Engine pauses via decision gate, not ad-hoc flags

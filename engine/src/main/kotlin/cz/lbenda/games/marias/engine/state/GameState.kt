@@ -15,6 +15,7 @@ data class GameState(
     val currentPlayerIndex: Int = 0,
     val talon: List<Card> = emptyList(),
     val trump: Suit? = null,
+    val trumpCard: Card? = null, // The specific card used to declare trump (visible to all after reveal)
     val gameType: GameType? = null,
     val declarerId: String? = null,
     val dealing: DealingState = DealingState(),

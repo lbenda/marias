@@ -71,11 +71,12 @@ Content-Type: application/json
 ### ===========================================
 
 ### Choose trump during dealing pause (chooser only)
+### Chooser places a card from hand - card's suit becomes trump
 ### Makes chooser the declarer, skips bidding
 POST http://localhost:8080/games/{{gameId}}/actions
 Content-Type: application/json
 
-{"action": {"type": "choosetrump", "playerId": "p2", "trump": "HEARTS"}}
+{"action": {"type": "choosetrump", "playerId": "p2", "card": {"suit": "HEARTS", "rank": "ACE"}}}
 
 ### Chooser pass during dealing pause (chooser only)
 ### Proceeds to normal bidding
@@ -88,7 +89,7 @@ Content-Type: application/json
 ### Player Hands
 ### ===========================================
 
-### Get player 1's hand
+### Get player 1's hand (returns in deal order or custom order)
 GET http://localhost:8080/games/{{gameId}}/players/p1/hand
 
 ### Get player 2's hand
@@ -96,6 +97,32 @@ GET http://localhost:8080/games/{{gameId}}/players/p2/hand
 
 ### Get player 3's hand
 GET http://localhost:8080/games/{{gameId}}/players/p3/hand
+
+### Reorder player 1's hand (cards must match current hand)
+PUT http://localhost:8080/games/{{gameId}}/players/p1/hand
+Content-Type: application/json
+
+{"cards": [
+  {"suit": "HEARTS", "rank": "ACE"},
+  {"suit": "HEARTS", "rank": "KING"},
+  {"suit": "SPADES", "rank": "ACE"},
+  {"suit": "SPADES", "rank": "KING"},
+  {"suit": "DIAMONDS", "rank": "ACE"},
+  {"suit": "DIAMONDS", "rank": "KING"},
+  {"suit": "CLUBS", "rank": "ACE"},
+  {"suit": "CLUBS", "rank": "KING"},
+  {"suit": "HEARTS", "rank": "QUEEN"},
+  {"suit": "SPADES", "rank": "QUEEN"}
+]}
+
+### Reorder hand via action (alternative method)
+POST http://localhost:8080/games/{{gameId}}/actions
+Content-Type: application/json
+
+{"action": {"type": "reorderhand", "playerId": "p1", "cards": [
+  {"suit": "HEARTS", "rank": "ACE"},
+  {"suit": "SPADES", "rank": "ACE"}
+]}}
 
 ### Get bidding state
 GET http://localhost:8080/games/{{gameId}}/bidding
@@ -183,7 +210,7 @@ Content-Type: application/json
 ### ===========================================
 ### Reference
 ### ===========================================
-# Action types: join, leave, start, deal, choosetrump, chooserpass, bid, pass, exchange, trump, play, marriage, newround
+# Action types: join, leave, start, deal, choosetrump, chooserpass, bid, pass, exchange, trump, play, marriage, newround, reorderhand
 # Game types: HRA, SEDMA, KILO, BETL, DURCH
 # Suits: SPADES, CLUBS, DIAMONDS, HEARTS
 # Ranks: SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING, ACE

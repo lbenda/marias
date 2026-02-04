@@ -28,9 +28,9 @@ sealed class GameAction {
         val twoPhase: Boolean = true
     ) : GameAction()
 
-    /** Chooser selects trump during dealing pause. Resumes dealing and makes chooser the declarer. */
+    /** Chooser selects trump by placing a card face-down. Card determines trump suit. */
     @Serializable @SerialName("choosetrump")
-    data class ChooseTrump(override val playerId: String, val trump: Suit) : GameAction()
+    data class ChooseTrump(override val playerId: String, val card: Card) : GameAction()
 
     /** Chooser passes during dealing pause. Resumes dealing and proceeds to normal bidding. */
     @Serializable @SerialName("chooserpass")
@@ -56,4 +56,8 @@ sealed class GameAction {
 
     @Serializable @SerialName("newround")
     data class StartNewRound(override val playerId: String) : GameAction()
+
+    /** Reorder cards in hand. Cards must match current hand exactly. */
+    @Serializable @SerialName("reorderhand")
+    data class ReorderHand(override val playerId: String, val cards: List<Card>) : GameAction()
 }

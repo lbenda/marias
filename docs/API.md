@@ -15,7 +15,8 @@ http://localhost:8080
 | GET | `/games/{id}` | Get game state |
 | DELETE | `/games/{id}` | Delete game |
 | POST | `/games/{id}/actions` | Dispatch action |
-| GET | `/games/{id}/players/{playerId}/hand` | Get player's hand |
+| GET | `/games/{id}/players/{playerId}/hand` | Get player's hand (in deal/custom order) |
+| PUT | `/games/{id}/players/{playerId}/hand` | Reorder player's hand |
 | GET | `/games/{id}/talon?playerId={id}` | Get talon (declarer only) |
 | GET | `/games/{id}/bidding` | Get bidding state |
 
@@ -72,9 +73,12 @@ All actions are sent to `POST /games/{id}/actions` with body `{"action": {...}}`
 
 ### Choose Trump (during dealing pause)
 ```json
-{"type": "choosetrump", "playerId": "p2", "trump": "HEARTS"}
+{"type": "choosetrump", "playerId": "p2", "card": {"suit": "HEARTS", "rank": "ACE"}}
 ```
+Chooser places a specific card from their hand to declare trump. The card's suit becomes trump.
 Only valid when `dealing.isWaitingForChooser` is `true`. Makes chooser the declarer.
+
+The `trumpCard` is then visible to all players in the game state response.
 
 ### Chooser Pass (during dealing pause)
 ```json
@@ -120,6 +124,48 @@ Game types: `HRA` (Game), `SEDMA` (Seven), `KILO` (Hundred), `BETL` (Misère), `
 ```json
 {"type": "newround", "playerId": "p1"}
 ```
+
+### Reorder Hand
+```json
+{"type": "reorderhand", "playerId": "p1", "cards": [
+  {"suit": "HEARTS", "rank": "ACE"},
+  {"suit": "SPADES", "rank": "KING"},
+  ...
+]}
+```
+Cards must match current hand exactly (same cards, different order).
+
+## Hand Management
+
+### Get Hand
+```http
+GET /games/{id}/players/{playerId}/hand
+```
+Returns hand in current order (deal order initially, or custom order if reordered).
+
+Response:
+```json
+{
+  "hand": [{"suit": "HEARTS", "rank": "ACE"}, ...],
+  "validCards": [{"suit": "HEARTS", "rank": "ACE"}, ...]
+}
+```
+
+### Reorder Hand
+```http
+PUT /games/{id}/players/{playerId}/hand
+Content-Type: application/json
+
+{"cards": [
+  {"suit": "SPADES", "rank": "KING"},
+  {"suit": "HEARTS", "rank": "ACE"},
+  ...
+]}
+```
+Cards must match current hand exactly. Returns error if cards don't match.
+
+Response (success): Same as GET hand
+Response (error): `{"error": "Cards don't match current hand"}`
 
 ## Card Reference
 

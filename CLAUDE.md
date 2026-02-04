@@ -96,13 +96,25 @@ After implementing:
 ## 7) API changes
 If you change anything in the HTTP API (endpoints, payloads, status codes, auth, error format), you MUST update:
 - docs/API.md
-- api-tests.http
+- docs/api-tests.http
 
 Treat these files as part of the API contract.
 
 ---
 
-## 8) Safety boundaries
+## 8) Game rules documentation
+The file `docs/RULES.md` contains the official mariáš game rules as implemented.
+When implementing features that change game mechanics, update this file to reflect:
+- New game phases or flows
+- Card handling rules
+- Scoring changes
+- Any rule variations
+
+This file serves as both player documentation and implementation reference.
+
+---
+
+## 9) Safety boundaries
 - Do not introduce new dependencies unless requested or clearly justified.
 - Do not change formatting or lint rules unless explicitly asked.
 - Do not modify unrelated files.

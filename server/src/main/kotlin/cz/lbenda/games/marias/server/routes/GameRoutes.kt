@@ -41,6 +41,22 @@ fun Route.gameRoutes(service: GameService) {
             call.respond(state.handResponse(call.parameters["playerId"]!!))
         }
 
+        put("/{id}/players/{playerId}/hand") {
+            val gameId = call.parameters["id"]!!
+            val playerId = call.parameters["playerId"]!!
+            val req = call.receive<ReorderHandRequest>()
+
+            val state = service.dispatch(
+                gameId,
+                cz.lbenda.games.marias.engine.action.GameAction.ReorderHand(playerId, req.cards)
+            ) ?: return@put call.respond(HttpStatusCode.NotFound, "Game not found")
+
+            if (state.error != null) {
+                return@put call.respond(HttpStatusCode.BadRequest, mapOf("error" to state.error))
+            }
+            call.respond(state.handResponse(playerId))
+        }
+
         get("/{id}/talon") {
             val state = service.get(call.parameters["id"]!!)
                 ?: return@get call.respond(HttpStatusCode.NotFound, "Game not found")

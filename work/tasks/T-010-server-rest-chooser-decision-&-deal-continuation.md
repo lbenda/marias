@@ -30,13 +30,21 @@ Response:
 - chooserPlayerId
 - allowedOptions
 - pendingCardsCount
+- trumpCard (after reveal, visible to all players)
 
 POST /games/{id}/decision
 Request:
 - decisionType
-- payload
+- payload (for SELECT_TRUMP: card object, not just suit)
+
+### Trump Card Visibility
+- Before reveal (face-down): only chooser knows the card
+- After "Dobrá": trumpCard included in game state for all players
+- The specific card (not just suit) is strategically important information
 
 ## Definition of Done
 - REST mirrors engine decision gate accurately
 - Server refuses invalid or out-of-phase decisions
-- Integration test covers full pause → decision → resume flow
+- Trump selection accepts Card, not just Suit (see T-013)
+- Game state includes trumpCard after reveal
+- Integration test covers full pause → decision → reveal → resume flow

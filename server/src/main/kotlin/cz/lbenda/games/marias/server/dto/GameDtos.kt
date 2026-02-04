@@ -22,6 +22,7 @@ data class GameResponse(
     val currentPlayerId: String?,
     val dealerId: String?,
     val trump: Suit?,
+    val trumpCard: Card?, // The specific card used to declare trump (visible to all after reveal)
     val gameType: GameType?,
     val declarerId: String?,
     val dealing: DealingDto?,
@@ -70,6 +71,9 @@ data class BiddingResponse(
     val passedPlayers: List<String>
 )
 
+@Serializable
+data class ReorderHandRequest(val cards: List<Card>)
+
 fun GameState.toResponse() = GameResponse(
     gameId = gameId,
     version = version,
@@ -78,6 +82,7 @@ fun GameState.toResponse() = GameResponse(
     currentPlayerId = playerOrder.getOrNull(currentPlayerIndex),
     dealerId = playerOrder.getOrNull(dealerIndex),
     trump = trump,
+    trumpCard = trumpCard,
     gameType = gameType,
     declarerId = declarerId,
     dealing = dealing.toDto(),

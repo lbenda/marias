@@ -47,7 +47,8 @@ engine/
 - OpenAPI is generated code-first
 - HTTP API documentation:
   - docs/API.md — human-readable API reference
-  - api-tests.http — executable API examples
+  - docs/api-tests.http — executable API examples
+- Game rules: docs/RULES.md — mariáš rules as implemented
 
 ### Module Structure
 

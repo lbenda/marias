@@ -100,7 +100,8 @@ data class DealingState(
     val deck: List<Card> = emptyList(), // Full deck for deterministic continuation
     val chooserId: String? = null,
     val pendingCards: List<Card> = emptyList(),  // Cards on table for chooser (remaining cards to deal)
-    val dealOrder: Map<String, List<Card>> = emptyMap() // Per-player deal order log
+    val dealOrder: Map<String, List<Card>> = emptyMap(), // Per-player deal order log
+    val trumpCard: Card? = null // Trump card placed face-down (before reveal)
 ) {
     val isWaitingForChooser: Boolean get() = phase == DealingPhase.WAITING_FOR_TRUMP
     val isComplete: Boolean get() = phase == DealingPhase.COMPLETE
