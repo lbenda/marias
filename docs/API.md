@@ -1,4 +1,4 @@
-# Mariáš Game Engine REST API
+# Mariash Game Engine REST API
 
 ## Base URL
 ```
@@ -62,7 +62,7 @@ All actions are sent to `POST /games/{id}/actions` with body `{"action": {...}}`
 ```json
 {"type": "bid", "playerId": "p2", "gameType": "HRA"}
 ```
-Game types: `HRA`, `SEDMA`, `KILO`, `BETL`, `DURCH`
+Game types: `HRA` (Game), `SEDMA` (Seven), `KILO` (Hundred), `BETL` (Misère), `DURCH` (Slam)
 
 ### Pass
 ```json
@@ -118,13 +118,15 @@ Total deck points: 120
 
 ## Game Types
 
-| Type | Description |
-|------|-------------|
-| HRA | Declarer needs >50 points |
-| SEDMA | Win last trick with 7 of trumps |
-| KILO | Declarer needs 100+ points |
-| BETL | Declarer must not win any trick |
-| DURCH | Declarer must win all tricks |
+> **Note:** Code values will be renamed per [VOCABULARY.md](VOCABULARY.md) in T-024.
+
+| Code | English | Description |
+|------|---------|-------------|
+| HRA | Game | Declarer needs >50 points |
+| SEDMA | Seven | Win last trick with 7 of trumps |
+| KILO | Hundred | Declarer needs 100+ points |
+| BETL | Misère | Declarer must not win any trick |
+| DURCH | Slam | Declarer must win all tricks |
 
 ## Running
 

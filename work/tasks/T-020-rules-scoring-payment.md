@@ -15,33 +15,33 @@ From Article I of source:
 ### Base Rates (with 0.20 base)
 | Game Type | Rate |
 |-----------|------|
-| hra (game) | 0.20 |
-| sedma | 0.40 |
-| sto | 0.80 |
-| betl | 3.00 |
-| durch | 6.00 |
-| dvě sedmy | 8.00 |
-| tichá sedma | 0.20 |
-| omyl | 1.20 |
-| renonc paušál 1 | 2.00 |
-| renonc paušál 2 | 10.00 |
+| game | 0.20 |
+| seven | 0.40 |
+| hundred | 0.80 |
+| misère | 3.00 |
+| slam | 6.00 |
+| two sevens | 8.00 |
+| silent seven | 0.20 |
+| mistake | 1.20 |
+| minor penalty | 2.00 |
+| major penalty | 10.00 |
 | limit | 100.00 |
-| zvýšený limit | 150.00 |
+| raised limit | 150.00 |
 
 ### Point Counting
 - Total deck: 120 points
 - Declarer's points = tricks + talon discards
 - Win conditions:
-  - Hra: >50 points (at least 51)
-  - Sto: ≥100 points
-  - Betl: 0 tricks taken
-  - Durch: all 10 tricks taken
+  - Game: >50 points (at least 51)
+  - Hundred: ≥100 points
+  - Misère: 0 tricks taken
+  - Slam: all 10 tricks taken
 
 ### Payment Rules
 - Declarer vs all defenders (rule 2)
 - Sitting out player pays/receives as defender
 - Red trump doubles all rates
-- Flekování multiplies rates
+- Doubling multiplies rates
 
 ### Limits
 - Standard limit: 100x base

@@ -1,83 +1,78 @@
 # T-014: Vocabulary (Czech-English Glossary)
 
 - Parent: F-008
-- Status: Planned
+- Status: Done
 - Owner: docs
 - Related modules: docs
 
+## Summary of Changes
+
+- Created docs/VOCABULARY.md with complete Czech-English glossary
+- Key terminology decisions:
+  - mariáš → mariash
+  - betl → misère (standard card game term)
+  - durch → slam (bridge/tarot term)
+  - kilo → hundred (kilo is confusing - means 1000 in SI)
+  - flek/re/tutti/boty → double/redouble/raise/final raise
+- Updated docs/RULES.md to use English terminology throughout
+- Updated F-008 feature with new vocabulary
+- Updated tasks T-017, T-018, T-020, T-022, T-023 with new terminology
+- Updated docs/API.md with vocabulary references
+- Created T-024 for implementing vocabulary in source code
+
+## Result
+
+- docs/VOCABULARY.md created with ~100 terms organized by category
+- All documentation uses consistent English terminology
+- Source code changes tracked in T-024
+
+## Verification
+
+- docs/VOCABULARY.md exists and is complete
+- docs/RULES.md references vocabulary and uses English terms
+- All F-008 tasks use consistent terminology
+
 ## Goal
-Create a Czech-English glossary for mariáš terminology to ensure consistent
+Create a Czech-English glossary for mariash terminology to ensure consistent
 translation throughout docs/RULES.md and the codebase.
 
 ## Context
-Many mariáš terms don't have standard English equivalents. This glossary
+Many mariash terms don't have standard English equivalents. This glossary
 establishes the canonical translations used in this project.
 
 ## Deliverable
 Create docs/VOCABULARY.md with terms organized by category.
 
-## Initial Vocabulary
+## Key Vocabulary Decisions
 
-### Players & Positions
+### Game Name
+| Czech | English |
+|-------|---------|
+| mariáš | mariash |
+
+### Contracts
 | Czech | English | Notes |
 |-------|---------|-------|
-| aktér | declarer | the player who won the bid |
-| obrana | defense | the two players opposing declarer |
-| rozdávající | dealer | deals the cards |
-| volič | chooser | player after dealer, first to decide |
-| zadák | cutter | player who cuts the deck |
-| pauzírující | sitting out | 4th player not playing current hand |
-
-### Game Actions
-| Czech | English | Notes |
-|-------|---------|-------|
-| licitace | bidding/auction | the bidding phase |
-| flek | double | doubles the stake |
-| re | redouble | doubles again after flek |
-| tutti | all double | when all players double |
-| barva | suit/trump | "Barva?" = asking about trump |
-| dobrá | good/accept | accepting the contract |
-| pas | pass | declining to bid |
-
-### Contracts & Game Types
-| Czech | English | Notes |
-|-------|---------|-------|
-| hra | game (basic) | declarer needs >50 points |
+| hra | game | basic contract |
 | sedma | seven | win last trick with trump 7 |
-| sto/stovka | hundred/kilo | declarer needs 100+ points |
-| stosedma | hundred-seven | both sto and sedma |
-| betl | betl | declarer must take no tricks |
-| durch | durch | declarer must take all tricks |
-| dvě sedmy | two sevens | both trump 7s in play |
-| červená | red | hearts or diamonds as trump (2x rate) |
+| sto/stovka | hundred | 100+ points (not "kilo") |
+| stosedma | hundred-seven | combined |
+| betl | misère | take no tricks (tarot term) |
+| durch | slam | take all tricks (bridge term) |
+| dvě sedmy | two sevens | both trump 7s |
 
-### Card Terms
-| Czech | English | Notes |
-|-------|---------|-------|
-| trumf | trump | the trump suit |
-| talon | talon | 2 cards set aside during deal |
-| zdvih | trick | one round of card play |
-| hláška | marriage | K+Q of same suit |
-| pomocná | helper card | non-trump 7 in Two Sevens |
-
-### Game Situations
-| Czech | English | Notes |
-|-------|---------|-------|
-| ložená hra | lay-down hand | unbeatable hand, shown without play |
-| tichá sedma | silent seven | unannounced seven win |
-| tiché sto | silent hundred | unannounced 100+ points |
-| renonc | violation/revoke | rule violation |
-| omyl | mistake | folding without playing |
-
-### Scoring
-| Czech | English | Notes |
-|-------|---------|-------|
-| prémiové body (PB) | premium points | tournament scoring |
-| paušál | penalty fee | fixed penalty for violations |
-| sazba | rate/stake | payment amount |
+### Doubling
+| Czech | English | Multiplier |
+|-------|---------|------------|
+| flek | double | 2x |
+| re | redouble | 4x |
+| tutti/výš/víc | raise | 8x |
+| boty | final raise | 16x |
 
 ## Definition of Done
-- docs/VOCABULARY.md created with all terms
-- Terms organized by category
-- Notes explain non-obvious translations
-- Referenced from docs/RULES.md
+- docs/VOCABULARY.md created with all terms ✓
+- Terms organized by category ✓
+- Notes explain non-obvious translations ✓
+- Referenced from docs/RULES.md ✓
+- All tasks/features updated with vocabulary ✓
+- T-024 created for source code changes ✓

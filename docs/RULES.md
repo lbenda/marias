@@ -1,8 +1,9 @@
+# Mariash - Game Rules
 
-# Mariáš - Game Rules
-
-Mariáš is a traditional Czech trick-taking card game for 3 players.
+Mariash is a traditional Czech trick-taking card game for 3 players.
 This document describes the rules as implemented in this game engine.
+
+For Czech-English terminology, see [VOCABULARY.md](VOCABULARY.md).
 
 ## Equipment
 
@@ -30,11 +31,11 @@ This document describes the rules as implemented in this game engine.
 
 - 3 players sit around the table
 - Positions rotate each round:
-  - **Dealer** (rozdávající) - deals cards
-  - **Chooser** (volič) - sits after dealer, makes first decisions
+  - **Dealer** - deals cards
+  - **Chooser** - sits after dealer, makes first decisions
   - **Third player** - sits after chooser
 
-## Dealing (Rozdávání)
+## Dealing
 
 Dealing happens in two phases:
 
@@ -52,7 +53,7 @@ After receiving 7 cards, the chooser must decide:
    - The card is NOT revealed yet
    - Continue to Phase B
 
-2. **Pass** (Pas) - Decline to choose trump
+2. **Pass** - Decline to choose trump
    - Proceed to bidding phase
    - Other players may bid for contracts
 
@@ -62,21 +63,21 @@ If chooser selected trump:
 2. Chooser discards **2 cards** face-down to the talon
 3. Chooser now has 10 cards in hand
 
-### Talon Exchange (Výměna talonu)
-After discarding, the chooser asks: **"Barva?"** (Trump?)
+### Talon Exchange
+After discarding, the chooser asks: **"Trump?"**
 
 Other players respond in order:
-- **"Dobrá"** (Good) - Accept the trump, game proceeds normally
-- **Take talon** - Player takes the 2 talon cards and declares Betl or Durch
+- **"Good"** - Accept the trump, game proceeds normally
+- **Take talon** - Player takes the 2 talon cards and declares Misère or Slam
 
-### Trump Reveal (Vyložení trumfu)
-If all players say "Dobrá":
+### Trump Reveal
+If all players say "Good":
 1. Chooser **flips the trump card** face-up on the desk
 2. Chooser **announces the game type** with trump suit:
-   - **"Hra v srdcích"** - Basic game in Hearts
-   - **"Sedma v srdcích"** - Sedma in Hearts (win last trick with trump 7)
-   - **"Stovka v srdcích"** - Kilo in Hearts (score 100+ points)
-   - **"Stosedma v srdcích"** - Both Sedma and Kilo combined
+   - **"Game in Hearts"** - Basic game in Hearts
+   - **"Seven in Hearts"** - Seven in Hearts (win last trick with trump 7)
+   - **"Hundred in Hearts"** - Hundred in Hearts (score 100+ points)
+   - **"Hundred-Seven in Hearts"** - Both Seven and Hundred combined
 3. Chooser **takes the trump card back** into their hand
 4. Chooser leads the first trick
 
@@ -85,16 +86,16 @@ If all players say "Dobrá":
 - Talon (discarded): 2 cards
 - Total: 32 cards
 
-## Game Types (Druhy her)
+## Game Types
 
-| Type | Czech | Description |
-|------|-------|-------------|
-| HRA | Hra | Basic game - declarer needs more than 50 points |
-| SEDMA | Sedma | Win last trick with 7 of trumps |
-| KILO | Kilo/Stovka | Declarer needs 100+ points |
-| STOSEDMA | Stosedma | Sedma + Kilo combined |
-| BETL | Betl | Declarer must not win any trick |
-| DURCH | Durch | Declarer must win all tricks |
+| Type | Description |
+|------|-------------|
+| Game | Basic game - declarer needs more than 50 points |
+| Seven | Win last trick with 7 of trumps |
+| Hundred | Declarer needs 100+ points |
+| Hundred-Seven | Seven + Hundred combined |
+| Misère | Declarer must not win any trick |
+| Slam | Declarer must win all tricks |
 
 **Note:** The revealed trump card is visible to all players - they know both the trump suit AND which specific card was used to declare it. This information is strategically important.
 
@@ -106,7 +107,7 @@ If all players say "Dobrá":
 
 *(To be documented)*
 
-## Marriages (Hlášky)
+## Marriages
 
 *(To be documented)*
 
