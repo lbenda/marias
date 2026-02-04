@@ -8,24 +8,35 @@ For Czech-English terminology, see [VOCABULARY.md](VOCABULARY.md).
 ## Equipment
 
 ### Deck
-32 cards (German or French suits):
-- 4 suits: Spades, Clubs, Diamonds, Hearts
-- 8 ranks per suit: 7, 8, 9, 10, Jack, Queen, King, Ace
+32 cards using either German or French suits:
 
-### Card Values (Points)
+| French | German | Color |
+|--------|--------|-------|
+| Spades | Leaves (Zelené) | Black |
+| Clubs | Acorns (Žaludy) | Black |
+| Diamonds | Bells (Kule) | Red |
+| Hearts | Hearts (Srdce) | Red |
 
-| Rank  | Points | Strength |
-|-------|--------|----------|
-| Seven | 0      | 1 (lowest) |
-| Eight | 0      | 2 |
-| Nine  | 0      | 3 |
-| Ten   | 10     | 4 |
-| Jack  | 2      | 5 |
-| Queen | 3      | 6 |
-| King  | 4      | 7 |
-| Ace   | 11     | 8 (highest) |
+Each suit has 8 ranks: 7, 8, 9, 10, Jack, Queen, King, Ace
 
-**Total deck points: 120**
+**Red suits** (Hearts, Diamonds): When chosen as trump, all payment rates are doubled.
+
+### Card Values
+
+| Rank  | Points | Strength | Notes |
+|-------|--------|----------|-------|
+| Seven | 0      | 1 (lowest) | Special role in Seven contract |
+| Eight | 0      | 2 | |
+| Nine  | 0      | 3 | |
+| Ten   | 10     | 4 | High points, mid strength |
+| Jack  | 2      | 5 | |
+| Queen | 3      | 6 | Marriage with King |
+| King  | 4      | 7 | Marriage with Queen |
+| Ace   | 11     | 8 (highest) | |
+
+**Total deck points: 120** (30 points per suit)
+
+**Note:** The Ten is valuable (10 points) but can be beaten by Jack, Queen, King, or Ace. Protecting your Tens is a key tactical consideration.
 
 ## Players and Seating
 
@@ -37,10 +48,26 @@ For Czech-English terminology, see [VOCABULARY.md](VOCABULARY.md).
 
 ## Dealing
 
-Dealing happens in two phases:
+### Cutting (Not Shuffling)
+In tournament play, cards are **cut, not shuffled**:
+- Cutter (player before dealer) cuts with one hand only
+- Cut at least 2 cards from top or bottom
+- Cannot lift or raise the whole deck
+- No counting, sliding, or leafing through cards
+- Cutter may request dealer to reshape the deck
 
-### Phase A - Initial Deal
-1. Dealer shuffles and deals cards
+**Note:** Casual games may use shuffling. The engine supports both modes.
+
+### Dealing Direction
+Cards are dealt **clockwise**, starting with the chooser.
+
+### Dealing Mistakes
+One free dealing mistake is allowed per round. Second mistake in the same round is a violation.
+
+### Two-Phase Deal
+
+#### Phase A - Initial Deal
+1. Dealer cuts (or shuffles in casual mode) and deals cards
 2. **Chooser receives 7 cards first**
 3. Other players receive their full 10 cards
 4. 2 cards remain face-down on table (talon)
@@ -85,6 +112,36 @@ If all players say "Good":
 - Each player: 10 cards
 - Talon (discarded): 2 cards
 - Total: 32 cards
+
+### Talon Rules
+
+**Ownership:**
+- The talon belongs to no player and must remain separate
+- Talon points count toward the **declarer's** score at end of round
+
+**Discard Restrictions:**
+- **Aces and Tens cannot be discarded** to the talon (major violation)
+- Exception: Misère and Slam contracts allow any cards to be discarded
+- Announced Seven cannot be discarded to talon
+
+**Timing:**
+- Talon can only be changed before the first defender comments on trump
+- After play starts, no one may look at the talon
+- For Misère/Slam: talon must never be looked at
+
+**Wrong Card Count:**
+- If discovered before play: can be doubled, then warned (violation)
+- If discovered after play starts: game violation
+
+### Card Handling After Play
+
+**Trick Management:**
+- Each player keeps their own won tricks in a pile
+- Trick order must not be disturbed (for verification)
+
+**Round Cleanup:**
+- Unplayed cards must be sorted by suit and placed face-down
+- Dealer collects cards in specific order for next round
 
 ## Game Types
 
