@@ -136,7 +136,8 @@ private fun executeDealingPhaseA(
                 deck = deck,
                 chooserId = chooserId,
                 pendingCards = pendingCards.toList(),
-                dealOrder = dealOrder.mapValues { it.value.toList() }
+                dealOrder = dealOrder.mapValues { it.value.toList() },
+                decisionGate = DecisionGate.trumpSelection(chooserId)
             ),
             currentPlayerIndex = state.playerOrder.indexOf(chooserId)
         )
@@ -193,7 +194,8 @@ private fun chooseTrumpReducer(state: GameState, action: GameAction.ChooseTrump)
         dealing = dealing.copy(
             phase = DealingPhase.COMPLETE,
             pendingCards = emptyList(),
-            trumpCard = trumpCard
+            trumpCard = trumpCard,
+            decisionGate = null // Decision made, clear gate
         ),
         phase = GamePhase.TALON_EXCHANGE,
         currentPlayerIndex = state.playerOrder.indexOf(chooserId)
@@ -229,7 +231,8 @@ private fun movePendingCardsToHand(state: GameState): GameState {
         players = state.players + (chooserId to chooser.copy(hand = newHand)),
         dealing = dealing.copy(
             phase = DealingPhase.COMPLETE,
-            pendingCards = emptyList()
+            pendingCards = emptyList(),
+            decisionGate = null // Decision made, clear gate
         )
     )
 }

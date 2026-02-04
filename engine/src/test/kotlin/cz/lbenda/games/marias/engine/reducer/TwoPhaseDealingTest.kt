@@ -372,4 +372,57 @@ class TwoPhaseDealingTest {
         // Trump card should also be stored in dealing state
         assertEquals(trumpCard, state.dealing.trumpCard)
     }
+
+    @Test
+    fun `decision gate is created during dealing pause`() {
+        var state = setupPlayers()
+        val deck = createOrderedDeck()
+
+        state = reduce(state, GameAction.DealCards("p1", deck, twoPhase = true))
+
+        // Decision gate should be created
+        val gate = state.dealing.decisionGate
+        assertNotNull(gate)
+        assertEquals("p2", gate.playerId)
+        assertTrue(state.dealing.canMakeDecision(ChooserDecisionType.SELECT_TRUMP))
+        assertTrue(state.dealing.canMakeDecision(ChooserDecisionType.PASS))
+        assertFalse(state.dealing.canMakeDecision(ChooserDecisionType.TAKE_TALON))
+
+        // Available decisions should be exposed
+        assertEquals(
+            setOf(ChooserDecisionType.SELECT_TRUMP, ChooserDecisionType.PASS),
+            state.dealing.availableDecisions
+        )
+    }
+
+    @Test
+    fun `decision gate is cleared after trump selection`() {
+        var state = setupPlayers()
+        val deck = createOrderedDeck()
+
+        state = reduce(state, GameAction.DealCards("p1", deck, twoPhase = true))
+        assertNotNull(state.dealing.decisionGate)
+
+        val trumpCard = state.players["p2"]!!.hand.first()
+        state = reduce(state, GameAction.ChooseTrump("p2", trumpCard))
+
+        // Decision gate should be cleared
+        assertNull(state.dealing.decisionGate)
+        assertTrue(state.dealing.availableDecisions.isEmpty())
+    }
+
+    @Test
+    fun `decision gate is cleared after pass`() {
+        var state = setupPlayers()
+        val deck = createOrderedDeck()
+
+        state = reduce(state, GameAction.DealCards("p1", deck, twoPhase = true))
+        assertNotNull(state.dealing.decisionGate)
+
+        state = reduce(state, GameAction.ChooserPass("p2"))
+
+        // Decision gate should be cleared
+        assertNull(state.dealing.decisionGate)
+        assertTrue(state.dealing.availableDecisions.isEmpty())
+    }
 }

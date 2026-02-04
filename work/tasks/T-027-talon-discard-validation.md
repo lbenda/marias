@@ -4,16 +4,16 @@
 - Status: Planned
 - Owner: engine
 - Related modules: engine
-- Depends on: T-024 (vocabulary - for MISERE/SLAM enum names)
+- Depends on: T-024 (Done - MISERE/SLAM enum names available)
 
 ## Goal
 Implement validation that prevents discarding Aces and Tens to the talon,
-except in Misère and Slam contracts.
+except in Misere and Slam contracts.
 
 ## Background
 From docs/RULES.md:
 > **Aces and Tens cannot be discarded** to the talon (major violation)
-> Exception: Misère and Slam contracts allow any cards to be discarded
+> Exception: Misere and Slam contracts allow any cards to be discarded
 
 Current `exchangeTalonReducer()` only validates that exactly 2 cards are discarded.
 
@@ -22,7 +22,7 @@ Current `exchangeTalonReducer()` only validates that exactly 2 cards are discard
 ### Add validation in GameRules
 ```kotlin
 fun validateTalonDiscard(cards: List<Card>, gameType: GameType): Boolean {
-    // Misère and Slam allow any discard
+    // Misere and Slam allow any discard
     if (gameType == GameType.MISERE || gameType == GameType.SLAM) {
         return true
     }
@@ -49,12 +49,15 @@ fun validateTalonDiscard(cards: List<Card>, gameType: GameType): Boolean {
 1. Discard two low cards (7, 8) → allowed
 2. Discard Ace in Game contract → rejected
 3. Discard Ten in Hundred contract → rejected
-4. Discard Ace in Misère → allowed
+4. Discard Ace in Misere → allowed
 5. Discard Ten in Slam → allowed
-6. Discard Ace + Ten in Misère → allowed
+6. Discard Ace + Ten in Misere → allowed
+
+## Related Tasks
+- T-009: Deal pattern validation (validates card distribution, not discard content)
 
 ## Definition of Done
 - Validation prevents Ace/Ten discard in normal games
-- Misère and Slam exempt from restriction
+- Misere and Slam exempt from restriction
 - Error returned with clear message
 - Unit tests cover all cases

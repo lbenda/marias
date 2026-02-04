@@ -3,6 +3,7 @@ package cz.lbenda.games.marias.engine.rules
 import cz.lbenda.games.marias.engine.action.GameAction
 import cz.lbenda.games.marias.engine.model.Card
 import cz.lbenda.games.marias.engine.model.Rank
+import cz.lbenda.games.marias.engine.state.ChooserDecisionType
 import cz.lbenda.games.marias.engine.state.DealingPhase
 import cz.lbenda.games.marias.engine.state.GamePhase
 import cz.lbenda.games.marias.engine.state.GameState
@@ -28,15 +29,17 @@ fun validate(state: GameState, action: GameAction): String? = when (action) {
     }
     is GameAction.ChooseTrump -> when {
         state.phase != GamePhase.DEALING -> "Not dealing phase"
-        state.dealing.phase != DealingPhase.WAITING_FOR_TRUMP -> "Not waiting for trump selection"
-        action.playerId != state.dealing.chooserId -> "Not chooser"
+        state.dealing.decisionGate == null -> "No decision pending"
+        action.playerId != state.dealing.decisionGate.playerId -> "Not chooser"
+        !state.dealing.canMakeDecision(ChooserDecisionType.SELECT_TRUMP) -> "Trump selection not available"
         action.card !in (state.players[action.playerId]?.hand ?: emptyList()) -> "Card not in hand"
         else -> null
     }
     is GameAction.ChooserPass -> when {
         state.phase != GamePhase.DEALING -> "Not dealing phase"
-        state.dealing.phase != DealingPhase.WAITING_FOR_TRUMP -> "Not waiting for trump selection"
-        action.playerId != state.dealing.chooserId -> "Not chooser"
+        state.dealing.decisionGate == null -> "No decision pending"
+        action.playerId != state.dealing.decisionGate.playerId -> "Not chooser"
+        !state.dealing.canMakeDecision(ChooserDecisionType.PASS) -> "Pass not available"
         else -> null
     }
     is GameAction.PlaceBid -> when {

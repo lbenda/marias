@@ -101,8 +101,17 @@ data class DealingState(
     val chooserId: String? = null,
     val pendingCards: List<Card> = emptyList(),  // Cards on table for chooser (remaining cards to deal)
     val dealOrder: Map<String, List<Card>> = emptyMap(), // Per-player deal order log
-    val trumpCard: Card? = null // Trump card placed face-down (before reveal)
+    val trumpCard: Card? = null, // Trump card placed face-down (before reveal)
+    val decisionGate: DecisionGate? = null // Generic decision gate for chooser actions
 ) {
     val isWaitingForChooser: Boolean get() = phase == DealingPhase.WAITING_FOR_TRUMP
     val isComplete: Boolean get() = phase == DealingPhase.COMPLETE
+
+    /** Available decisions at current gate, empty if no gate active */
+    val availableDecisions: Set<ChooserDecisionType>
+        get() = decisionGate?.availableDecisions ?: emptySet()
+
+    /** Check if a specific decision is available */
+    fun canMakeDecision(type: ChooserDecisionType): Boolean =
+        decisionGate?.isAvailable(type) ?: false
 }

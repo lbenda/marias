@@ -39,7 +39,7 @@ Request:
 
 ### Trump Card Visibility
 - Before reveal (face-down): only chooser knows the card
-- After "Dobrá": trumpCard included in game state for all players
+- After "Good": trumpCard included in game state for all players
 - The specific card (not just suit) is strategically important information
 
 ## Definition of Done
