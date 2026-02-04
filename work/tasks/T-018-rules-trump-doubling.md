@@ -1,0 +1,61 @@
+# T-018: Rules - Trump Selection and Doubling
+
+- Parent: F-008
+- Status: Planned
+- Owner: docs
+- Related modules: docs
+- Depends on: T-014
+
+## Goal
+Document trump selection and the doubling system in docs/RULES.md.
+
+## Scope
+
+### Trump Selection
+- Chooser places trump card face-down (already implemented in T-013)
+- After "Good" responses, trump card is revealed
+- Trump card returns to hand after reveal
+- Declarer announces contract with trump suit
+
+### Doubling System
+From Article II rules 14-18:
+
+- Must follow clockwise order strictly (rule 14)
+- Must express clearly with words, not gestures (rule 15)
+- Words: "double" or "good"
+- Can double any announced contract component
+
+### Doubling Levels
+| Level | Czech | English | Multiplier |
+|-------|-------|---------|------------|
+| 0 | základní | base | 1x |
+| 1 | flek | double | 2x |
+| 2 | re | redouble | 4x |
+| 3 | tutti | raise | 8x |
+| 4 | boty | final raise | 16x (max) |
+
+### Rules
+- Contract higher than Seven doesn't need to match cards (rule 16)
+- Player can double based on any card reasoning
+- Maximum 4 levels (beyond is not a violation but invalid)
+
+### Lay-down Hand
+Rules 19-22:
+- If hand is unbeatable, must show and not play
+- Playing a lay-down is considered "card shuffling" violation
+- Lay-down criteria by contract type:
+  - Game/Hundred: Can't lose and won't lose any of 90 possible points
+  - Seven: Won't give up any trick
+  - Two Sevens: Can't lose regardless of defense play
+  - Misère: Can't take any trick
+  - Slam: Can't lose any trick
+
+## Implementation Features
+- Doubling system needs implementation
+- Lay-down detection (optional advanced feature)
+
+## Definition of Done
+- Trump selection rules complete (reference T-013)
+- Doubling system documented
+- Doubling levels table
+- Lay-down rules documented
