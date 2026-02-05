@@ -70,7 +70,7 @@ One free dealing mistake is allowed per round. Second mistake in the same round 
 1. Dealer cuts (or shuffles in casual mode) and deals cards
 2. **Chooser receives 7 cards first**
 3. Other players receive their full 10 cards
-4. 2 cards remain face-down on table (talon)
+4. **5 cards remain** on table (not yet dealt)
 
 ### Chooser's Decision
 After receiving 7 cards, the chooser must decide:
@@ -81,21 +81,37 @@ After receiving 7 cards, the chooser must decide:
    - Continue to Phase B
 
 2. **Pass** - Decline to choose trump
+   - Remaining 5 cards are dealt: 3 to chooser (total 10), 2 to talon
    - Proceed to bidding phase
    - Other players may bid for contracts
 
 ### Phase B - Completing the Deal
 If chooser selected trump:
-1. Chooser receives remaining **5 cards** (now has 12 cards total)
-2. Chooser discards **2 cards** face-down to the talon
-3. Chooser now has 10 cards in hand
+1. Chooser receives **remaining 5 cards** from the deal
+2. Chooser now has: 6 + 5 = **11 cards in hand + 1 trump on desk = 12 total**
 
-### Talon Exchange
-After discarding, the chooser asks: **"Trump?"**
+Note: There is no talon yet - it will be created by the chooser's discard.
+
+### Chooser's Discard Decision
+Before asking "Barva?", chooser must discard 2 cards to create the talon. Two options:
+
+**Option 1 - Normal game (with trump):**
+1. Keep trump on desk
+2. Discard 2 cards from the 11 in hand → 9 in hand + 1 trump on desk
+3. Ask "Barva?"
+4. After "Good": trump returns to hand → 10 cards
+
+**Option 2 - Slam or Misère (without trump):**
+1. Take trump card back into hand → 12 cards in hand
+2. Discard 2 cards from the 12 → 10 cards in hand
+3. Declare Slam or Misère (no "Barva?" question needed)
+
+### Asking "Barva?" (Trump?)
+After discarding (Option 1), the chooser asks: **"Barva?"** (Trump?)
 
 Other players respond in order:
-- **"Good"** - Accept the trump, game proceeds normally
-- **Take talon** - Player takes the 2 talon cards and declares Misère or Slam
+- **"Good"** (Dobrá) - Accept the trump, game proceeds normally
+- **Take talon** - Player takes the 2 talon cards, discards 2, and declares Misère or Slam
 
 ### Trump Reveal
 If all players say "Good":

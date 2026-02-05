@@ -69,22 +69,23 @@ class TwoPhaseDealingTest {
         val trumpCard = state.players["p2"]!!.hand.first() // First card in hand
         state = reduce(state, GameAction.ChooseTrump("p2", trumpCard))
 
-        // Should complete dealing and move to TALON_EXCHANGE
+        // Should move to TALON_EXCHANGE for discarding
         assertEquals(GamePhase.TALON_EXCHANGE, state.phase)
-        assertEquals(DealingPhase.COMPLETE, state.dealing.phase)
+        assertEquals(DealingPhase.PHASE_B, state.dealing.phase)
         assertEquals(trumpCard.suit, state.trump)
         assertEquals(trumpCard, state.trumpCard)
         assertEquals("p2", state.declarerId)
         assertEquals(GameType.GAME, state.gameType)
 
-        // All players should now have 10 cards (trump card returned to hand)
+        // Per rules: chooser has 11 cards in hand + 1 trump on desk = 12 total
+        // (7 - 1 trump + 3 pending + 2 talon = 11 in hand)
         assertEquals(10, state.players["p1"]!!.hand.size)
-        assertEquals(10, state.players["p2"]!!.hand.size)
+        assertEquals(11, state.players["p2"]!!.hand.size)  // 12 total minus trump on desk
         assertEquals(10, state.players["p3"]!!.hand.size)
-        assertEquals(2, state.talon.size)
+        assertEquals(0, state.talon.size)  // Talon picked up, will be recreated by discard
 
-        // Trump card should be in chooser's hand
-        assertTrue(trumpCard in state.players["p2"]!!.hand)
+        // Trump card should NOT be in chooser's hand yet (it's on desk)
+        assertFalse(trumpCard in state.players["p2"]!!.hand)
     }
 
     @Test
@@ -506,5 +507,39 @@ class TwoPhaseDealingTest {
         // Decision gate should be cleared
         assertNull(state.dealing.decisionGate)
         assertTrue(state.dealing.availableDecisions.isEmpty())
+    }
+
+    @Test
+    fun `full flow - choose trump then discard returns trump to hand`() {
+        var state = setupPlayers()
+        val deck = createOrderedDeck()
+
+        // Deal cards
+        state = reduce(state, GameAction.DealCards("p1", deck, twoPhase = true))
+        assertEquals(7, state.players["p2"]!!.hand.size)
+
+        // Choose trump
+        val trumpCard = state.players["p2"]!!.hand.first()
+        state = reduce(state, GameAction.ChooseTrump("p2", trumpCard))
+
+        // Chooser has 11 cards in hand, trump on desk
+        assertEquals(11, state.players["p2"]!!.hand.size)
+        assertEquals(GamePhase.TALON_EXCHANGE, state.phase)
+        assertFalse(trumpCard in state.players["p2"]!!.hand)
+
+        // Discard 2 cards to form new talon
+        val cardsToDiscard = state.players["p2"]!!.hand.take(2)
+        state = reduce(state, GameAction.ExchangeTalon("p2", cardsToDiscard))
+
+        // After discard: 11 - 2 = 9 in hand, trump returns = 10 cards
+        assertEquals(10, state.players["p2"]!!.hand.size)
+        assertEquals(2, state.talon.size)
+        assertEquals(cardsToDiscard.toSet(), state.talon.toSet())
+
+        // Trump card should be back in hand
+        assertTrue(trumpCard in state.players["p2"]!!.hand)
+
+        // Should proceed to playing
+        assertEquals(GamePhase.PLAYING, state.phase)
     }
 }

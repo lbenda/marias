@@ -167,8 +167,12 @@ private fun executeDealingPhaseA(
 }
 
 /**
- * Chooser selects trump by placing a card face-down.
- * Card is removed from hand, pending cards added, then card returned after reveal.
+ * Chooser selects trump by placing a card face-down on desk.
+ * Per rules:
+ * 1. Chooser has 7 cards, places trump → 6 in hand + 1 on desk
+ * 2. Receives pending cards (3) + talon (2) = 5 more → 11 in hand + 1 on desk = 12 total
+ * 3. Then goes to TALON_EXCHANGE to discard 2 cards
+ * 4. Trump stays on desk until "Good" response (handled later)
  */
 private fun chooseTrumpReducer(state: GameState, action: GameAction.ChooseTrump): GameState {
     val dealing = state.dealing
@@ -176,26 +180,26 @@ private fun chooseTrumpReducer(state: GameState, action: GameAction.ChooseTrump)
     val chooser = state.players[chooserId]!!
     val trumpCard = action.card
 
-    // Remove trump card from hand temporarily (placed on desk)
+    // Remove trump card from hand (placed face-down on desk)
+    // Chooser had 7 cards, now has 6 in hand + 1 on desk
     val handWithoutTrump = chooser.hand - trumpCard
 
-    // Add pending cards to hand (chooser now has: 7 - 1 + pending cards)
-    val newHand = handWithoutTrump + dealing.pendingCards
-
-    // Return trump card to hand (after reveal) - now has full 10 cards
-    val finalHand = newHand + trumpCard
+    // Add pending cards (3) AND talon (2) to hand
+    // Chooser now has: 6 + 3 + 2 = 11 in hand + 1 on desk = 12 total
+    val newHand = handWithoutTrump + dealing.pendingCards + state.talon
 
     return state.copy(
-        players = state.players + (chooserId to chooser.copy(hand = finalHand)),
-        trump = trumpCard.suit, // Derive suit from card
-        trumpCard = trumpCard,  // Store the specific card (visible to all)
-        gameType = GameType.GAME, // Default game type when choosing trump early
+        players = state.players + (chooserId to chooser.copy(hand = newHand)),
+        trump = trumpCard.suit,
+        trumpCard = trumpCard,
+        gameType = GameType.GAME,
         declarerId = chooserId,
+        talon = emptyList(), // Talon picked up, will be recreated by discard
         dealing = dealing.copy(
-            phase = DealingPhase.COMPLETE,
+            phase = DealingPhase.PHASE_B,
             pendingCards = emptyList(),
             trumpCard = trumpCard,
-            decisionGate = null // Decision made, clear gate
+            decisionGate = null
         ),
         phase = GamePhase.TALON_EXCHANGE,
         currentPlayerIndex = state.playerOrder.indexOf(chooserId)
@@ -279,16 +283,30 @@ private fun nextActiveBidder(order: List<String>, current: Int, passed: Set<Stri
 
 private fun exchangeTalonReducer(state: GameState, action: GameAction.ExchangeTalon): GameState {
     val declarer = state.players[action.playerId]!!
-    val newHand = (declarer.hand + state.talon).filterNot { it in action.cardsToDiscard }
+
+    // If talon is empty (chooser already picked it up), just discard from hand
+    // If talon has cards (normal bidding flow), pick up talon first then discard
+    val handWithTalon = declarer.hand + state.talon
+    val newHand = handWithTalon.filterNot { it in action.cardsToDiscard }
+
+    // After discard: if trump was selected early and trump card is still on desk,
+    // we need to handle the "barva?" phase. For now, proceed to playing.
     val nextPhase = if (state.gameType?.requiresTrump == true && state.trump == null) {
         GamePhase.TRUMP_SELECTION
     } else {
         GamePhase.PLAYING
     }
 
+    // After talon exchange, trump card returns to hand (if it was on desk)
+    val finalHand = if (state.trumpCard != null && state.trumpCard !in newHand) {
+        newHand + state.trumpCard
+    } else {
+        newHand
+    }
+
     val leadPlayerId = state.playerOrder[(state.dealerIndex + 1) % 3]
     return state.copy(
-        players = state.players + (action.playerId to declarer.copy(hand = newHand)),
+        players = state.players + (action.playerId to declarer.copy(hand = finalHand)),
         talon = action.cardsToDiscard,
         phase = nextPhase,
         trick = if (nextPhase == GamePhase.PLAYING) TrickState(leadPlayerId = leadPlayerId) else state.trick,
