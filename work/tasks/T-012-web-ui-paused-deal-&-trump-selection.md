@@ -1,7 +1,7 @@
 # T-012: Web UI – paused deal, trump selection, and pending cards
 
 - Parent: F-007
-- Status: Planned
+- Status: Done
 - Owner: web
 - Related modules: web-ui
 - Depends on: T-010, T-011, T-013
@@ -36,3 +36,30 @@ OUT:
 - All players see the revealed trump card (strategic information)
 - UI matches engine state exactly
 - No hidden auto-resume behavior
+
+## Result
+
+Updated web UI to support paused dealing and trump selection:
+
+**Types updated (`types.ts`):**
+- Added `DealingPhase` and `DealingDto` types
+- Added `trumpCard` and `dealing` to `GameResponse`
+- Added `ChooserDecisionType` and `DecisionResponse` types
+- Updated `GameType` to use English names (GAME, SEVEN, etc.)
+- Added `ChooseTrumpAction` and `ChooserPassAction` action types
+
+**GamePage updated (`GamePage.tsx`):**
+- Added `CardView` component with click handling and selection highlight
+- Added decision state loading from `/games/{id}/decision` endpoint
+- Shows "Your Decision" panel for chooser with instructions
+- Shows "Waiting for chooser" message for other players
+- Chooser can click card to select, then click "Declare Trump"
+- Chooser can click "Pass" to proceed to bidding
+- Shows trump card prominently in game info after selection
+- Shows pending cards count with face-down card visualization
+- Hand is shown during dealing pause for chooser
+
+## Verification
+
+- Web UI builds successfully (`npm run build`)
+- TypeScript compiles without errors

@@ -34,7 +34,7 @@ Business logic is isolated from transport and presentation layers.
 ```
 engine/
   model/     Suit, Rank, Card (with createDeck functions)
-  state/     GamePhase, GameType, PlayerState, TrickState, BiddingState, DealingState, GameState
+  state/     GamePhase, GameType, PlayerState, TrickState, BiddingState, DealingState, ChooserDecision, GameState
   action/    GameAction sealed class
   reducer/   reduce() function
   store/     GameStore class
@@ -50,6 +50,11 @@ engine/
   - docs/API.md — human-readable API reference
   - docs/api-tests.http — executable API examples
 - Game rules: docs/RULES.md — mariash rules as implemented
+- Key endpoints:
+  - `/games` — game lifecycle (create, list, get, delete)
+  - `/games/{id}/actions` — dispatch game actions
+  - `/games/{id}/decision` — chooser decision during two-phase dealing
+  - `/games/{id}/players/{playerId}/hand` — player hand management
 
 ### Module Structure
 
@@ -63,7 +68,7 @@ server/
 
 ### ui/web
 - React-based web UI
-- Separate frontend build (npm + Vite, not part of Gradle build) 
+- Separate frontend build (npm + Vite, not part of Gradle build)
 - Communicates with the system exclusively via the server REST API
 - Written in TypeScript
 - Renders state and dispatches actions derived from the engine model
@@ -72,6 +77,8 @@ server/
   - join player
   - start/init game
   - display player hand
+  - two-phase dealing with chooser decision (trump selection or pass)
+  - trump card display after reveal
 
 ### Module Structure
 

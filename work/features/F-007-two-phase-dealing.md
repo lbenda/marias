@@ -1,7 +1,7 @@
 # F-007: Two-phase dealing with chooser decision
 
 * Type: Feature
-* Status: In Progress
+* Status: Done
 * Source: Article II, rules 1-13 of https://www.talon.cz/pravidla/mariáš_pravidla_licitovaný_2014.pdf
 
 ## Description
@@ -31,15 +31,15 @@ The trump card (not just suit) is revealed to all players - this is strategicall
 - Trump selection uses specific card (not just suit) ✓
 - Trump card visibility tracked in game state ✓
 - Server exposes decision endpoints with card information ✓
-- UI shows trump card to all players after reveal
+- UI shows trump card to all players after reveal ✓
 
 ## Related Tasks
 - T-007 Engine + server basic support ✓ (Done)
-- T-008 Generic chooser decision gate (Planned)
-- T-009 Deal pattern validation (Planned)
-- T-010 REST API cleanup (Planned)
-- T-011 Deal order visibility (Planned)
-- T-012 Web UI (Planned)
+- T-008 Generic chooser decision gate ✓ (Done)
+- T-009 Deal pattern validation ✓ (Done)
+- T-010 REST API for chooser decision ✓ (Done)
+- T-011 Deal order visibility ✓ (Done)
+- T-012 Web UI paused deal & trump selection ✓ (Done)
 - T-013 Trump card selection and reveal ✓ (Done)
 
 ## Related Documentation
