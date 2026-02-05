@@ -1,7 +1,7 @@
 # F-007: Two-phase dealing with chooser decision
 
 * Type: Feature
-* Status: Done
+* Status: In Progress
 * Source: Article II, rules 1-13 of https://www.talon.cz/pravidla/mariáš_pravidla_licitovaný_2014.pdf
 
 ## Description
@@ -41,6 +41,7 @@ The trump card (not just suit) is revealed to all players - this is strategicall
 - T-011 Deal order visibility ✓ (Done)
 - T-012 Web UI paused deal & trump selection ✓ (Done)
 - T-013 Trump card selection and reveal ✓ (Done)
+- T-035 Web UI player switcher (Planned)
 
 ## Related Documentation
 - T-016: Rules - Dealing and Talon (documents the rules this feature implements)
