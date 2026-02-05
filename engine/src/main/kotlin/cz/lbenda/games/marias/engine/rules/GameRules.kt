@@ -3,6 +3,7 @@ package cz.lbenda.games.marias.engine.rules
 import cz.lbenda.games.marias.engine.action.GameAction
 import cz.lbenda.games.marias.engine.model.Card
 import cz.lbenda.games.marias.engine.model.Rank
+import cz.lbenda.games.marias.engine.model.Suit
 import cz.lbenda.games.marias.engine.state.ChooserDecisionType
 import cz.lbenda.games.marias.engine.state.DealingPhase
 import cz.lbenda.games.marias.engine.state.GamePhase
@@ -67,6 +68,7 @@ fun validate(state: GameState, action: GameAction): String? = when (action) {
     is GameAction.SelectTrump -> when {
         state.phase != GamePhase.TRUMP_SELECTION -> "Not trump selection phase"
         action.playerId != state.declarerId -> "Not declarer"
+        !canAnnounceSevenVariant(state.gameType, action.trump, state.talon) -> "Cannot announce Seven - trump 7 was discarded"
         else -> null
     }
     is GameAction.PlayCard -> validatePlayCard(state, action)
@@ -140,4 +142,20 @@ fun isValidTalonDiscard(cards: List<Card>, gameType: GameType?): Boolean {
 
     // Check for Ace or Ten - not allowed in normal games
     return cards.none { it.rank == Rank.ACE || it.rank == Rank.TEN }
+}
+
+/**
+ * Validates that Seven-variant game types can be announced.
+ * If trump 7 was discarded to talon, Seven variants cannot be announced.
+ */
+fun canAnnounceSevenVariant(gameType: GameType?, trump: Suit, talon: List<Card>): Boolean {
+    // Only check for Seven-variant game types
+    val sevenVariants = setOf(GameType.SEVEN, GameType.HUNDRED_SEVEN, GameType.TWO_SEVENS)
+    if (gameType == null || gameType !in sevenVariants) {
+        return true
+    }
+
+    // Check if trump 7 is in talon - if so, cannot announce Seven variant
+    val trump7 = Card(trump, Rank.SEVEN)
+    return trump7 !in talon
 }
