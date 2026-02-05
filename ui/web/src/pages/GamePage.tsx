@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { apiRequest } from "../api/client";
-import type { Card, GameResponse, HandResponse, Suit, Rank, DecisionResponse } from "../types";
+import type { Card, GameResponse, HandResponse, Suit, Rank, DecisionResponse, TalonResponse, GameType } from "../types";
 
 const SUIT_SYMBOLS: Record<Suit, string> = {
     SPADES: "♠",
@@ -74,6 +74,8 @@ export default function GamePage() {
     const [decision, setDecision] = useState<DecisionResponse | null>(null);
     const [selectedCard, setSelectedCard] = useState<Card | null>(null);
     const [activePlayerId, setActivePlayerId] = useState<string | null>(null);
+    const [talon, setTalon] = useState<Card[]>([]);
+    const [selectedDiscards, setSelectedDiscards] = useState<Card[]>([]);
 
     // Default player from localStorage (the one who joined)
     const defaultPlayerId = useMemo(() => {
@@ -125,6 +127,16 @@ export default function GamePage() {
         }
     }, [gameId]);
 
+    const loadTalon = useCallback(async () => {
+        if (!gameId || !playerId) return;
+        try {
+            const resp = await apiRequest<TalonResponse>(`/games/${gameId}/talon?playerId=${playerId}`, "GET");
+            setTalon(resp.cards ?? []);
+        } catch {
+            setTalon([]);
+        }
+    }, [gameId, playerId]);
+
     const dispatchAction = useCallback(async (actionType: "start" | "deal") => {
         if (!gameId || !playerId) return;
         setError(null);
@@ -166,6 +178,42 @@ export default function GamePage() {
         }
     }, [gameId, playerId, loadHand, loadDecision]);
 
+    const submitExchangeTalon = useCallback(async (cardsToDiscard: Card[]) => {
+        if (!gameId || !playerId) return;
+        setError(null);
+        setLoading(true);
+        try {
+            const resp = await apiRequest<GameResponse>(`/games/${gameId}/actions`, "POST", {
+                action: { type: "exchange", playerId, cardsToDiscard }
+            });
+            setGame(resp);
+            setSelectedDiscards([]);
+            setTalon([]);
+            await loadHand();
+        } catch (e: unknown) {
+            setError(e instanceof Error ? e.message : String(e));
+        } finally {
+            setLoading(false);
+        }
+    }, [gameId, playerId, loadHand]);
+
+    const submitSelectTrump = useCallback(async (trump: Suit) => {
+        if (!gameId || !playerId) return;
+        setError(null);
+        setLoading(true);
+        try {
+            const resp = await apiRequest<GameResponse>(`/games/${gameId}/actions`, "POST", {
+                action: { type: "trump", playerId, trump }
+            });
+            setGame(resp);
+            await loadHand();
+        } catch (e: unknown) {
+            setError(e instanceof Error ? e.message : String(e));
+        } finally {
+            setLoading(false);
+        }
+    }, [gameId, playerId, loadHand]);
+
     // Load game on mount
     useEffect(() => {
         void loadGame();
@@ -181,13 +229,18 @@ export default function GamePage() {
             if (game.phase === "DEALING" || game.dealing?.isWaitingForChooser) {
                 void loadDecision();
             }
+            if (game.phase === "TALON_EXCHANGE" && playerId === game.declarerId) {
+                void loadTalon();
+            }
         }
-    }, [game, playerId, loadHand, loadDecision]);
+    }, [game, playerId, loadHand, loadDecision, loadTalon]);
 
     // Clear selected card when switching players
     const handlePlayerChange = (newPlayerId: string) => {
         setActivePlayerId(newPlayerId);
         setSelectedCard(null);
+        setSelectedDiscards([]);
+        setTalon([]);
         setHand([]);
     };
 
@@ -207,7 +260,38 @@ export default function GamePage() {
         decision.playerId === playerId &&
         decision.availableDecisions.includes("PASS");
 
+    // Talon exchange state
+    const isTalonExchange = game?.phase === "TALON_EXCHANGE";
+    const isDeclarer = playerId === game?.declarerId;
+    const canExchange = isTalonExchange && isDeclarer;
+
+    // Trump selection phase state
+    const isTrumpSelection = game?.phase === "TRUMP_SELECTION";
+    const canSelectTrumpPhase = isTrumpSelection && isDeclarer;
+
+    // Helper to check if card is selected for discard
+    const isSelectedForDiscard = (card: Card) =>
+        selectedDiscards.some(c => c.suit === card.suit && c.rank === card.rank);
+
+    // Helper to check if card is Ace or Ten (for validation warning)
+    const isAceOrTen = (card: Card) => card.rank === "ACE" || card.rank === "TEN";
+
+    // Check if current game type allows Ace/Ten discard (Misere/Slam)
+    const allowsAnyDiscard = game?.gameType === "MISERE" || game?.gameType === "SLAM";
+
+    // Validation: check if selection contains invalid cards
+    const hasInvalidDiscard = !allowsAnyDiscard && selectedDiscards.some(isAceOrTen);
+
     const handleCardClick = (card: Card) => {
+        if (canExchange) {
+            // Toggle card selection for discard
+            if (isSelectedForDiscard(card)) {
+                setSelectedDiscards(prev => prev.filter(c => c.suit !== card.suit || c.rank !== card.rank));
+            } else if (selectedDiscards.length < 2) {
+                setSelectedDiscards(prev => [...prev, card]);
+            }
+            return;
+        }
         if (!canSelectTrump) return;
         setSelectedCard(prev =>
             prev?.suit === card.suit && prev?.rank === card.rank ? null : card
@@ -222,6 +306,16 @@ export default function GamePage() {
 
     const handlePass = () => {
         void submitDecision("PASS");
+    };
+
+    const handleExchangeTalon = () => {
+        if (selectedDiscards.length === 2) {
+            void submitExchangeTalon(selectedDiscards);
+        }
+    };
+
+    const handleSelectTrumpSuit = (suit: Suit) => {
+        void submitSelectTrump(suit);
     };
 
     const activePlayer = game?.players.find(p => p.playerId === playerId);
@@ -364,6 +458,124 @@ export default function GamePage() {
                 </div>
             )}
 
+            {/* Talon Exchange UI */}
+            {isTalonExchange && (
+                <div style={{
+                    marginBottom: 16,
+                    padding: 16,
+                    background: isDeclarer ? "#d4edda" : "#d1ecf1",
+                    border: `2px solid ${isDeclarer ? "#28a745" : "#17a2b8"}`,
+                    borderRadius: 8
+                }}>
+                    <h3 style={{ margin: "0 0 8px 0" }}>
+                        {isDeclarer
+                            ? "Talon Exchange"
+                            : `Waiting for ${game?.players.find(p => p.playerId === game?.declarerId)?.name ?? "declarer"} to exchange talon`
+                        }
+                    </h3>
+                    {isDeclarer ? (
+                        <>
+                            <p style={{ margin: "0 0 12px 0" }}>
+                                Pick up the talon cards and select <strong>2 cards</strong> from your hand to discard.
+                            </p>
+
+                            {/* Talon cards display */}
+                            {talon.length > 0 && (
+                                <div style={{ marginBottom: 16 }}>
+                                    <h4 style={{ margin: "0 0 8px 0" }}>Talon Cards (added to your hand):</h4>
+                                    <div style={{ display: "flex", gap: 8 }}>
+                                        {talon.map((c, idx) => (
+                                            <CardView
+                                                key={`talon-${c.suit}-${c.rank}-${idx}`}
+                                                card={c}
+                                                highlight
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Selection status */}
+                            <p style={{ margin: "0 0 8px 0" }}>
+                                Selected for discard: <strong>{selectedDiscards.length}/2</strong>
+                                {selectedDiscards.length > 0 && (
+                                    <span> ({selectedDiscards.map(c => cardLabel(c)).join(", ")})</span>
+                                )}
+                            </p>
+
+                            {/* Validation warning */}
+                            {hasInvalidDiscard && (
+                                <p style={{
+                                    margin: "0 0 12px 0",
+                                    padding: 8,
+                                    background: "#f8d7da",
+                                    color: "#721c24",
+                                    borderRadius: 4
+                                }}>
+                                    Warning: Cannot discard Ace or Ten to talon (except in Misere/Slam)
+                                </p>
+                            )}
+
+                            {/* Confirm button */}
+                            <button
+                                onClick={handleExchangeTalon}
+                                disabled={selectedDiscards.length !== 2 || hasInvalidDiscard || loading}
+                                style={{
+                                    padding: "8px 16px",
+                                    background: selectedDiscards.length === 2 && !hasInvalidDiscard ? "#28a745" : "#ccc",
+                                    color: "white",
+                                    border: "none",
+                                    borderRadius: 4,
+                                    cursor: selectedDiscards.length === 2 && !hasInvalidDiscard ? "pointer" : "not-allowed"
+                                }}
+                            >
+                                Confirm Discard
+                            </button>
+                        </>
+                    ) : (
+                        <p style={{ margin: 0 }}>
+                            The declarer is choosing which cards to discard to the talon.
+                        </p>
+                    )}
+                </div>
+            )}
+
+            {/* Trump Selection UI */}
+            {canSelectTrumpPhase && (
+                <div style={{
+                    marginBottom: 16,
+                    padding: 16,
+                    background: "#fff3cd",
+                    border: "2px solid #ffc107",
+                    borderRadius: 8
+                }}>
+                    <h3 style={{ margin: "0 0 8px 0" }}>Select Trump Suit</h3>
+                    <p style={{ margin: "0 0 12px 0" }}>
+                        Choose the trump suit for this round.
+                    </p>
+                    <div style={{ display: "flex", gap: 8 }}>
+                        {(["HEARTS", "DIAMONDS", "CLUBS", "SPADES"] as Suit[]).map(suit => (
+                            <button
+                                key={suit}
+                                onClick={() => handleSelectTrumpSuit(suit)}
+                                disabled={loading}
+                                style={{
+                                    padding: "12px 20px",
+                                    fontSize: 24,
+                                    background: "white",
+                                    color: suit === "HEARTS" || suit === "DIAMONDS" ? "crimson" : "black",
+                                    border: "2px solid #ccc",
+                                    borderRadius: 8,
+                                    cursor: "pointer"
+                                }}
+                            >
+                                {SUIT_SYMBOLS[suit]}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
+
             <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
                 <button onClick={loadGame} disabled={loading}>
                     {loading ? "Loading..." : "Refresh"}
@@ -387,6 +599,7 @@ export default function GamePage() {
                     <h3>
                         {activePlayer?.name ?? "Player"}'s Hand
                         {isWaitingForChooser && isChooser && " (click a card to select as trump)"}
+                        {canExchange && " (click cards to select for discard)"}
                     </h3>
                     {hand.length === 0 ? (
                         <p style={{ opacity: 0.6 }}>No cards yet</p>
@@ -403,8 +616,11 @@ export default function GamePage() {
                                 <CardView
                                     key={`${c.suit}-${c.rank}-${idx}`}
                                     card={c}
-                                    onClick={canSelectTrump ? () => handleCardClick(c) : undefined}
-                                    selected={selectedCard?.suit === c.suit && selectedCard?.rank === c.rank}
+                                    onClick={(canSelectTrump || canExchange) ? () => handleCardClick(c) : undefined}
+                                    selected={
+                                        (selectedCard?.suit === c.suit && selectedCard?.rank === c.rank) ||
+                                        isSelectedForDiscard(c)
+                                    }
                                 />
                             ))}
                         </div>

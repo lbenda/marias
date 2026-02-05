@@ -1,7 +1,7 @@
 # T-027: Validate Talon Discard Restrictions
 
 - Parent: F-010
-- Status: Planned
+- Status: Done
 - Owner: engine
 - Related modules: engine
 - Depends on: T-024 (Done - MISERE/SLAM enum names available)
@@ -61,3 +61,21 @@ fun validateTalonDiscard(cards: List<Card>, gameType: GameType): Boolean {
 - Misere and Slam exempt from restriction
 - Error returned with clear message
 - Unit tests cover all cases
+
+## Result
+
+Implemented talon discard validation:
+
+- Added `isValidTalonDiscard(cards, gameType)` function in `GameRules.kt`
+- Returns true if cards contain no Ace or Ten, OR if gameType is MISERE/SLAM
+- Updated `ExchangeTalon` validation to call `isValidTalonDiscard`
+- Error message: "Cannot discard Ace or Ten to talon"
+- Created `TalonValidationTest.kt` with 8 tests:
+  - Unit tests for `isValidTalonDiscard` function
+  - Integration tests for exchange talon with low cards, Ace, Ten
+
+## Verification
+
+- All 61 engine tests pass
+- Validation correctly blocks Ace/Ten in normal games
+- Validation correctly allows any cards in Misère/Slam

@@ -3,10 +3,12 @@ package cz.lbenda.games.marias.engine.rules
 import cz.lbenda.games.marias.engine.action.GameAction
 import cz.lbenda.games.marias.engine.model.Card
 import cz.lbenda.games.marias.engine.model.Rank
+import cz.lbenda.games.marias.engine.model.Suit
 import cz.lbenda.games.marias.engine.state.ChooserDecisionType
 import cz.lbenda.games.marias.engine.state.DealingPhase
 import cz.lbenda.games.marias.engine.state.GamePhase
 import cz.lbenda.games.marias.engine.state.GameState
+import cz.lbenda.games.marias.engine.state.GameType
 
 fun validate(state: GameState, action: GameAction): String? = when (action) {
     is GameAction.JoinGame -> when {
@@ -60,11 +62,13 @@ fun validate(state: GameState, action: GameAction): String? = when (action) {
         state.phase != GamePhase.TALON_EXCHANGE -> "Not exchange phase"
         action.playerId != state.declarerId -> "Not declarer"
         action.cardsToDiscard.size != 2 -> "Must discard 2 cards"
+        !isValidTalonDiscard(action.cardsToDiscard, state.gameType) -> "Cannot discard Ace or Ten to talon"
         else -> null
     }
     is GameAction.SelectTrump -> when {
         state.phase != GamePhase.TRUMP_SELECTION -> "Not trump selection phase"
         action.playerId != state.declarerId -> "Not declarer"
+        !canAnnounceSevenVariant(state.gameType, action.trump, state.talon) -> "Cannot announce Seven - trump 7 was discarded"
         else -> null
     }
     is GameAction.PlayCard -> validatePlayCard(state, action)
@@ -124,4 +128,34 @@ fun validCards(state: GameState, playerId: String): List<Card> {
     }
 
     return hand
+}
+
+/**
+ * Validates that cards can be discarded to talon.
+ * Aces and Tens cannot be discarded, except in Misère and Slam contracts.
+ */
+fun isValidTalonDiscard(cards: List<Card>, gameType: GameType?): Boolean {
+    // Misère and Slam allow any cards to be discarded
+    if (gameType == GameType.MISERE || gameType == GameType.SLAM) {
+        return true
+    }
+
+    // Check for Ace or Ten - not allowed in normal games
+    return cards.none { it.rank == Rank.ACE || it.rank == Rank.TEN }
+}
+
+/**
+ * Validates that Seven-variant game types can be announced.
+ * If trump 7 was discarded to talon, Seven variants cannot be announced.
+ */
+fun canAnnounceSevenVariant(gameType: GameType?, trump: Suit, talon: List<Card>): Boolean {
+    // Only check for Seven-variant game types
+    val sevenVariants = setOf(GameType.SEVEN, GameType.HUNDRED_SEVEN, GameType.TWO_SEVENS)
+    if (gameType == null || gameType !in sevenVariants) {
+        return true
+    }
+
+    // Check if trump 7 is in talon - if so, cannot announce Seven variant
+    val trump7 = Card(trump, Rank.SEVEN)
+    return trump7 !in talon
 }
