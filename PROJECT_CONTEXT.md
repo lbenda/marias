@@ -45,10 +45,11 @@ engine/
 - REST API exposing engine capabilities for client/server play
 - Thin adapter over the engine
 - OpenAPI is generated code-first
+- Real-time communication: WebSocket with fallback to long/short polling
 - HTTP API documentation:
   - docs/API.md — human-readable API reference
   - docs/api-tests.http — executable API examples
-- Game rules: docs/RULES.md — mariáš rules as implemented
+- Game rules: docs/RULES.md — mariash rules as implemented
 
 ### Module Structure
 
@@ -130,5 +131,6 @@ UI → engine → state update → UI render
 - ADR-0006: Code-first OpenAPI strategy
 - ADR-0010: Extensible engine for multiple card games
 - ADR-0011: Android UI delivery strategy (pending)
+- ADR-0012: Real-time communication (WebSocket → long polling → short polling)
 
 ---

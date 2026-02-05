@@ -3,7 +3,7 @@
 - Parent: F-007
 - Status: Planned  
 - Owner: server  
-- Related modules: server  
+- Related modules: server
 - Depends on: T-007, T-008
 
 ## Goal
