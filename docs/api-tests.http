@@ -39,7 +39,8 @@ Content-Type: application/json
 {"action": {"type": "join", "playerId": "p2", "playerName": "Bob"}}
 
 ### Player 3 joins
-POST http://localhost:8080/games/{{gameId}}/actions
+# POST http://localhost:8080/games/{{gameId}}/actions
+POST http://localhost:8080/games/e9167d3f-1881-46b7-91f5-7e02cc846744/actions
 Content-Type: application/json
 
 {"action": {"type": "join", "playerId": "p3", "playerName": "Charlie"}}
@@ -55,7 +56,8 @@ Content-Type: application/json
 {"action": {"type": "start", "playerId": "p1"}}
 
 ### Deal cards (two-phase mode - default)
-POST http://localhost:8080/games/{{gameId}}/actions
+# POST http://localhost:8080/games/{{gameId}}/actions
+POST http://localhost:8080/games/440f4b13-f9b6-4e07-ac9e-180349af8bfe/actions
 Content-Type: application/json
 
 {"action": {"type": "deal", "playerId": "p1"}}
@@ -223,6 +225,25 @@ Content-Type: application/json
 {"action": {"type": "newround", "playerId": "p1"}}
 
 ### ===========================================
+### Real-time Updates
+### ===========================================
+
+### Poll for events (short polling - immediate response)
+GET http://localhost:8080/games/{{gameId}}/events
+
+### Poll with ETag (304 if no changes)
+GET http://localhost:8080/games/{{gameId}}/events
+If-None-Match: v1
+
+### Long polling (wait up to 30s for changes)
+GET http://localhost:8080/games/{{gameId}}/events
+If-None-Match: v1
+Prefer: wait=30
+
+### WebSocket endpoint (use WebSocket client)
+### ws://localhost:8080/games/{{gameId}}/ws
+
+### ===========================================
 ### Reference
 ### ===========================================
 # Action types: join, leave, start, deal, choosetrump, chooserpass, bid, pass, exchange, trump, play, marriage, newround, reorderhand
@@ -231,3 +252,4 @@ Content-Type: application/json
 # Ranks: SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING, ACE
 # Points: 7,8,9=0  J=2  Q=3  K=4  10=10  A=11
 # Two-phase dealing: deal with twoPhase=true (default) pauses after chooser gets 7 cards
+# Real-time updates: GET /games/{id}/events (polling) or ws://host/games/{id}/ws (WebSocket)

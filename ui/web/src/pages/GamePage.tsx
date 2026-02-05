@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { apiRequest } from "../api/client";
+import { useTransport } from "../hooks/useTransport";
+import { ConnectionIndicator } from "../components/ConnectionIndicator";
 import type { Card, GameResponse, HandResponse, Suit, Rank, DecisionResponse, TalonResponse, GameType } from "../types";
 
 const SUIT_SYMBOLS: Record<Suit, string> = {
@@ -76,6 +78,16 @@ export default function GamePage() {
     const [activePlayerId, setActivePlayerId] = useState<string | null>(null);
     const [talon, setTalon] = useState<Card[]>([]);
     const [selectedDiscards, setSelectedDiscards] = useState<Card[]>([]);
+
+    // Real-time transport for game state updates
+    const { state: transportState, connectionStatus } = useTransport(gameId ?? null);
+
+    // Update local game state when transport receives updates
+    useEffect(() => {
+        if (transportState) {
+            setGame(transportState);
+        }
+    }, [transportState]);
 
     // Default player from localStorage (the one who joined)
     const defaultPlayerId = useMemo(() => {
@@ -322,7 +334,10 @@ export default function GamePage() {
 
     return (
         <div>
-            <h2>Game {gameId}</h2>
+            <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 16 }}>
+                <h2 style={{ margin: 0 }}>Game {gameId}</h2>
+                <ConnectionIndicator status={connectionStatus} />
+            </div>
 
             {/* Player Switcher */}
             {game && game.players.length > 0 && (
