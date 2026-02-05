@@ -70,7 +70,22 @@ Content-Type: application/json
 ### Two-Phase Dealing (chooser actions)
 ### ===========================================
 
-### Choose trump during dealing pause (chooser only)
+### Get decision state (check if chooser must decide)
+GET http://localhost:8080/games/{{gameId}}/decision
+
+### Submit decision: Select trump (cleaner API)
+POST http://localhost:8080/games/{{gameId}}/decision
+Content-Type: application/json
+
+{"playerId": "p2", "decisionType": "SELECT_TRUMP", "card": {"suit": "HEARTS", "rank": "ACE"}}
+
+### Submit decision: Pass (cleaner API)
+POST http://localhost:8080/games/{{gameId}}/decision
+Content-Type: application/json
+
+{"playerId": "p2", "decisionType": "PASS"}
+
+### Choose trump via action (alternative method)
 ### Chooser places a card from hand - card's suit becomes trump
 ### Makes chooser the declarer, skips bidding
 POST http://localhost:8080/games/{{gameId}}/actions
@@ -78,7 +93,7 @@ Content-Type: application/json
 
 {"action": {"type": "choosetrump", "playerId": "p2", "card": {"suit": "HEARTS", "rank": "ACE"}}}
 
-### Chooser pass during dealing pause (chooser only)
+### Chooser pass via action (alternative method)
 ### Proceeds to normal bidding
 POST http://localhost:8080/games/{{gameId}}/actions
 Content-Type: application/json

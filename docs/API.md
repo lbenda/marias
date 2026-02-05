@@ -19,6 +19,8 @@ http://localhost:8080
 | PUT | `/games/{id}/players/{playerId}/hand` | Reorder player's hand |
 | GET | `/games/{id}/talon?playerId={id}` | Get talon (declarer only) |
 | GET | `/games/{id}/bidding` | Get bidding state |
+| GET | `/games/{id}/decision` | Get decision state |
+| POST | `/games/{id}/decision` | Submit chooser decision |
 
 ## Game Flow
 
@@ -166,6 +168,51 @@ Cards must match current hand exactly. Returns error if cards don't match.
 
 Response (success): Same as GET hand
 Response (error): `{"error": "Cards don't match current hand"}`
+
+## Decision Endpoint
+
+The decision endpoint provides a cleaner API for the chooser decision during two-phase dealing.
+
+### Get Decision State
+```http
+GET /games/{id}/decision
+```
+
+Response:
+```json
+{
+  "hasDecision": true,
+  "playerId": "p2",
+  "availableDecisions": ["SELECT_TRUMP", "PASS"],
+  "mandatory": true,
+  "pendingCardsCount": 25,
+  "trumpCard": null
+}
+```
+
+- `hasDecision`: Whether a decision is pending
+- `playerId`: Player who must make the decision
+- `availableDecisions`: `SELECT_TRUMP`, `PASS`, or `TAKE_TALON`
+- `mandatory`: Whether decision must be made now
+- `pendingCardsCount`: Cards remaining to deal
+- `trumpCard`: Revealed trump card (null until revealed)
+
+### Submit Decision
+```http
+POST /games/{id}/decision
+Content-Type: application/json
+
+{
+  "playerId": "p2",
+  "decisionType": "SELECT_TRUMP",
+  "card": {"suit": "HEARTS", "rank": "ACE"}
+}
+```
+
+- For `SELECT_TRUMP`: `card` is required (the card placed for trump)
+- For `PASS`: no additional fields needed
+
+Response: Full game state (same as `/games/{id}`)
 
 ## Card Reference
 
