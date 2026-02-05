@@ -83,4 +83,9 @@ export type StartAction = { type: "start"; playerId: string };
 export type DealAction = { type: "deal"; playerId: string; twoPhase?: boolean };
 export type ChooseTrumpAction = { type: "choosetrump"; playerId: string; card: Card };
 export type ChooserPassAction = { type: "chooserpass"; playerId: string };
-export type GameAction = JoinAction | LeaveAction | StartAction | DealAction | ChooseTrumpAction | ChooserPassAction;
+export type ExchangeTalonAction = { type: "exchange"; playerId: string; cardsToDiscard: Card[] };
+export type SelectTrumpAction = { type: "trump"; playerId: string; trump: Suit };
+export type GameAction = JoinAction | LeaveAction | StartAction | DealAction | ChooseTrumpAction | ChooserPassAction | ExchangeTalonAction | SelectTrumpAction;
+
+// Talon response
+export type TalonResponse = { cards: Card[] };

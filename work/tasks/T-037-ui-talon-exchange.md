@@ -1,7 +1,7 @@
 # T-037: UI for Talon Exchange
 
 - Parent: F-010
-- Status: Planned
+- Status: Done
 - Owner: ui/web
 - Related modules: ui/web, engine
 - Depends on: T-027 (Done), T-036 (Done)
@@ -73,3 +73,38 @@ interface TalonExchangePanelProps {
 - Can select and discard 2 cards
 - Validation feedback shown for invalid selections
 - Smooth transition to trump selection after exchange
+
+## Result
+
+Implemented talon exchange UI in GamePage.tsx:
+
+1. **Types added** (`types.ts`):
+   - `ExchangeTalonAction` type for exchange action
+   - `SelectTrumpAction` type for trump selection
+   - `TalonResponse` type for talon endpoint
+
+2. **New state variables**:
+   - `talon` - cards from talon endpoint
+   - `selectedDiscards` - cards selected for discard (0-2)
+
+3. **Talon Exchange Panel**:
+   - Shows talon cards with highlight
+   - Displays selection count (0/2, 1/2, 2/2)
+   - Validation warning for Ace/Ten in non-Misere/Slam games
+   - Confirm button enabled only when 2 valid cards selected
+   - Non-declarer sees waiting message
+
+4. **Trump Selection Panel**:
+   - Four suit buttons for selecting trump
+   - Shows after talon exchange in normal bidding flow
+
+5. **Hand display updates**:
+   - Cards clickable during talon exchange
+   - Selected cards highlighted with gold border
+   - Instruction text updated for exchange phase
+
+## Verification
+
+- UI builds successfully (vite build)
+- Server tests pass
+- Integrates with existing /talon and /actions endpoints

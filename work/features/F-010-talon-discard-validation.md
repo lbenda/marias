@@ -1,7 +1,7 @@
 # F-010: Talon Discard Validation
 
 * Type: Feature
-* Status: In Progress
+* Status: Done
 * Source: T-016 (Dealing and Talon Rules), docs/RULES.md
 
 ## Description
@@ -36,7 +36,7 @@ Current implementation gap:
 ## Related Tasks
 - T-027: Validate Ace/Ten talon discard restrictions (Done)
 - T-036: Validate Seven announcement after trump 7 discard (Done)
-- T-037: UI for Talon Exchange (Planned)
+- T-037: UI for Talon Exchange (Done)
 
 ## Future Scope (not in current feature)
 - Talon change timing: allow changing talon before first defender responds to "Barva?"
