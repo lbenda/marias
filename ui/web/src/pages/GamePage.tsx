@@ -73,11 +73,23 @@ export default function GamePage() {
     const [hand, setHand] = useState<Card[]>([]);
     const [decision, setDecision] = useState<DecisionResponse | null>(null);
     const [selectedCard, setSelectedCard] = useState<Card | null>(null);
+    const [activePlayerId, setActivePlayerId] = useState<string | null>(null);
 
-    const playerId = useMemo(() => {
+    // Default player from localStorage (the one who joined)
+    const defaultPlayerId = useMemo(() => {
         if (!gameId) return null;
         return localStorage.getItem(`playerId:${gameId}`);
     }, [gameId]);
+
+    // Initialize active player from localStorage on first load
+    useEffect(() => {
+        if (defaultPlayerId && !activePlayerId) {
+            setActivePlayerId(defaultPlayerId);
+        }
+    }, [defaultPlayerId, activePlayerId]);
+
+    // The effective player ID used for all operations
+    const playerId = activePlayerId;
 
     const loadGame = useCallback(async () => {
         if (!gameId) return;
@@ -99,7 +111,7 @@ export default function GamePage() {
             const resp = await apiRequest<HandResponse>(`/games/${gameId}/players/${playerId}/hand`, "GET");
             setHand(resp.hand ?? []);
         } catch {
-            // Hand may not be available yet
+            setHand([]);
         }
     }, [gameId, playerId]);
 
@@ -154,29 +166,36 @@ export default function GamePage() {
         }
     }, [gameId, playerId, loadHand, loadDecision]);
 
+    // Load game on mount
     useEffect(() => {
         void loadGame();
     }, [loadGame]);
 
+    // Load hand when player changes or game state changes
     useEffect(() => {
-        if (game) {
-            // Load hand and decision when dealing is paused or after dealing
+        if (game && playerId) {
             if (game.dealing?.isWaitingForChooser ||
                 (game.phase !== "WAITING_FOR_PLAYERS" && game.phase !== "DEALING")) {
                 void loadHand();
             }
-            // Load decision state when dealing is in progress
             if (game.phase === "DEALING" || game.dealing?.isWaitingForChooser) {
                 void loadDecision();
             }
         }
-    }, [game, loadHand, loadDecision]);
+    }, [game, playerId, loadHand, loadDecision]);
+
+    // Clear selected card when switching players
+    const handlePlayerChange = (newPlayerId: string) => {
+        setActivePlayerId(newPlayerId);
+        setSelectedCard(null);
+        setHand([]);
+    };
 
     const canStart = game?.phase === "WAITING_FOR_PLAYERS" && game.players.length === 3;
     const canDeal = game?.phase === "DEALING" && !game.dealing?.isWaitingForChooser;
     const isWaitingForChooser = game?.dealing?.isWaitingForChooser ?? false;
     const isChooser = playerId === game?.dealing?.chooserId;
-    const showHand = game && (
+    const showHand = game && playerId && (
         (game.phase !== "WAITING_FOR_PLAYERS" && game.phase !== "DEALING") ||
         isWaitingForChooser
     );
@@ -205,13 +224,52 @@ export default function GamePage() {
         void submitDecision("PASS");
     };
 
+    const activePlayer = game?.players.find(p => p.playerId === playerId);
+
     return (
         <div>
             <h2>Game {gameId}</h2>
 
-            {!playerId && (
-                <p style={{ color: "crimson" }}>
-                    Missing playerId for this game. Please join the game first.
+            {/* Player Switcher */}
+            {game && game.players.length > 0 && (
+                <div style={{
+                    marginBottom: 16,
+                    padding: 12,
+                    background: "#e8f4fd",
+                    borderRadius: 8,
+                    border: "1px solid #b8daff"
+                }}>
+                    <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <strong>Playing as:</strong>
+                        <select
+                            value={playerId ?? ""}
+                            onChange={(e) => handlePlayerChange(e.target.value)}
+                            style={{
+                                padding: "4px 8px",
+                                fontSize: 14,
+                                borderRadius: 4,
+                                border: "1px solid #ccc"
+                            }}
+                        >
+                            {!playerId && <option value="">Select player...</option>}
+                            {game.players.map(p => (
+                                <option key={p.playerId} value={p.playerId}>
+                                    {p.name} {p.playerId === defaultPlayerId ? "(you)" : ""} {p.isDealer ? "[Dealer]" : ""}
+                                </option>
+                            ))}
+                        </select>
+                        {activePlayer && (
+                            <span style={{ marginLeft: 8, color: "#666" }}>
+                                {activePlayer.cardCount} cards, {activePlayer.points} pts
+                            </span>
+                        )}
+                    </label>
+                </div>
+            )}
+
+            {!playerId && game && game.players.length > 0 && (
+                <p style={{ color: "#856404", background: "#fff3cd", padding: 8, borderRadius: 4 }}>
+                    Select a player above to view their hand and make moves.
                 </p>
             )}
 
@@ -326,7 +384,10 @@ export default function GamePage() {
 
             {showHand && (
                 <>
-                    <h3>Your Hand {isWaitingForChooser && isChooser && "(click a card to select as trump)"}</h3>
+                    <h3>
+                        {activePlayer?.name ?? "Player"}'s Hand
+                        {isWaitingForChooser && isChooser && " (click a card to select as trump)"}
+                    </h3>
                     {hand.length === 0 ? (
                         <p style={{ opacity: 0.6 }}>No cards yet</p>
                     ) : (

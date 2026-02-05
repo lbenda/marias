@@ -1,7 +1,7 @@
 # T-035: Web UI - Player Switcher
 
 - Parent: F-007
-- Status: Planned
+- Status: Done
 - Owner: web
 - Related modules: ui/web
 - Depends on: T-012
@@ -40,3 +40,24 @@ OUT:
 - Actions are dispatched as the selected player
 - Works correctly during all game phases
 - Default to localStorage playerId on initial load
+
+## Result
+
+Implemented player switcher in GamePage:
+
+- Added `activePlayerId` state for currently selected player
+- Added player selector dropdown in blue info box at top of game view
+- Dropdown shows all players with indicators:
+  - "(you)" for the player who joined via localStorage
+  - "[Dealer]" for the dealer
+- Shows card count and points for selected player
+- Switching players clears selected card and reloads hand
+- All actions (start, deal, decisions) use selected player
+- Hand title shows selected player's name
+- Defaults to localStorage playerId on page load
+- Prompt shown if no player selected when players exist
+
+## Verification
+
+- Web UI builds successfully (`npm run build`)
+- TypeScript compiles without errors
