@@ -1,4 +1,4 @@
-### Mariáš Game Engine API Tests
+### Mariash Game Engine API Tests
 ### Run these requests from IntelliJ IDEA
 
 ### ===========================================
@@ -54,17 +54,57 @@ Content-Type: application/json
 
 {"action": {"type": "start", "playerId": "p1"}}
 
-### Deal cards
+### Deal cards (two-phase mode - default)
 POST http://localhost:8080/games/{{gameId}}/actions
 Content-Type: application/json
 
 {"action": {"type": "deal", "playerId": "p1"}}
 
+### Deal cards (non-two-phase mode)
+POST http://localhost:8080/games/{{gameId}}/actions
+Content-Type: application/json
+
+{"action": {"type": "deal", "playerId": "p1", "twoPhase": false}}
+
+### ===========================================
+### Two-Phase Dealing (chooser actions)
+### ===========================================
+
+### Get decision state (check if chooser must decide)
+GET http://localhost:8080/games/{{gameId}}/decision
+
+### Submit decision: Select trump (cleaner API)
+POST http://localhost:8080/games/{{gameId}}/decision
+Content-Type: application/json
+
+{"playerId": "p2", "decisionType": "SELECT_TRUMP", "card": {"suit": "HEARTS", "rank": "ACE"}}
+
+### Submit decision: Pass (cleaner API)
+POST http://localhost:8080/games/{{gameId}}/decision
+Content-Type: application/json
+
+{"playerId": "p2", "decisionType": "PASS"}
+
+### Choose trump via action (alternative method)
+### Chooser places a card from hand - card's suit becomes trump
+### Makes chooser the declarer, skips bidding
+POST http://localhost:8080/games/{{gameId}}/actions
+Content-Type: application/json
+
+{"action": {"type": "choosetrump", "playerId": "p2", "card": {"suit": "HEARTS", "rank": "ACE"}}}
+
+### Chooser pass via action (alternative method)
+### Proceeds to normal bidding
+POST http://localhost:8080/games/{{gameId}}/actions
+Content-Type: application/json
+
+{"action": {"type": "chooserpass", "playerId": "p2"}}
+
 ### ===========================================
 ### Player Hands
 ### ===========================================
 
-### Get player 1's hand
+### Get player 1's hand (returns in deal order or custom order)
 GET http://localhost:8080/games/{{gameId}}/players/p1/hand
 
 ### Get player 2's hand
@@ -73,6 +113,32 @@ GET http://localhost:8080/games/{{gameId}}/players/p2/hand
 ### Get player 3's hand
 GET http://localhost:8080/games/{{gameId}}/players/p3/hand
 
+### Reorder player 1's hand (cards must match current hand)
+PUT http://localhost:8080/games/{{gameId}}/players/p1/hand
+Content-Type: application/json
+
+{"cards": [
+  {"suit": "HEARTS", "rank": "ACE"},
+  {"suit": "HEARTS", "rank": "KING"},
+  {"suit": "SPADES", "rank": "ACE"},
+  {"suit": "SPADES", "rank": "KING"},
+  {"suit": "DIAMONDS", "rank": "ACE"},
+  {"suit": "DIAMONDS", "rank": "KING"},
+  {"suit": "CLUBS", "rank": "ACE"},
+  {"suit": "CLUBS", "rank": "KING"},
+  {"suit": "HEARTS", "rank": "QUEEN"},
+  {"suit": "SPADES", "rank": "QUEEN"}
+]}
+
+### Reorder hand via action (alternative method)
+POST http://localhost:8080/games/{{gameId}}/actions
+Content-Type: application/json
+
+{"action": {"type": "reorderhand", "playerId": "p1", "cards": [
+  {"suit": "HEARTS", "rank": "ACE"},
+  {"suit": "SPADES", "rank": "ACE"}
+]}}
+
 ### Get bidding state
 GET http://localhost:8080/games/{{gameId}}/bidding
 
@@ -80,11 +146,11 @@ GET http://localhost:8080/games/{{gameId}}/bidding
 ### Bidding
 ### ===========================================
 
-### Place bid (HRA)
+### Place bid (GAME)
 POST http://localhost:8080/games/{{gameId}}/actions
 Content-Type: application/json
 
-{"action": {"type": "bid", "playerId": "p2", "gameType": "HRA"}}
+{"action": {"type": "bid", "playerId": "p2", "gameType": "GAME"}}
 
 ### Pass
 POST http://localhost:8080/games/{{gameId}}/actions
@@ -159,8 +225,9 @@ Content-Type: application/json
 ### ===========================================
 ### Reference
 ### ===========================================
-# Action types: join, leave, start, deal, bid, pass, exchange, trump, play, marriage, newround
-# Game types: HRA, SEDMA, KILO, BETL, DURCH
+# Action types: join, leave, start, deal, choosetrump, chooserpass, bid, pass, exchange, trump, play, marriage, newround, reorderhand
+# Game types: GAME, SEVEN, HUNDRED, HUNDRED_SEVEN, MISERE, SLAM, TWO_SEVENS
 # Suits: SPADES, CLUBS, DIAMONDS, HEARTS
 # Ranks: SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING, ACE
 # Points: 7,8,9=0  J=2  Q=3  K=4  10=10  A=11
+# Two-phase dealing: deal with twoPhase=true (default) pauses after chooser gets 7 cards

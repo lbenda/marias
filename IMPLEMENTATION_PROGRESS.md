@@ -2,7 +2,7 @@
 
 ## NOTE (2026-02-03):
 This file is a historical progress log / milestone summary.
-Active work is tracked as Markdown tickets under `work/tickets/`.
+Active work is tracked as Markdown tasks under `work/tasks/`.
 For current architecture and project map see `PROJECT_CONTEXT.md`.
 For decisions see `docs/adr/`.
 
@@ -70,9 +70,10 @@ server/
 - `docs/API.md` - API reference
 - `docs/api-tests.http` - IntelliJ HTTP client tests
 
-## Completed work items (tickets)
-- work/tickets/T-001-install-project-structure.md
-- work/tickets/T-002-engine-basic-game-management.md
-- work/tickets/T-003-server-basic-api.md
-- work/tickets/T-004-engine-redux-state-container.md
-- work/tickets/T-005-openapi-generation-and-docs.md
+## Completed work items (tasks)
+- work/tasks/T-001-install-project-structure.md
+- work/tasks/T-002-engine-basic-game-management.md
+- work/tasks/T-003-server-basic-api.md
+- work/tasks/T-004-engine-redux-state-container.md
+- work/tasks/T-005-openapi-generation-and-docs.md
+- work/tasks/T-006-web-ui-prototype-rest-game-flow.md

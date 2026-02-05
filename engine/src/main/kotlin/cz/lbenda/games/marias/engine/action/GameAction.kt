@@ -2,6 +2,7 @@ package cz.lbenda.games.marias.engine.action
 
 import cz.lbenda.games.marias.engine.model.Card
 import cz.lbenda.games.marias.engine.model.Suit
+import cz.lbenda.games.marias.engine.state.DealPattern
 import cz.lbenda.games.marias.engine.state.GameType
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -20,7 +21,20 @@ sealed class GameAction {
     data class StartGame(override val playerId: String) : GameAction()
 
     @Serializable @SerialName("deal")
-    data class DealCards(override val playerId: String, val deck: List<Card>? = null) : GameAction()
+    data class DealCards(
+        override val playerId: String,
+        val deck: List<Card>? = null,
+        val pattern: DealPattern? = null,
+        val twoPhase: Boolean = true
+    ) : GameAction()
+
+    /** Chooser selects trump by placing a card face-down. Card determines trump suit. */
+    @Serializable @SerialName("choosetrump")
+    data class ChooseTrump(override val playerId: String, val card: Card) : GameAction()
+
+    /** Chooser passes during dealing pause. Resumes dealing and proceeds to normal bidding. */
+    @Serializable @SerialName("chooserpass")
+    data class ChooserPass(override val playerId: String) : GameAction()
 
     @Serializable @SerialName("bid")
     data class PlaceBid(override val playerId: String, val gameType: GameType) : GameAction()
@@ -42,4 +56,8 @@ sealed class GameAction {
 
     @Serializable @SerialName("newround")
     data class StartNewRound(override val playerId: String) : GameAction()
+
+    /** Reorder cards in hand. Cards must match current hand exactly. */
+    @Serializable @SerialName("reorderhand")
+    data class ReorderHand(override val playerId: String, val cards: List<Card>) : GameAction()
 }

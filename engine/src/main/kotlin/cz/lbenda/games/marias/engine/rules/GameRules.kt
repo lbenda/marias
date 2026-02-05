@@ -3,6 +3,8 @@ package cz.lbenda.games.marias.engine.rules
 import cz.lbenda.games.marias.engine.action.GameAction
 import cz.lbenda.games.marias.engine.model.Card
 import cz.lbenda.games.marias.engine.model.Rank
+import cz.lbenda.games.marias.engine.state.ChooserDecisionType
+import cz.lbenda.games.marias.engine.state.DealingPhase
 import cz.lbenda.games.marias.engine.state.GamePhase
 import cz.lbenda.games.marias.engine.state.GameState
 
@@ -20,7 +22,27 @@ fun validate(state: GameState, action: GameAction): String? = when (action) {
         state.players.size != 3 -> "Need 3 players"
         else -> null
     }
-    is GameAction.DealCards -> if (state.phase != GamePhase.DEALING) "Not dealing phase" else null
+    is GameAction.DealCards -> when {
+        state.phase != GamePhase.DEALING -> "Not dealing phase"
+        state.dealing.phase != DealingPhase.NOT_STARTED -> "Already dealing"
+        action.pattern != null && action.pattern.validate() != null -> action.pattern.validate()
+        else -> null
+    }
+    is GameAction.ChooseTrump -> when {
+        state.phase != GamePhase.DEALING -> "Not dealing phase"
+        state.dealing.decisionGate == null -> "No decision pending"
+        action.playerId != state.dealing.decisionGate.playerId -> "Not chooser"
+        !state.dealing.canMakeDecision(ChooserDecisionType.SELECT_TRUMP) -> "Trump selection not available"
+        action.card !in (state.players[action.playerId]?.hand ?: emptyList()) -> "Card not in hand"
+        else -> null
+    }
+    is GameAction.ChooserPass -> when {
+        state.phase != GamePhase.DEALING -> "Not dealing phase"
+        state.dealing.decisionGate == null -> "No decision pending"
+        action.playerId != state.dealing.decisionGate.playerId -> "Not chooser"
+        !state.dealing.canMakeDecision(ChooserDecisionType.PASS) -> "Pass not available"
+        else -> null
+    }
     is GameAction.PlaceBid -> when {
         state.phase != GamePhase.BIDDING -> "Not bidding phase"
         state.playerOrder[state.currentPlayerIndex] != action.playerId -> "Not your turn"
@@ -55,6 +77,18 @@ fun validate(state: GameState, action: GameAction): String? = when (action) {
         state.phase != GamePhase.SCORING && state.phase != GamePhase.FINISHED -> "Round not finished"
         else -> null
     }
+    is GameAction.ReorderHand -> validateReorderHand(state, action)
+}
+
+private fun validateReorderHand(state: GameState, action: GameAction.ReorderHand): String? {
+    val player = state.players[action.playerId] ?: return "Player not in game"
+    val currentHand = player.hand
+    val newOrder = action.cards
+
+    if (newOrder.size != currentHand.size) return "Card count mismatch"
+    if (newOrder.toSet() != currentHand.toSet()) return "Cards don't match current hand"
+
+    return null
 }
 
 private fun validatePlayCard(state: GameState, action: GameAction.PlayCard): String? {

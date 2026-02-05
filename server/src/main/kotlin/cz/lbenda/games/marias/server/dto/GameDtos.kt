@@ -22,12 +22,22 @@ data class GameResponse(
     val currentPlayerId: String?,
     val dealerId: String?,
     val trump: Suit?,
+    val trumpCard: Card?, // The specific card used to declare trump (visible to all after reveal)
     val gameType: GameType?,
     val declarerId: String?,
+    val dealing: DealingDto?,
     val trick: TrickDto,
     val tricksPlayed: Int,
     val roundNumber: Int,
     val error: String?
+)
+
+@Serializable
+data class DealingDto(
+    val phase: DealingPhase,
+    val chooserId: String?,
+    val pendingCardsCount: Int,
+    val isWaitingForChooser: Boolean
 )
 
 @Serializable
@@ -61,6 +71,26 @@ data class BiddingResponse(
     val passedPlayers: List<String>
 )
 
+@Serializable
+data class ReorderHandRequest(val cards: List<Card>)
+
+@Serializable
+data class DecisionResponse(
+    val hasDecision: Boolean,
+    val playerId: String?,
+    val availableDecisions: Set<ChooserDecisionType>,
+    val mandatory: Boolean,
+    val pendingCardsCount: Int,
+    val trumpCard: Card? // Visible after reveal
+)
+
+@Serializable
+data class DecisionRequest(
+    val playerId: String,
+    val decisionType: ChooserDecisionType,
+    val card: Card? = null // Required for SELECT_TRUMP
+)
+
 fun GameState.toResponse() = GameResponse(
     gameId = gameId,
     version = version,
@@ -69,12 +99,21 @@ fun GameState.toResponse() = GameResponse(
     currentPlayerId = playerOrder.getOrNull(currentPlayerIndex),
     dealerId = playerOrder.getOrNull(dealerIndex),
     trump = trump,
+    trumpCard = trumpCard,
     gameType = gameType,
     declarerId = declarerId,
+    dealing = dealing.toDto(),
     trick = trick.toDto(),
     tricksPlayed = tricksPlayed,
     roundNumber = roundNumber,
     error = error
+)
+
+fun DealingState.toDto() = DealingDto(
+    phase = phase,
+    chooserId = chooserId,
+    pendingCardsCount = pendingCards.size,
+    isWaitingForChooser = isWaitingForChooser
 )
 
 fun PlayerState.toDto() = PlayerDto(
@@ -101,4 +140,13 @@ fun GameState.biddingResponse() = BiddingResponse(
     currentBid = bidding.currentBid,
     bidderId = bidding.bidderId,
     passedPlayers = bidding.passedPlayers.toList()
+)
+
+fun GameState.decisionResponse() = DecisionResponse(
+    hasDecision = dealing.decisionGate != null,
+    playerId = dealing.decisionGate?.playerId,
+    availableDecisions = dealing.decisionGate?.availableDecisions ?: emptySet(),
+    mandatory = dealing.decisionGate?.mandatory ?: false,
+    pendingCardsCount = dealing.pendingCards.size,
+    trumpCard = trumpCard
 )

@@ -34,7 +34,7 @@ Business logic is isolated from transport and presentation layers.
 ```
 engine/
   model/     Suit, Rank, Card (with createDeck functions)
-  state/     GamePhase, GameType, PlayerState, TrickState, BiddingState, GameState
+  state/     GamePhase, GameType, PlayerState, TrickState, BiddingState, DealingState, ChooserDecision, GameState
   action/    GameAction sealed class
   reducer/   reduce() function
   store/     GameStore class
@@ -45,9 +45,16 @@ engine/
 - REST API exposing engine capabilities for client/server play
 - Thin adapter over the engine
 - OpenAPI is generated code-first
+- Real-time communication: WebSocket with fallback to long/short polling
 - HTTP API documentation:
   - docs/API.md — human-readable API reference
-  - api-test.http — executable API examples
+  - docs/api-tests.http — executable API examples
+- Game rules: docs/RULES.md — mariash rules as implemented
+- Key endpoints:
+  - `/games` — game lifecycle (create, list, get, delete)
+  - `/games/{id}/actions` — dispatch game actions
+  - `/games/{id}/decision` — chooser decision during two-phase dealing
+  - `/games/{id}/players/{playerId}/hand` — player hand management
 
 ### Module Structure
 
@@ -61,7 +68,7 @@ server/
 
 ### ui/web
 - React-based web UI
-- Separate frontend build (npm + Vite, not part of Gradle build) 
+- Separate frontend build (npm + Vite, not part of Gradle build)
 - Communicates with the system exclusively via the server REST API
 - Written in TypeScript
 - Renders state and dispatches actions derived from the engine model
@@ -70,6 +77,8 @@ server/
   - join player
   - start/init game
   - display player hand
+  - two-phase dealing with chooser decision (trump selection or pass)
+  - trump card display after reveal
 
 ### Module Structure
 
@@ -120,6 +129,25 @@ UI → engine → state update → UI render
 
 ---
 
+## Work tracking
+
+Work items are tracked in Markdown files under `/work/`:
+
+```
+work/
+  features/   F-XXX-*.md   High-level feature definitions
+  tasks/      T-XXX-*.md   Implementation tasks (split from features)
+  bugs/       B-XXX-*.md   Bug reports and fixes
+```
+
+- Features describe *what* the system should do
+- Tasks describe *how* to implement features
+- Bugs describe defects in existing functionality
+
+See `docs/TASKS_WORKFLOW.md` for detailed workflow and file structure.
+
+---
+
 ## Active architectural decisions
 - ADR-0001: Kotlin as the core implementation language
 - ADR-0002: React as the web UI technology
@@ -129,5 +157,6 @@ UI → engine → state update → UI render
 - ADR-0006: Code-first OpenAPI strategy
 - ADR-0010: Extensible engine for multiple card games
 - ADR-0011: Android UI delivery strategy (pending)
+- ADR-0012: Real-time communication (WebSocket → long polling → short polling)
 
 ---

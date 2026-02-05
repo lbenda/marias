@@ -1,5 +1,7 @@
 package cz.lbenda.games.marias.server.routes
 
+import cz.lbenda.games.marias.engine.action.GameAction
+import cz.lbenda.games.marias.engine.state.ChooserDecisionType
 import cz.lbenda.games.marias.server.dto.*
 import cz.lbenda.games.marias.server.service.GameService
 import io.ktor.http.*
@@ -41,6 +43,22 @@ fun Route.gameRoutes(service: GameService) {
             call.respond(state.handResponse(call.parameters["playerId"]!!))
         }
 
+        put("/{id}/players/{playerId}/hand") {
+            val gameId = call.parameters["id"]!!
+            val playerId = call.parameters["playerId"]!!
+            val req = call.receive<ReorderHandRequest>()
+
+            val state = service.dispatch(
+                gameId,
+                cz.lbenda.games.marias.engine.action.GameAction.ReorderHand(playerId, req.cards)
+            ) ?: return@put call.respond(HttpStatusCode.NotFound, "Game not found")
+
+            if (state.error != null) {
+                return@put call.respond(HttpStatusCode.BadRequest, mapOf("error" to state.error))
+            }
+            call.respond(state.handResponse(playerId))
+        }
+
         get("/{id}/talon") {
             val state = service.get(call.parameters["id"]!!)
                 ?: return@get call.respond(HttpStatusCode.NotFound, "Game not found")
@@ -55,6 +73,47 @@ fun Route.gameRoutes(service: GameService) {
             val state = service.get(call.parameters["id"]!!)
                 ?: return@get call.respond(HttpStatusCode.NotFound, "Game not found")
             call.respond(state.biddingResponse())
+        }
+
+        get("/{id}/decision") {
+            val state = service.get(call.parameters["id"]!!)
+                ?: return@get call.respond(HttpStatusCode.NotFound, "Game not found")
+            call.respond(state.decisionResponse())
+        }
+
+        post("/{id}/decision") {
+            val gameId = call.parameters["id"]!!
+            val req = call.receive<DecisionRequest>()
+
+            // Convert decision request to engine action
+            val action = when (req.decisionType) {
+                ChooserDecisionType.SELECT_TRUMP -> {
+                    if (req.card == null) {
+                        return@post call.respond(
+                            HttpStatusCode.BadRequest,
+                            mapOf("error" to "Card required for SELECT_TRUMP decision")
+                        )
+                    }
+                    GameAction.ChooseTrump(req.playerId, req.card)
+                }
+                ChooserDecisionType.PASS -> GameAction.ChooserPass(req.playerId)
+                ChooserDecisionType.TAKE_TALON -> {
+                    // Future: implement talon taking for Misere/Slam
+                    return@post call.respond(
+                        HttpStatusCode.BadRequest,
+                        mapOf("error" to "TAKE_TALON not yet implemented")
+                    )
+                }
+            }
+
+            val state = service.dispatch(gameId, action)
+                ?: return@post call.respond(HttpStatusCode.NotFound, "Game not found")
+
+            if (state.error != null) {
+                return@post call.respond(HttpStatusCode.BadRequest, mapOf("error" to state.error))
+            }
+
+            call.respond(state.toResponse())
         }
     }
 }

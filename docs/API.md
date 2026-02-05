@@ -15,14 +15,28 @@ http://localhost:8080
 | GET | `/games/{id}` | Get game state |
 | DELETE | `/games/{id}` | Delete game |
 | POST | `/games/{id}/actions` | Dispatch action |
-| GET | `/games/{id}/players/{playerId}/hand` | Get player's hand |
+| GET | `/games/{id}/players/{playerId}/hand` | Get player's hand (in deal/custom order) |
+| PUT | `/games/{id}/players/{playerId}/hand` | Reorder player's hand |
 | GET | `/games/{id}/talon?playerId={id}` | Get talon (declarer only) |
 | GET | `/games/{id}/bidding` | Get bidding state |
+| GET | `/games/{id}/decision` | Get decision state |
+| POST | `/games/{id}/decision` | Submit chooser decision |
 
 ## Game Flow
 
 ```
 WAITING_FOR_PLAYERS → DEALING → BIDDING → TALON_EXCHANGE → TRUMP_SELECTION → PLAYING → SCORING
+```
+
+### Two-Phase Dealing
+
+When `twoPhase: true` (default), dealing pauses after the chooser (player after dealer) receives 7 cards.
+The chooser can then:
+- Select trump early with `choosetrump` action → becomes declarer, skips bidding
+- Pass with `chooserpass` action → proceeds to normal bidding
+
+```
+DEALING (Phase A) → [chooser has 7 cards] → WAITING_FOR_TRUMP → [chooser decision] → DEALING (Phase B) → ...
 ```
 
 ## Create Game
@@ -55,14 +69,30 @@ All actions are sent to `POST /games/{id}/actions` with body `{"action": {...}}`
 
 ### Deal
 ```json
-{"type": "deal", "playerId": "p1"}
+{"type": "deal", "playerId": "p1", "twoPhase": true}
 ```
+- `twoPhase` (optional, default: `true`): Enable two-phase dealing with pause for trump selection
+
+### Choose Trump (during dealing pause)
+```json
+{"type": "choosetrump", "playerId": "p2", "card": {"suit": "HEARTS", "rank": "ACE"}}
+```
+Chooser places a specific card from their hand to declare trump. The card's suit becomes trump.
+Only valid when `dealing.isWaitingForChooser` is `true`. Makes chooser the declarer.
+
+The `trumpCard` is then visible to all players in the game state response.
+
+### Chooser Pass (during dealing pause)
+```json
+{"type": "chooserpass", "playerId": "p2"}
+```
+Only valid when `dealing.isWaitingForChooser` is `true`. Proceeds to normal bidding.
 
 ### Bid
 ```json
-{"type": "bid", "playerId": "p2", "gameType": "HRA"}
+{"type": "bid", "playerId": "p2", "gameType": "GAME"}
 ```
-Game types: `HRA` (Game), `SEDMA` (Seven), `KILO` (Hundred), `BETL` (Misère), `DURCH` (Slam)
+Game types: `GAME`, `SEVEN`, `HUNDRED`, `HUNDRED_SEVEN`, `MISERE`, `SLAM`, `TWO_SEVENS`
 
 ### Pass
 ```json
@@ -97,6 +127,93 @@ Game types: `HRA` (Game), `SEDMA` (Seven), `KILO` (Hundred), `BETL` (Misère), `
 {"type": "newround", "playerId": "p1"}
 ```
 
+### Reorder Hand
+```json
+{"type": "reorderhand", "playerId": "p1", "cards": [
+  {"suit": "HEARTS", "rank": "ACE"},
+  {"suit": "SPADES", "rank": "KING"},
+  ...
+]}
+```
+Cards must match current hand exactly (same cards, different order).
+
+## Hand Management
+
+### Get Hand
+```http
+GET /games/{id}/players/{playerId}/hand
+```
+Returns hand in current order (deal order initially, or custom order if reordered).
+
+Response:
+```json
+{
+  "hand": [{"suit": "HEARTS", "rank": "ACE"}, ...],
+  "validCards": [{"suit": "HEARTS", "rank": "ACE"}, ...]
+}
+```
+
+### Reorder Hand
+```http
+PUT /games/{id}/players/{playerId}/hand
+Content-Type: application/json
+
+{"cards": [
+  {"suit": "SPADES", "rank": "KING"},
+  {"suit": "HEARTS", "rank": "ACE"},
+  ...
+]}
+```
+Cards must match current hand exactly. Returns error if cards don't match.
+
+Response (success): Same as GET hand
+Response (error): `{"error": "Cards don't match current hand"}`
+
+## Decision Endpoint
+
+The decision endpoint provides a cleaner API for the chooser decision during two-phase dealing.
+
+### Get Decision State
+```http
+GET /games/{id}/decision
+```
+
+Response:
+```json
+{
+  "hasDecision": true,
+  "playerId": "p2",
+  "availableDecisions": ["SELECT_TRUMP", "PASS"],
+  "mandatory": true,
+  "pendingCardsCount": 25,
+  "trumpCard": null
+}
+```
+
+- `hasDecision`: Whether a decision is pending
+- `playerId`: Player who must make the decision
+- `availableDecisions`: `SELECT_TRUMP`, `PASS`, or `TAKE_TALON`
+- `mandatory`: Whether decision must be made now
+- `pendingCardsCount`: Cards remaining to deal
+- `trumpCard`: Revealed trump card (null until revealed)
+
+### Submit Decision
+```http
+POST /games/{id}/decision
+Content-Type: application/json
+
+{
+  "playerId": "p2",
+  "decisionType": "SELECT_TRUMP",
+  "card": {"suit": "HEARTS", "rank": "ACE"}
+}
+```
+
+- For `SELECT_TRUMP`: `card` is required (the card placed for trump)
+- For `PASS`: no additional fields needed
+
+Response: Full game state (same as `/games/{id}`)
+
 ## Card Reference
 
 ### Suits
@@ -118,15 +235,15 @@ Total deck points: 120
 
 ## Game Types
 
-> **Note:** Code values will be renamed per [VOCABULARY.md](VOCABULARY.md) in T-024.
-
-| Code | English | Description |
-|------|---------|-------------|
-| HRA | Game | Declarer needs >50 points |
-| SEDMA | Seven | Win last trick with 7 of trumps |
-| KILO | Hundred | Declarer needs 100+ points |
-| BETL | Misère | Declarer must not win any trick |
-| DURCH | Slam | Declarer must win all tricks |
+| Code | Description |
+|------|-------------|
+| GAME | Declarer needs >50 points |
+| SEVEN | Win last trick with 7 of trumps |
+| HUNDRED | Declarer needs 100+ points |
+| HUNDRED_SEVEN | Combined Hundred and Seven |
+| MISERE | Declarer must not win any trick |
+| SLAM | Declarer must win all tricks |
+| TWO_SEVENS | Control both trump 7s |
 
 ## Running
 

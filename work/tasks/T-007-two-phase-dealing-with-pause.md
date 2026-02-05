@@ -1,9 +1,41 @@
 # T-007: Two-phase dealing with paused trump selection and deal-order visibility
 
-- Status: Ready
+- Parent: F-007
+- Status: Done
 - Owner: engine / AI
 - Related modules: engine, server
 - Related ADRs: (none)
+
+## Summary of Changes
+
+- Added `DealingState` with `DealingPhase` enum (NOT_STARTED, PHASE_A, WAITING_FOR_TRUMP, PHASE_B, COMPLETE)
+- Added `DealPattern` model with configurable chunk sizes and built-in patterns (STANDARD, TWO_PHASE, oneByOne)
+- Extended `GameState` with `dealing: DealingState` field and `chooserId` helper
+- Added new actions: `ChooseTrump` (select trump during pause) and `ChooserPass` (proceed to bidding)
+- Updated `DealCards` action with `twoPhase` parameter (default: true) and optional custom `pattern`
+- Implemented two-phase dealing: chooser gets 7 cards in hand, remaining 3 go to `pendingCards` (on table)
+- Other players receive full 10 cards during dealing pause
+- Added validation for new actions (must be chooser, must be waiting for trump)
+- Added server DTO `DealingDto` exposing dealing state in `GameResponse`
+- Updated docs/API.md with new actions and two-phase flow
+- Updated docs/api-tests.http with new action examples
+- Added 12 tests covering determinism, multiple patterns, pause/resume, validation
+
+## Result
+
+Two-phase dealing is now the default. When `twoPhase: true`:
+1. Dealing executes fully but chooser's last 3 cards go to `pendingCards`
+2. Game pauses in DEALING phase with `dealing.isWaitingForChooser = true`
+3. Chooser can `choosetrump` (becomes declarer, skips bidding) or `chooserpass` (normal bidding)
+4. Pending cards move to hand, game proceeds
+
+Legacy mode (`twoPhase: false`) deals all cards at once and goes directly to BIDDING.
+
+## Verification
+
+- All 36 engine tests pass
+- Existing tests updated to use `twoPhase: false` for backward compatibility
+- New tests verify: determinism with fixed deck, 3 patterns (standard, two-phase, one-by-one), pause/resume, validation
 
 ## Goal
 Implement configurable dealing patterns where one player may receive an initial partial hand (typically 7 cards),
@@ -33,7 +65,7 @@ IN:
     - Phase B: continue dealing remaining cards (chooser gets remaining cards that were held on table).
 - Represent “cards on table” (pending dealt cards) distinctly from “cards in hand” for the chooser.
 - Emit/record **per-player deal order** (the exact sequence of cards dealt to that player), so UI can render it.
-- Add engine-level events/state transitions required by server in later tickets:
+- Add engine-level events/state transitions required by server in later tasks:
     - e.g. `DealPausedWaitingForTrump`, `TrumpSelected`, `DealResumed`, `DealCompleted`
 - REST endpoints in server for use new features of engine
 

@@ -33,9 +33,9 @@ Document trick-taking rules in docs/RULES.md.
 - Only last completed trick can be reviewed during play
 
 ### Last Trick
-- Special significance for Sedma contract
-- Trump 7 must win last trick for Sedma
-- "Tichá sedma" if won without announcement
+- Special significance for Seven contract
+- Trump 7 must win last trick for Seven
+- "Silent Seven" if won without announcement (half value)
 
 ## Definition of Done
 - Trick-taking rules complete in docs/RULES.md

@@ -11,7 +11,7 @@ allows any cards to be discarded, but the rules restrict this.
 ## Background
 From docs/RULES.md Talon Rules section:
 > **Aces and Tens cannot be discarded** to the talon (major violation)
-> Exception: Misère and Slam contracts allow any cards to be discarded
+> Exception: Misere and Slam contracts allow any cards to be discarded
 > Announced Seven cannot be discarded to talon
 
 Current implementation gap:
@@ -21,12 +21,12 @@ Current implementation gap:
 
 ## Scope
 - Add validation in talon exchange to reject Ace/Ten discards
-- Allow exception for Misère (BETL) and Slam (DURCH) contracts
+- Allow exception for Misere and Slam contracts
 - Return appropriate error when validation fails
 
 ## Success Criteria
 - Cannot discard Ace or Ten to talon in normal games
-- Misère and Slam allow any cards to be discarded
+- Misere and Slam allow any cards to be discarded
 - Clear error message when validation fails
 - All existing tests pass
 - New tests cover validation scenarios

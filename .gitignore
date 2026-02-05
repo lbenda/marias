@@ -31,3 +31,5 @@ replay_pid*
 /ui/web/.env
 /ui/web/node_modules/
 **/*.iml
+/ui/web/dist/
+

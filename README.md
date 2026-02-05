@@ -57,7 +57,8 @@ All clients render state and interact with the engine by dispatching actions.
 │   └── VOCABULARY.md       # Czech-English terminology
 ├── work/
 │   ├── features/           # Feature definitions
-│   └── tasks/              # Implementation tasks
+│   ├── tasks/              # Implementation tasks
+│   └── bugs/               # Bug reports and fixes
 ├── build.gradle.kts
 └── settings.gradle.kts
 ```
@@ -93,6 +94,12 @@ cd ui/web
 npm install
 cp .env.example .env
 npm run dev
+```
+
+or
+
+```bash
+./gradlew :ui-web:dev
 ```
 
 ---
