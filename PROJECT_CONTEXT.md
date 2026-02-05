@@ -129,6 +129,25 @@ UI → engine → state update → UI render
 
 ---
 
+## Work tracking
+
+Work items are tracked in Markdown files under `/work/`:
+
+```
+work/
+  features/   F-XXX-*.md   High-level feature definitions
+  tasks/      T-XXX-*.md   Implementation tasks (split from features)
+  bugs/       B-XXX-*.md   Bug reports and fixes
+```
+
+- Features describe *what* the system should do
+- Tasks describe *how* to implement features
+- Bugs describe defects in existing functionality
+
+See `docs/TASKS_WORKFLOW.md` for detailed workflow and file structure.
+
+---
+
 ## Active architectural decisions
 - ADR-0001: Kotlin as the core implementation language
 - ADR-0002: React as the web UI technology

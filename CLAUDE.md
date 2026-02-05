@@ -84,9 +84,10 @@ After implementing:
 ### Work tracking
 - Features are defined in /work/features/ as high-level requirements.
 - Tasks are defined in /work/tasks/ as implementable work items.
-- Tasks may have a parent feature.
-- For any task, read the referenced task file and write progress updates into it.
-- Always read the referenced task before starting implementation.
+- Bugs are defined in /work/bugs/ as defect reports and fixes.
+- Tasks and bugs may have a parent feature.
+- For any task or bug, read the referenced file and write progress updates into it.
+- Always read the referenced task/bug before starting implementation.
 - Follow the task workflow and constraints exactly.
 - Do NOT write step-by-step progress into IMPLEMENTATION_PROGRESS.md.
 - IMPLEMENTATION_PROGRESS.md is used only for occasional milestone summaries (when explicitly requested).
