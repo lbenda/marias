@@ -10,6 +10,10 @@
 Integrate transport client with React UI for real-time game state updates
 and optimistic UI updates with server reconciliation.
 
+## Scope
+- Implement React hooks for game state synchronization
+- Implement UI components for connection status
+
 ## React Integration
 
 ### useGameState Hook

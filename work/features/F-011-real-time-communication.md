@@ -2,7 +2,7 @@
 
 * Type: Feature
 * Status: Done
-* Source: ADR-0012 (Real-time communication strategy)
+* Source: A-012 (Real-time communication strategy)
 
 ## Description
 Implement real-time game state updates using progressive enhancement:

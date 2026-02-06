@@ -1,4 +1,4 @@
-# ADR-0010: Extensible Engine for Multiple Card Games
+# A-010: Extensible Engine for Multiple Card Games
 
 Status: Accepted
 Date: 2026-02-02

@@ -1,4 +1,4 @@
-# ADR-0003 — Redux-Style State Container for the Engine
+# A-003 — Redux-Style State Container for the Engine
 
 Status: Accepted
 Date: 2026-02-02

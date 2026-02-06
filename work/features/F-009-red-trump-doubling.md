@@ -1,15 +1,15 @@
 # F-009: Red Trump Color Multiplier
 
 * Type: Feature
-* Status: Planned
-* Source: T-015 (Equipment and Card Values), docs/RULES.md
+* Status: Todo
+* Source: T-015 (Equipment and Card Values), docs/rules/R-001-equipment.md
 
 ## Description
 Implement the rule that red trump suits (Hearts, Diamonds) double all payment rates.
 This requires adding a color property to suits and applying a 2x multiplier in scoring.
 
 ## Background
-From docs/RULES.md Equipment section:
+From docs/rules/R-001-equipment.md:
 > **Red suits** (Hearts, Diamonds): When chosen as trump, all payment rates are doubled.
 
 Current implementation gaps:

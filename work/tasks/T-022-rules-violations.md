@@ -1,13 +1,13 @@
 # T-022: Rules - Violations and Penalties
 
 - Parent: F-008
-- Status: Planned
+- Status: Todo
 - Owner: docs
 - Related modules: docs
 - Depends on: T-014
 
 ## Goal
-Document violation rules and penalties in docs/RULES.md.
+Document violation rules and penalties in docs/rules/.
 
 ## Scope
 From Articles IV and V of source:
@@ -63,7 +63,7 @@ From Articles IV and V of source:
 - Advanced: full violation tracking (optional)
 
 ## Definition of Done
-- Violation rules complete in docs/RULES.md
+- Violation rules complete in docs/rules/
 - All violation types listed
 - Penalties documented
 - Consequence rules explained

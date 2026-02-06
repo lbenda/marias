@@ -1,4 +1,4 @@
-# ADR-0012: Real-time communication strategy
+# A-012: Real-time communication strategy
 
 Status: Accepted
 Date: 2026-02-05

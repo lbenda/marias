@@ -1,13 +1,13 @@
 # T-020: Rules - Scoring and Payment
 
 - Parent: F-008
-- Status: Planned
+- Status: Todo
 - Owner: docs
 - Related modules: docs
 - Depends on: T-014, T-017
 
 ## Goal
-Document scoring and payment rules in docs/RULES.md.
+Document scoring and payment rules in docs/rules/R-008-scoring.md.
 
 ## Scope
 From Article I of source:
@@ -54,7 +54,7 @@ From Article I of source:
 - All involved players must sign score sheet
 
 ## Definition of Done
-- Scoring rules complete in docs/RULES.md
+- Scoring rules complete in docs/rules/R-008-scoring.md
 - Payment table documented
 - Win conditions for each contract
 - Limit rules explained

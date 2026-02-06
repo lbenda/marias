@@ -22,7 +22,7 @@ The project is designed around a clear separation between:
   - Two-phase dealing with trump card selection
   - Bidding ladder with 12 contract levels
   - Doubling system (double/redouble/raise/final raise)
-  - See [docs/RULES.md](docs/RULES.md) for complete rules
+  - See [docs/rules/](docs/rules/) for complete rules
 
 - **Multi-client UI approach**
   - Web UI implemented in React
@@ -51,9 +51,11 @@ All clients render state and interact with the engine by dispatching actions.
 ├── ui/web/                 # React web UI
 ├── docs/
 │   ├── adr/                # Architectural Decision Records
+│   ├── rules/              # Mariash game rules
+│   ├── ADMINISTRATION.md   # Administrators' guide
 │   ├── API.md              # REST API reference
 │   ├── api-tests.http      # API test examples
-│   ├── RULES.md            # Mariash game rules
+│   ├── TASK_WORKFLOW.md    # Defintion of workflow
 │   └── VOCABULARY.md       # Czech-English terminology
 ├── work/
 │   ├── features/           # Feature definitions
@@ -67,7 +69,7 @@ All clients render state and interact with the engine by dispatching actions.
 
 ## Documentation
 
-- [Game Rules](docs/RULES.md) - Complete Mariash rules in English
+- [Game Rules](docs/rules/) - Complete Mariash rules in English
 - [Vocabulary](docs/VOCABULARY.md) - Czech-English terminology glossary
 - [REST API](docs/API.md) - Server API reference
 
@@ -104,6 +106,18 @@ or
 
 ---
 
+## Generate context for AI
+
+```bash
+./scripts/ai-briefing.sh F-007 > /tmp/AI_BRIEFING_F-007.md
+```
+
+```powershell
+bash -c "./scripts/ai-briefing.sh F-007 > /tmp/AI_BRIEFING_F-007.md"
+```
+
+---
+
 ## Game Types
 
 | Type | Description |
@@ -115,3 +129,15 @@ or
 | Slam | Declarer must win all tricks |
 
 See [VOCABULARY.md](docs/VOCABULARY.md) for complete terminology.
+
+## 🛠️ Administrátorské nastavení (nutné pro běh automatizací)
+
+Tento repozitář používá **GitHub Actions** k synchronizaci:
+- Markdown ticketů v repozitáři
+- GitHub Issues
+- GitHub Projects (v2)
+
+Repo je **zdrojem pravdy**.  
+Issues a Project slouží pouze jako stavová projekce.
+
+Aby automatizace fungovaly, je potřeba následující nastavení.

@@ -1,13 +1,13 @@
 # T-023: Rules - Two Sevens Special Rules
 
 - Parent: F-008
-- Status: Planned
+- Status: Todo
 - Owner: docs
 - Related modules: docs
 - Depends on: T-014, T-017
 
 ## Goal
-Document special rules for the Two Sevens contract in docs/RULES.md.
+Document special rules for the Two Sevens contract in docs/rules/R-005-game-types.md.
 
 ## Scope
 From Article III of source:
@@ -39,6 +39,6 @@ From Article III of source:
 - Helper card rules are tournament-specific
 
 ## Definition of Done
-- Two Sevens rules complete in docs/RULES.md
+- Two Sevens rules complete in docs/rules/R-005-game-types.md
 - Helper card rules documented
 - Special cases for Two Sevens and Hundred documented

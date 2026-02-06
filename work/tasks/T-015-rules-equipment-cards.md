@@ -18,7 +18,7 @@
 
 ## Result
 
-Equipment section in docs/RULES.md is now complete with:
+docs/rules/R-001-equipment.md is now complete with:
 - Both German and French suit names
 - Red/Black suit distinction (important for doubling)
 - Complete card values with strength ordering
@@ -26,11 +26,11 @@ Equipment section in docs/RULES.md is now complete with:
 
 ## Verification
 
-- docs/RULES.md Equipment section complete
+- docs/rules/R-001-equipment.md complete
 - Consistent with VOCABULARY.md terminology
 
 ## Goal
-Document equipment, deck composition, and card values in docs/RULES.md.
+Document equipment, deck composition, and card values in docs/rules/R-001-equipment.md.
 
 ## Scope
 - Deck composition (32 cards) ✓
@@ -40,7 +40,7 @@ Document equipment, deck composition, and card values in docs/RULES.md.
 - Total deck points (120) ✓
 
 ## Definition of Done
-- Equipment section complete in docs/RULES.md ✓
+- docs/rules/R-001-equipment.md complete ✓
 - Card values table accurate ✓
 - Consistent with vocabulary from T-014 ✓
 

@@ -1,13 +1,13 @@
 # T-018: Rules - Trump Selection and Doubling
 
 - Parent: F-008
-- Status: Planned
+- Status: Todo
 - Owner: docs
 - Related modules: docs
 - Depends on: T-014
 
 ## Goal
-Document trump selection and the doubling system in docs/RULES.md.
+Document trump selection and the doubling system in docs/rules/R-003-dealing.md and docs/rules/R-005-game-types.md.
 
 ## Scope
 

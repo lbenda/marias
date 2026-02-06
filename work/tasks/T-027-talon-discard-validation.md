@@ -11,7 +11,7 @@ Implement validation that prevents discarding Aces and Tens to the talon,
 except in Misere and Slam contracts.
 
 ## Background
-From docs/RULES.md:
+From docs/rules/R-004-talon.md:
 > **Aces and Tens cannot be discarded** to the talon (major violation)
 > Exception: Misere and Slam contracts allow any cards to be discarded
 

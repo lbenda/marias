@@ -14,11 +14,14 @@
   - durch → slam (bridge/tarot term)
   - kilo → hundred (kilo is confusing - means 1000 in SI)
   - flek/re/tutti/boty → double/redouble/raise/final raise
-- Updated docs/RULES.md to use English terminology throughout
+- Updated docs/rules/ to use English terminology throughout
 - Updated F-008 feature with new vocabulary
 - Updated tasks T-017, T-018, T-020, T-022, T-023 with new terminology
 - Updated docs/API.md with vocabulary references
 - Created T-024 for implementing vocabulary in source code
+
+## Scope
+- docs/VOCABULARY.md
 
 ## Result
 
@@ -29,12 +32,12 @@
 ## Verification
 
 - docs/VOCABULARY.md exists and is complete
-- docs/RULES.md references vocabulary and uses English terms
+- docs/rules/ references vocabulary and uses English terms
 - All F-008 tasks use consistent terminology
 
 ## Goal
 Create a Czech-English glossary for mariash terminology to ensure consistent
-translation throughout docs/RULES.md and the codebase.
+translation throughout docs/rules/ and the codebase.
 
 ## Context
 Many mariash terms don't have standard English equivalents. This glossary
@@ -73,6 +76,6 @@ Create docs/VOCABULARY.md with terms organized by category.
 - docs/VOCABULARY.md created with all terms ✓
 - Terms organized by category ✓
 - Notes explain non-obvious translations ✓
-- Referenced from docs/RULES.md ✓
+- Referenced from docs/rules/ ✓
 - All tasks/features updated with vocabulary ✓
 - T-024 created for source code changes ✓

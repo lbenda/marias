@@ -6,7 +6,7 @@
 
 ## Description
 Translate and document the complete official mariash rules from Czech to English
-in docs/RULES.md. The source document contains tournament rules for "auction mariash"
+in docs/rules/. The source document contains tournament rules for "auction mariash"
 which is the standard competitive variant.
 
 A Czech-English vocabulary/glossary (docs/VOCABULARY.md) ensures consistent terminology
@@ -46,7 +46,7 @@ The rules are organized into 5 articles:
 
 ## Success Criteria
 - Czech-English vocabulary with consistent terminology
-- Complete English translation of all rules in docs/RULES.md
+- Complete English translation of all rules in docs/rules/
 - Rules are clear enough for someone unfamiliar with mariash to learn the game
 - Implementation features/tasks identified for each rule section
 - Source code updated to use vocabulary

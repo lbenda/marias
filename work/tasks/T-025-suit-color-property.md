@@ -1,7 +1,7 @@
 # T-025: Add Suit Color Property
 
 - Parent: F-009
-- Status: Planned
+- Status: Todo
 - Owner: engine
 - Related modules: engine
 - Depends on: none
@@ -11,7 +11,7 @@ Add a `color` property to the `Suit` enum to distinguish red suits (Hearts, Diam
 from black suits (Spades, Clubs).
 
 ## Background
-From docs/RULES.md:
+From docs/rules/R-001-equipment.md:
 > **Red suits** (Hearts, Diamonds): When chosen as trump, all payment rates are doubled.
 
 The `Suit` enum currently only has a `symbol` property. A `color` property is needed

@@ -172,4 +172,4 @@ Similar to bridge doubling, but with 4 levels:
 
 ---
 
-*This vocabulary is used consistently in docs/RULES.md and the codebase.*
+*This vocabulary is used consistently in docs/rules/*.md and the codebase.*

@@ -2,14 +2,14 @@
 
 * Type: Feature
 * Status: Done
-* Source: T-016 (Dealing and Talon Rules), docs/RULES.md
+* Source: T-016 (Dealing and Talon Rules), docs/rules/R-004-talon.md
 
 ## Description
 Implement validation rules for discarding cards to the talon. Currently the engine
 allows any cards to be discarded, but the rules restrict this.
 
 ## Background
-From docs/RULES.md Talon Rules section:
+From docs/rules/R-004-talon.md:
 > **Aces and Tens cannot be discarded** to the talon (major violation)
 > Exception: Misere and Slam contracts allow any cards to be discarded
 > Announced Seven cannot be discarded to talon

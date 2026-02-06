@@ -1,0 +1,40 @@
+name: Tickets - on merge to master
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [master]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  on-merge:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Close issues + mark files as Merged + sync Project v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PROJECT_TOKEN: ${{ secrets.PROJECT_TOKEN }}
+
+          DEFAULT_BRANCH: master
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+
+          PROJECT_KIND: user
+          PROJECT_OWNER: lbenda
+          PROJECT_NUMBER: "1"
+
+          PROJECT_FIELD_STATUS: Status
+          PROJECT_FIELD_AREA: Area
+        run: node .github/scripts/tickets-on-merge.js
