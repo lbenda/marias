@@ -10,6 +10,10 @@
 Implement transport client that automatically negotiates best available
 communication method: WebSocket → Long Polling → Short Polling.
 
+## Scope
+- Transport client implementation
+- Transport negotiation algorithm
+
 ## API
 ```typescript
 interface TransportClient {

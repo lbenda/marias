@@ -1,4 +1,4 @@
-# ADR-0003: OpenAPI strategy
+# A-003: OpenAPI strategy
 
 Status: Accepted
 Date: 2026-02-02

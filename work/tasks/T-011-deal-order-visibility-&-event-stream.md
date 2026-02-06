@@ -39,7 +39,7 @@ will store the card in order which client choose, but there is validation only c
 in different order.
 
 ## Context
-In mariáš, skilled players infer card distribution from deal order.
+In mariash, skilled players infer card distribution from deal order.
 The engine must preserve and expose this information.
 Players also organize their hand for easier play — the server must support custom hand ordering.
 

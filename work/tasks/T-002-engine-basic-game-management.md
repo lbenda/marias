@@ -41,6 +41,9 @@ OUT:
 - Unit tests exist or can be added for deterministic parts (e.g. state transitions).
 - Manual smoke check via server endpoints confirms engine operations are callable.
 
+## Definition of Done
+- All tasks are completed.
+
 ## Follow-ups (not part of this ticket)
 - Add deterministic/replay-friendly action/reducer layer (Redux-style) if not fully in place yet
 - Add game-specific rules module(s)

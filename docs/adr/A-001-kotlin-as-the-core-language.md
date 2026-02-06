@@ -1,4 +1,4 @@
-# ADR-0001: Kotlin as the Core Implementation Language
+# A-001: Kotlin as the Core Implementation Language
 
 Status: Accepted
 Date: 2026-02-02

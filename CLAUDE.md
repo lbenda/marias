@@ -1,121 +1,90 @@
-# CLAUDE.md — AI coding rules for this repository
+# CLAUDE.md — AI Contract for this Repository
 
-This file defines mandatory rules for AI-assisted work in this repository.
-Project structure, architecture, and current system shape are defined in PROJECT_CONTEXT.md.
-Architectural rationale and history are documented in docs/adr/.
+This file defines mandatory, stable rules for AI-assisted work in this repository.
+It is intentionally short and low-entropy.
 
----
-
-## 1) Primary objectives
-- Produce correct, maintainable code with minimal complexity.
-- Optimize for low-context usage: public behavior must be understandable from interfaces and small excerpts.
-- Prefer clarity over cleverness.
+If information changes frequently, it does NOT belong here.
 
 ---
 
-## 2) Context sources (priority order)
-1. Closest CLAUDE.md (package/module level overrides root)
-2. PROJECT_CONTEXT.md (current system map)
-3. Explicit user instructions
-4. Code (only the minimum required)
+## 1) What this project is
+A Kotlin-based card game engine (Mariash) focused on deterministic core logic,
+clear domain modeling, and long-term maintainability.
 
-Do NOT read or rely on ADR files unless explicitly asked or when proposing architectural changes.
-
----
-
-## 3) Token-friendly coding style
-- Reduce verbosity wherever possible without harming clarity.
-- Remove redundant abstractions.
-- Flatten deep class hierarchies.
-- Minimize generics, DSLs, and heavy type-level programming.
-- Prefer simple data structures and straightforward control flow.
-- Keep files and classes small and focused.
+The project prioritizes correctness, clarity, and low-context reasoning over
+feature velocity or abstraction density.
 
 ---
 
-## 4) Interfaces as API contracts
-- Prefer Kotlin interfaces for:
-  - Cross-module and cross-package boundaries
-  - Public services and entry points
-  - Components frequently referenced in prompts or documentation
-- Interfaces are used as:
-  - Stable API contracts
-  - Context compression for AI tooling
-- Interfaces are NOT introduced primarily for polymorphism.
+## 2) Non-negotiable constraints
+- Language: Kotlin
+- Deterministic logic only (no randomness outside controlled inputs)
+- No runtime reflection
+- No UI layer
+- No persistence beyond in-memory unless explicitly introduced
+- No unnecessary dependencies
 
-Do NOT generate interfaces for:
+---
+
+## 3) Architectural boundaries
+- Core domain is pure and deterministic
+- Infrastructure depends on domain, never the opposite
+- Public behavior must be understandable from interfaces and small excerpts
+- Prefer composition over deep hierarchies
+
+Any architectural change requires an ADR in `docs/adr/`.
+
+---
+
+## 4) Token-friendly coding style
+- Prefer clarity over cleverness
+- Keep files and classes small and focused
+- Avoid deep inheritance and excessive generics
+- Do not introduce DSLs or heavy abstractions without strong justification
+- Minimize surface area of public APIs
+
+---
+
+## 5) Interfaces as API contracts
+Use Kotlin interfaces for:
+- Cross-module or cross-package boundaries
+- Public services and entry points
+- Stable contracts frequently referenced in documentation or prompts
+
+Do NOT introduce interfaces for:
 - Local helpers
 - One-off utilities
 - Simple data transformations
-- Classes not referenced outside their package
+- Classes not used outside their package
+
+Interfaces are used as **context compression**, not for polymorphism by default.
 
 ---
 
-## 5) Documentation split
-- Human-facing documentation lives in README, KDoc, and docs/.
-- AI context must rely on PROJECT_CONTEXT.md and local CLAUDE.md files.
-- Avoid copying large comment blocks or documentation into prompts.
+## 6) Rules for changes
+- Features are defined in `work/features/`
+- Tasks and bugs live in `work/tasks/` and `work/bugs/`
+- Always read the referenced task / bug before implementing
+- Minimize changes outside the requested scope
+- Preserve public APIs unless explicitly instructed otherwise
+
+Progress tracking and status updates belong in the corresponding work item,
+not in this file.
 
 ---
 
-## 6) Workflow rules (always follow)
+## 7) API and rules documentation
+If you change:
+- HTTP API → update `docs/API.md` and `docs/api-tests.http`
+- Game mechanics → update the relevant file(s) under `docs/rules/`
+  - Game rules are defined in ordered files under `docs/rules/` (01-*.md, 02-*.md, …).
 
-Before making changes:
-1. Identify the target module/package.
-2. Read PROJECT_CONTEXT.md.
-3. Read the closest CLAUDE.md.
-4. If working in a new or complex area, create a local CLAUDE.md first.
-
-When implementing:
-- Start with a short plan (3–8 bullets).
-- Minimize changes outside the requested scope.
-- Preserve public APIs and behavior unless explicitly told otherwise.
-
-After implementing:
-- Update the task:
-  - Set task Status to Done
-  - Summarize what changed and why (5–10 bullets).
-  - Add a short "Result" and "Verification" section if missing
-- If an architectural decision is introduced or changed:
-  - add or update an ADR in docs/adr/
-  - reflect the resulting state in PROJECT_CONTEXT.md
-- If the HTTP API changed, update `docs/API.md` and `docs/api-tests.http`
-
-### Work tracking
-- Features are defined in /work/features/ as high-level requirements.
-- Tasks are defined in /work/tasks/ as implementable work items.
-- Bugs are defined in /work/bugs/ as defect reports and fixes.
-- Tasks and bugs may have a parent feature.
-- For any task or bug, read the referenced file and write progress updates into it.
-- Always read the referenced task/bug before starting implementation.
-- Follow the task workflow and constraints exactly.
-- Do NOT write step-by-step progress into IMPLEMENTATION_PROGRESS.md.
-- IMPLEMENTATION_PROGRESS.md is used only for occasional milestone summaries (when explicitly requested).
+Do not restate rules in tasks. Tasks and features must reference the exact rule files they rely on.
 
 ---
 
-## 7) API changes
-If you change anything in the HTTP API (endpoints, payloads, status codes, auth, error format), you MUST update:
-- docs/API.md
-- docs/api-tests.http
+## 8) Safety boundaries
+- Do not modify unrelated files
+- Do not change formatting or lint rules unless asked
+- Do not introduce new dependencies unless clearly justified or requested
 
-Treat these files as part of the API contract.
-
----
-
-## 8) Game rules documentation
-The file `docs/RULES.md` contains the official mariáš game rules as implemented.
-When implementing features that change game mechanics, update this file to reflect:
-- New game phases or flows
-- Card handling rules
-- Scoring changes
-- Any rule variations
-
-This file serves as both player documentation and implementation reference.
-
----
-
-## 9) Safety boundaries
-- Do not introduce new dependencies unless requested or clearly justified.
-- Do not change formatting or lint rules unless explicitly asked.
-- Do not modify unrelated files.

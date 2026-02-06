@@ -10,6 +10,11 @@
 Implement infrastructure for broadcasting game state changes to all listeners
 (WebSocket connections and long-polling waiters).
 
+## Scope
+- Implement event bus interface
+- Implement in-memory event bus implementation
+- Integrate event bus with GameService
+
 ## Components
 
 ### GameEventBus

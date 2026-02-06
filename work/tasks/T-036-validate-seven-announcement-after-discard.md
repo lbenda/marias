@@ -10,7 +10,7 @@
 Prevent announcing Seven-variant game types if trump 7 was discarded to talon.
 
 ## Background
-From docs/RULES.md:
+From docs/rules/R-004-talon.md:
 > Announced Seven cannot be discarded to talon
 
 This means: if the declarer discards the trump 7 to the talon, they cannot announce
@@ -55,7 +55,7 @@ fun canAnnounceGameType(gameType: GameType, trump: Suit, talon: List<Card>): Boo
 - Validation prevents Seven announcement if trump 7 discarded
 - Error returned with clear message
 - Unit tests cover all cases
-- docs/RULES.md already documents this rule
+- docs/rules/R-004-talon.md already documents this rule
 
 ## Result
 

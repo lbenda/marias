@@ -1,7 +1,7 @@
 # T-026: Implement Red Trump Payment Multiplier
 
 - Parent: F-009
-- Status: Planned
+- Status: Todo
 - Owner: engine
 - Related modules: engine
 - Depends on: T-025
@@ -10,7 +10,7 @@
 Implement the rule that red trump suits double all payment rates in scoring.
 
 ## Background
-From docs/RULES.md:
+From docs/rules/R-001-equipment.md:
 > **Red suits** (Hearts, Diamonds): When chosen as trump, all payment rates are doubled.
 
 Current `ScoringCalculator.calculateScore()` uses `gameType.baseValue` directly

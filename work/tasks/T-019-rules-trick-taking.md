@@ -1,13 +1,13 @@
 # T-019: Rules - Trick-Taking
 
 - Parent: F-008
-- Status: Planned
+- Status: Todo
 - Owner: docs
 - Related modules: docs
 - Depends on: T-014
 
 ## Goal
-Document trick-taking rules in docs/RULES.md.
+Document trick-taking rules in docs/rules/R-006-playing-tricks.md.
 
 ## Scope
 
@@ -38,6 +38,6 @@ Document trick-taking rules in docs/RULES.md.
 - "Silent Seven" if won without announcement (half value)
 
 ## Definition of Done
-- Trick-taking rules complete in docs/RULES.md
+- Trick-taking rules complete in docs/rules/R-006-playing-tricks.md
 - Card following obligations clear
 - Trick storage rules documented

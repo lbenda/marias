@@ -49,7 +49,7 @@ engine/
 - HTTP API documentation:
   - docs/API.md — human-readable API reference
   - docs/api-tests.http — executable API examples
-- Game rules: docs/RULES.md — mariash rules as implemented
+- Game rules: docs/rules/R-XXX-*.md — mariash rules as implemented
 - Key endpoints:
   - `/games` — game lifecycle (create, list, get, delete)
   - `/games/{id}/actions` — dispatch game actions
@@ -149,14 +149,14 @@ See `docs/TASKS_WORKFLOW.md` for detailed workflow and file structure.
 ---
 
 ## Active architectural decisions
-- ADR-0001: Kotlin as the core implementation language
-- ADR-0002: React as the web UI technology
-- ADR-0003: Redux-style state container for the engine
-- ADR-0004: Module splitting (engine / server / ui)
-- ADR-0005: Interfaces as API boundaries
-- ADR-0006: Code-first OpenAPI strategy
-- ADR-0010: Extensible engine for multiple card games
-- ADR-0011: Android UI delivery strategy (pending)
-- ADR-0012: Real-time communication (WebSocket → long polling → short polling)
+- A-001: Kotlin as the core implementation language
+- A-002: React as the web UI technology
+- A-003: Redux-style state container for the engine
+- A-004: Module splitting (engine / server / ui)
+- A-005: Interfaces as API boundaries
+- A-006: Code-first OpenAPI strategy
+- A-010: Extensible engine for multiple card games
+- A-011: Android UI delivery strategy (pending)
+- A-012: Real-time communication (WebSocket → long polling → short polling)
 
 ---

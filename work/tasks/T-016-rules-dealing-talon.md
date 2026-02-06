@@ -20,7 +20,7 @@
 
 ## Result
 
-Dealing section in docs/RULES.md is now complete with:
+docs/rules/R-003-dealing.md and docs/rules/R-004-talon.md are now complete with:
 - Cutting vs shuffling distinction
 - Two-phase deal procedure
 - Comprehensive talon rules
@@ -28,11 +28,11 @@ Dealing section in docs/RULES.md is now complete with:
 
 ## Verification
 
-- docs/RULES.md Dealing section complete
+- docs/rules/R-003-dealing.md and docs/rules/R-004-talon.md complete
 - Consistent with VOCABULARY.md terminology
 
 ## Goal
-Document dealing rules and talon handling in docs/RULES.md.
+Document dealing rules and talon handling in docs/rules/R-003-dealing.md and docs/rules/R-004-talon.md.
 
 ## Scope
 From Article II of source:
@@ -63,7 +63,7 @@ From Article II of source:
 - Trick order must not be disturbed ✓
 
 ## Definition of Done
-- Dealing section complete in docs/RULES.md ✓
+- docs/rules/R-003-dealing.md complete ✓
 - Talon rules documented ✓
 - Card handling rules documented ✓
 

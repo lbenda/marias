@@ -8,7 +8,7 @@
 
 ## Goal
 Change trump selection from suit-only to card-based selection,
-matching authentic mariáš rules where chooser places a specific card face-down.
+matching authentic mariash rules where chooser places a specific card face-down.
 
 ## Context
 Current implementation: `ChooseTrump(playerId, suit)` - only suit is selected.

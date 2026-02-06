@@ -9,6 +9,9 @@
 ## Goal
 Implement WebSocket endpoint for real-time game event streaming.
 
+## Scope
+Server-side implementation of WebSocket endpoint for real-time game event streaming.
+
 ## Endpoint
 `ws://host/games/{id}/ws`
 

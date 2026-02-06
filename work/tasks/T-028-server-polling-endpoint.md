@@ -9,6 +9,9 @@
 ## Goal
 Implement polling endpoint for game events with ETag-based conditional requests.
 
+## Scope
+- Implement polling endpoint for game events
+
 ## Endpoint
 `GET /games/{id}/events`
 

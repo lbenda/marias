@@ -1,4 +1,4 @@
-# ADR-0004: Module splitting
+# A-004: Module splitting
 
 Status: Accepted
 Date: 2026-02-02

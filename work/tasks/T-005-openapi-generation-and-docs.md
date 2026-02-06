@@ -41,6 +41,11 @@ OUT:
 - Any API change must update both files.
 - OpenAPI may become the primary contract once the API stabilizes or gains external consumers.
 
+## Definition of Done
+- OpenAPI spec is generated from server code
+- docs/API.md describes all available endpoints and their behavior
+- api-test.http contains working example requests
+
 ## Verification
 - Generated OpenAPI spec matches server endpoints
 - API described in docs/API.md matches actual behavior

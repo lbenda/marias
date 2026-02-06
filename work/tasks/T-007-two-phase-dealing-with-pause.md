@@ -45,7 +45,7 @@ in which cards were dealt to them.
 ## Context
 Currently, the engine deals 10 cards to each of 3 players in a single uninterrupted flow.
 
-We need a new dealing rule used in mariáš:
+We need a new dealing rule used in mariash:
 - One player (the one immediately after the dealer) must receive an initial chunk (default 7 cards),
   then the deal pauses until that player selects trump (or a contract decision), and only then receives the remaining cards.
 - The other two players may receive their cards directly into their hands while the chooser’s remaining cards stay on the table.
@@ -76,7 +76,7 @@ OUT:
 
 ## Constraints
 - Must keep engine modular: avoid embedding server/UI concerns; expose required state & events only.
-- Dealing must be reproducible/deterministic given a fixed deck order (important for mariáš skill play).
+- Dealing must be reproducible/deterministic given a fixed deck order (important for mariash skill play).
 - Preserve player order strictly (dealer chooses chunk sizes, but order of recipients remains consistent).
 
 ## Implementation plan

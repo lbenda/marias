@@ -44,6 +44,10 @@ OUT:
 - docs/API.md describes the server API behavior and usage
 - api-test.http contains executable example requests reflecting the current API
 
+## Definition of Done
+- Server module compiles and runs
+- API documentation is up-to-date
+
 ## Verification
 - Manual smoke test:
     - start server

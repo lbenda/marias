@@ -40,6 +40,9 @@ OUT:
 - Prefer simple action schemas and reducer boundaries (avoid over-engineering).
 - Keep the state shape manageable; prefer normalized or structured state if it grows.
 
+## Definition of Done
+- Engine supports deterministic state transitions using actions and reducers
+
 ## Verification
 - Unit tests cover reducer behavior for key actions
 - Replaying the same action sequence yields identical final state

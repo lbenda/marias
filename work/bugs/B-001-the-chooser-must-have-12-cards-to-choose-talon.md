@@ -44,8 +44,15 @@ Updated `exchangeTalonReducer`:
 - After discarding 2 cards, chooser has 9 in hand + trump returns = 10 cards
 - New talon contains the 2 discarded cards
 
+## Steps to reproduce
+- Start game
+- Deal
+
+## Actual behavior
+- Chooser has 10 cards after selecting trump
+
 ## Verification
 
 - All 51 engine tests pass
 - New test `full flow - choose trump then discard returns trump to hand` verifies complete sequence
-- docs/RULES.md already documents correct flow
+- docs/rules/R-003-dealing.md and docs/rules/R-004-talon.md already document correct flow

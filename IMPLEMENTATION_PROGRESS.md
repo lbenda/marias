@@ -1,4 +1,4 @@
-# Mariáš Game Engine - Implementation Progress
+# Mariash Game Engine - Implementation Progress
 
 ## NOTE (2026-02-03):
 This file is a historical progress log / milestone summary.
@@ -19,7 +19,7 @@ For decisions see `docs/adr/`.
 ### Model Layer
 - **Rank enum** - Points and strength directly on enum (no separate lookup)
 - **Card** - Simple data class with `points` and `strength` properties
-- **Removed DeckType** - Only 32-card Mariáš deck supported
+- **Removed DeckType** - Only 32-card Mariash deck supported
 - **Top-level functions** - `createDeck()`, `createShuffledDeck()`
 
 ### State Layer

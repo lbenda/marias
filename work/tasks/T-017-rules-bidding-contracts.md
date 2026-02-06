@@ -1,13 +1,13 @@
 # T-017: Rules - Bidding Ladder and Contract Types
 
 - Parent: F-008
-- Status: Planned
+- Status: Todo
 - Owner: docs
 - Related modules: docs
 - Depends on: T-014
 
 ## Goal
-Document the bidding ladder and all contract types in docs/RULES.md.
+Document the bidding ladder and all contract types in docs/rules/R-005-game-types.md.
 
 ## Scope
 From Article I of source:
@@ -54,7 +54,7 @@ From Article I of source:
 - F-XXX: Implement all contract types
 
 ## Definition of Done
-- Bidding ladder complete in docs/RULES.md
+- Bidding ladder complete in docs/rules/R-005-game-types.md
 - All 12 contract levels documented
 - Red trump rule explained
 - Silent achievements documented

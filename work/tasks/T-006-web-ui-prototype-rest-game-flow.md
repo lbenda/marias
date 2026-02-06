@@ -3,7 +3,7 @@
 - Status: Done
 - Owner: ui/web
 - Related modules: ui/web, server, engine
-- Related ADRs: ADR-0002, ADR-0004, ADR-0006
+- Related ADRs: A-002, A-004, A-006
 
 ## Goal
 Create a minimal React UI that exercises the existing server REST API:

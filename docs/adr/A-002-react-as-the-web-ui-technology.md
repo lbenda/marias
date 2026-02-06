@@ -1,4 +1,4 @@
-# ADR-0002 — React as the Web UI Technology
+# A-002 — React as the Web UI Technology
 
 Status: Accepted
 Date: 2026-02-02
