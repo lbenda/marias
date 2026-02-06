@@ -1,7 +1,7 @@
 # T-030: Server - Event Broadcast Infrastructure
 
 - Parent: F-011
-- Status: Planned
+- Status: Done
 - Owner: server
 - Related modules: server
 - Depends on: none

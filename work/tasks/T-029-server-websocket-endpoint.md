@@ -1,7 +1,7 @@
 # T-029: Server - WebSocket Endpoint
 
 - Parent: F-011
-- Status: Planned
+- Status: Done
 - Owner: server
 - Related modules: server
 - Depends on: T-030

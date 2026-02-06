@@ -1,7 +1,7 @@
 # F-011: Real-time Communication
 
 * Type: Feature
-* Status: Planned
+* Status: Done
 * Source: ADR-0012 (Real-time communication strategy)
 
 ## Description
@@ -58,8 +58,51 @@ Uses `GameState.version` from Redux-style engine state:
 - All transports use same version numbering
 
 ## Related Tasks
-- T-028: Server - Polling endpoint with ETag support
-- T-029: Server - WebSocket endpoint
-- T-030: Server - Event broadcast infrastructure
-- T-031: Web UI - Transport client with fallback
-- T-032: Web UI - Real-time state synchronization
+- T-028: Server - Polling endpoint with ETag support (Done)
+- T-029: Server - WebSocket endpoint (Done)
+- T-030: Server - Event broadcast infrastructure (Done)
+- T-031: Web UI - Transport client with fallback (Done)
+- T-032: Web UI - Real-time state synchronization (Done)
+
+## Result
+
+Implemented full real-time communication stack:
+
+### Server (Kotlin/Ktor)
+1. **GameEventBus interface** (`server/event/GameEventBus.kt`)
+   - `subscribe(gameId)`: Flow for WebSocket streaming
+   - `publish(gameId, state)`: Broadcast state changes
+   - `waitForChange(gameId, version, timeout)`: Long polling support
+
+2. **InMemoryEventBus** (`server/event/InMemoryEventBus.kt`)
+   - MutableSharedFlow per game for efficient pub/sub
+   - Tracks latest state for immediate delivery to new subscribers
+
+3. **Polling Endpoint** (`server/routes/EventRoutes.kt`)
+   - `GET /games/{id}/events`
+   - ETag versioning with `If-None-Match` header
+   - Long polling with `Prefer: wait=N` header
+   - Returns 304 when no changes
+
+4. **WebSocket Endpoint** (`server/routes/WebSocketRoutes.kt`)
+   - `ws://host/games/{id}/ws`
+   - Sends current state on connect
+   - Broadcasts state changes to all connected clients
+
+### Web UI (React/TypeScript)
+1. **Transport Client** (`api/transport/TransportClient.ts`)
+   - Auto-negotiates: WebSocket -> Long Polling -> Short Polling
+   - Reconnection with exponential backoff
+   - Connection state tracking
+
+2. **useTransport Hook** (`hooks/useTransport.ts`)
+   - React hook for real-time game state
+   - Automatic connect/disconnect lifecycle
+
+3. **ConnectionIndicator** (`components/ConnectionIndicator.tsx`)
+   - Visual indicator: Live (WS), Connected (long poll), Polling (short poll)
+   - Shows reconnecting/disconnected states
+
+4. **GamePage Integration**
+   - Real-time state updates without manual refresh
+   - Connection status visible to user

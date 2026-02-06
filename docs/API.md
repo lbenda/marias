@@ -21,6 +21,8 @@ http://localhost:8080
 | GET | `/games/{id}/bidding` | Get bidding state |
 | GET | `/games/{id}/decision` | Get decision state |
 | POST | `/games/{id}/decision` | Submit chooser decision |
+| GET | `/games/{id}/events` | Polling endpoint for real-time updates |
+| WS | `/games/{id}/ws` | WebSocket endpoint for real-time updates |
 
 ## Game Flow
 
@@ -244,6 +246,61 @@ Total deck points: 120
 | MISERE | Declarer must not win any trick |
 | SLAM | Declarer must win all tricks |
 | TWO_SEVENS | Control both trump 7s |
+
+## Real-time Updates
+
+Two methods for receiving real-time game state updates:
+
+### Polling Endpoint
+
+```http
+GET /games/{id}/events
+```
+
+**Request headers:**
+| Header | Required | Description |
+|--------|----------|-------------|
+| `If-None-Match` | No | Version client has (e.g., `v5`) |
+| `Prefer` | No | `wait={seconds}` for long polling |
+| `Cache-Control` | No | Should be `no-cache` |
+
+**Responses:**
+- `200 OK` + game state + `ETag: v{version}` — new data available
+- `304 Not Modified` + `ETag: v{version}` — no changes since client's version
+
+**Examples:**
+
+Short polling (immediate response):
+```http
+GET /games/{id}/events
+If-None-Match: v5
+```
+
+Long polling (wait up to 30s for changes):
+```http
+GET /games/{id}/events
+If-None-Match: v5
+Prefer: wait=30
+```
+
+### WebSocket Endpoint
+
+```
+ws://host/games/{id}/ws
+```
+
+**Server → Client messages:**
+```json
+{"type": "state", "version": 6, "data": {/* GameResponse */}}
+```
+```json
+{"type": "error", "message": "Game not found"}
+```
+
+**Behavior:**
+1. On connect: validates game exists, sends current state
+2. On state change: broadcasts new state to all connected clients
+3. On error: sends error message and closes connection
 
 ## Running
 
