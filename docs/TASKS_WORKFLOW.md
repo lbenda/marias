@@ -22,9 +22,9 @@ A task:
 ### Bug (B-xxx)
 Represents incorrect behavior relative to rules or features.
 
-### ADR (A-xxx)
+### Architectonic decision (A-xxx)
 Records a structural or architectural decision.
-Any change affecting multiple components or rules requires an ADR.
+Any change affecting multiple components or rules requires an architectonic decision.
 
 ## Rules
 - Tasks must not restate rules
