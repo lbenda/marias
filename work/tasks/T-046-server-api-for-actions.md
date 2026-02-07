@@ -1,7 +1,7 @@
 # T-046: Server API for action delivery and execution
 
 - Parent: F-014
-- Status: Planned
+- Status: Todo
 - Owner: server
 - Related modules: server, engine, ui
 

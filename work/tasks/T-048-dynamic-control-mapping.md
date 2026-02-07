@@ -1,7 +1,7 @@
 # T-048: Implement dynamic control mapping (Action -> UI Component)
 
 - Parent: F-015
-- Status: Planned
+- Status: Todo
 - Owner: ui
 - Related modules: ui/web
 

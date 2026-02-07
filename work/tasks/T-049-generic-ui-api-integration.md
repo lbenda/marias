@@ -1,7 +1,7 @@
 # T-049: Integrate Generic UI with game-loop API
 
 - Parent: F-015
-- Status: Planned
+- Status: Todo
 - Owner: ui
 - Related modules: ui/web
 
@@ -16,7 +16,7 @@ Demonstrate end-to-end gameplay using only the generic UI and the new rule-based
 - [ ] Implement polling or WebSocket connection to receive updated `possibleActions` from the server.
 - [ ] Wire up action execution: clicking a generic control sends the POST request to `/games/{id}/actions`.
 - [ ] Handle server-side validation errors by displaying them in a generic alert or notification toast.
-- [ ] Verify that a complete game of Mariáš can be played using ONLY this generic UI.
+- [ ] Verify that a complete game of Mariash can be played using ONLY this generic UI.
 
 ## Files to Create/Modify
 - `ui/web/src/pages/GenericGamePage.tsx` (new)
