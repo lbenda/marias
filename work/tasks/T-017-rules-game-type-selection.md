@@ -1,7 +1,7 @@
 # T-017: Rules – Game Type Selection
 
 - Parent: F-008
-- Status: Done
+- Status: Merged
 - Owner: docs
 - Related modules: docs
 - Depends on: T-014
