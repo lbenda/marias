@@ -1,7 +1,7 @@
 # T-036: Validate Seven Announcement After Trump 7 Discard
 
 - Parent: F-010
-- Status: Done
+- Status: Merged
 - Owner: engine
 - Related modules: engine
 - Depends on: T-027

@@ -1,7 +1,7 @@
 # T-027: Validate Talon Discard Restrictions
 
 - Parent: F-010
-- Status: Done
+- Status: Merged
 - Owner: engine
 - Related modules: engine
 - Depends on: T-024 (Done - MISERE/SLAM enum names available)

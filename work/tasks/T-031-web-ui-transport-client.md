@@ -1,7 +1,7 @@
 # T-031: Web UI - Transport Client with Fallback
 
 - Parent: F-011
-- Status: Done
+- Status: Merged
 - Owner: ui/web
 - Related modules: ui/web
 - Depends on: T-028, T-029

@@ -1,6 +1,6 @@
 # T-003: Server — basic REST API over engine
 
-- Status: Done
+- Status: Merged
 - Owner: Server
 
 ## Goal

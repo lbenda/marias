@@ -1,7 +1,7 @@
 # T-037: UI for Talon Exchange
 
 - Parent: F-010
-- Status: Done
+- Status: Merged
 - Owner: ui/web
 - Related modules: ui/web, engine
 - Depends on: T-027 (Done), T-036 (Done)

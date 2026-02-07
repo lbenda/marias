@@ -1,7 +1,7 @@
 # T-016: Rules - Dealing and Talon
 
 - Parent: F-008
-- Status: Done
+- Status: Merged
 - Owner: docs
 - Related modules: docs
 - Depends on: T-014

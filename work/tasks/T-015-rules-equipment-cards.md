@@ -1,7 +1,7 @@
 # T-015: Rules - Equipment and Card Values
 
 - Parent: F-008
-- Status: Done
+- Status: Merged
 - Owner: docs
 - Related modules: docs
 - Depends on: T-014

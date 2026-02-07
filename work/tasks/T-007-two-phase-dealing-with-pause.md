@@ -1,7 +1,7 @@
 # T-007: Two-phase dealing with paused trump selection and deal-order visibility
 
 - Parent: F-007
-- Status: Done
+- Status: Merged
 - Owner: engine / AI
 - Related modules: engine, server
 - Related ADRs: (none)

@@ -1,6 +1,6 @@
 # T-006: Web UI prototype — REST game flow (create/join/start/show hand)
 
-- Status: Done
+- Status: Merged
 - Owner: ui/web
 - Related modules: ui/web, server, engine
 - Related ADRs: A-002, A-004, A-006

@@ -1,7 +1,7 @@
 # F-010: Talon Discard Validation
 
 * Type: Feature
-* Status: Done
+* Status: Merged
 * Source: T-016 (Dealing and Talon Rules), docs/rules/R-004-talon.md
 
 ## Description

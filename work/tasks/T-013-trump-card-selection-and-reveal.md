@@ -1,7 +1,7 @@
 # T-013: Trump card selection and reveal
 
 - Parent: F-007
-- Status: Done
+- Status: Merged
 - Owner: engine / server
 - Related modules: engine, server
 - Depends on: T-007

@@ -1,6 +1,6 @@
 # T-002: Engine — basic game management
 
-- Status: Done
+- Status: Merged
 - Owner: Engine
 
 ## Goal

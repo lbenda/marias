@@ -1,7 +1,7 @@
 # T-024: Implement Vocabulary in Source Code
 
 - Parent: F-008
-- Status: Done
+- Status: Merged
 - Owner: engine / server
 - Related modules: engine, server
 - Depends on: T-014

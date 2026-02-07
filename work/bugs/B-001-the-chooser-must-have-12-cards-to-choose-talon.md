@@ -1,7 +1,7 @@
 # B-001: The chooser must have 12 cards to choose talon
 
 - Parent: F-007
-- Status: Done
+- Status: Merged
 - Owner: engine
 - Related modules: engine
 

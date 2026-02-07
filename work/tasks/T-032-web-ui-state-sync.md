@@ -1,7 +1,7 @@
 # T-032: Web UI - Real-time State Synchronization
 
 - Parent: F-011
-- Status: Done
+- Status: Merged
 - Owner: ui/web
 - Related modules: ui/web
 - Depends on: T-031

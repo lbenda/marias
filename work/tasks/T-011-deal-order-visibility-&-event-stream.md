@@ -1,7 +1,7 @@
 # T-011: Deal order visibility and deal event stream
 
 - Parent: F-007
-- Status: Done
+- Status: Merged
 - Owner: engine / server
 - Related modules: engine, server
 - Depends on: T-007

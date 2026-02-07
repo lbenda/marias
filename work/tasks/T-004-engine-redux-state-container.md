@@ -1,6 +1,6 @@
 # T-004: Engine — Redux-style state container
 
-- Status: Done
+- Status: Merged
 - Owner: Engine
 
 ## Goal

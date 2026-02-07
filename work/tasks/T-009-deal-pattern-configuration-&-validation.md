@@ -1,7 +1,7 @@
 # T-009: Deal pattern configuration and validation
 
 - Parent: F-007
-- Status: Done
+- Status: Merged
 - Owner: engine
 - Related modules: engine
 - Depends on: T-007

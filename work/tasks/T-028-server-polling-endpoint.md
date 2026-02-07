@@ -1,7 +1,7 @@
 # T-028: Server - Polling Endpoint with ETag Support
 
 - Parent: F-011
-- Status: Done
+- Status: Merged
 - Owner: server
 - Related modules: server
 - Depends on: none

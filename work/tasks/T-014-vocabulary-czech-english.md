@@ -1,7 +1,7 @@
 # T-014: Vocabulary (Czech-English Glossary)
 
 - Parent: F-008
-- Status: Done
+- Status: Merged
 - Owner: docs
 - Related modules: docs
 

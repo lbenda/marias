@@ -1,7 +1,7 @@
 # T-010: Server REST for chooser decision and deal continuation
 
 - Parent: F-007
-- Status: Done
+- Status: Merged
 - Owner: server
 - Related modules: server
 - Depends on: T-007, T-008

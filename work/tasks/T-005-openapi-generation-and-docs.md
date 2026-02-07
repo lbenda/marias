@@ -1,6 +1,6 @@
 # T-005: OpenAPI generation and API documentation
 
-- Status: Done
+- Status: Merged
 - Owner: Server
 
 ## Goal

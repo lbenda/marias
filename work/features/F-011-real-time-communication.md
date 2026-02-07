@@ -1,7 +1,7 @@
 # F-011: Real-time Communication
 
 * Type: Feature
-* Status: Done
+* Status: Merged
 * Source: A-012 (Real-time communication strategy)
 
 ## Description

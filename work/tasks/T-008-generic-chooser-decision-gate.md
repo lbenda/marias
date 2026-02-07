@@ -1,7 +1,7 @@
 # T-008: Generic chooser decision gate in engine
 
 - Parent: F-007
-- Status: Done
+- Status: Merged
 - Owner: engine
 - Related modules: engine
 - Depends on: T-007

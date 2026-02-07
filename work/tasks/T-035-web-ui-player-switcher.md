@@ -1,7 +1,7 @@
 # T-035: Web UI - Player Switcher
 
 - Parent: F-007
-- Status: Done
+- Status: Merged
 - Owner: web
 - Related modules: ui/web
 - Depends on: T-012

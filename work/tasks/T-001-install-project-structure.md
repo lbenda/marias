@@ -1,6 +1,6 @@
 # T-001: Install project structure
 
-- Status: Done
+- Status: Merged
 - Owner: Initial setup
 
 ## Goal

@@ -1,7 +1,7 @@
 # F-007: Two-phase dealing with chooser decision
 
 * Type: Feature
-* Status: Done
+* Status: Merged
 * Source: Article II, rules 1-13 of https://www.talon.cz/pravidla/mariáš_pravidla_licitovaný_2014.pdf
 
 ## Description
