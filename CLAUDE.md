@@ -32,7 +32,7 @@ feature velocity or abstraction density.
 - Public behavior must be understandable from interfaces and small excerpts
 - Prefer composition over deep hierarchies
 
-Any architectural change requires an ADR in `docs/adr/`.
+Any architectural change requires an A in `docs/adr/`.
 
 ---
 
