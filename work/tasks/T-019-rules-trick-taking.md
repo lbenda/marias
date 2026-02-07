@@ -7,7 +7,7 @@
 - Depends on: T-014
 
 ## Goal
-Document trick-taking rules in docs/rules/R-006-playing-tricks.md.
+Document trick-taking rules in docs/rules/R-007-playing-tricks.md.
 
 ## Scope
 
@@ -38,6 +38,6 @@ Document trick-taking rules in docs/rules/R-006-playing-tricks.md.
 - "Silent Seven" if won without announcement (half value)
 
 ## Definition of Done
-- Trick-taking rules complete in docs/rules/R-006-playing-tricks.md
+- Trick-taking rules complete in docs/rules/R-007-playing-tricks.md
 - Card following obligations clear
 - Trick storage rules documented

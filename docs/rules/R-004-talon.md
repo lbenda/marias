@@ -1,5 +1,7 @@
 # R-004 - Talon Rules
 
+- Phase: Game Selection
+
 ## Ownership
 - The talon belongs to no player and must remain separate
 - Talon points count toward the **declarer's** score at end of round

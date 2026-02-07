@@ -223,30 +223,6 @@ async function syncMergedToProject(projectMeta, issueNodeId) {
     });
 }
 
-async function loadAllIssues() {
-    const issues = [];
-    let page = 1;
-    while (true) {
-        const res = await ghRest(`/repos/${OWNER}/${REPO}/issues?state=all&per_page=100&page=${page}`);
-        if (!Array.isArray(res) || res.length === 0) break;
-        issues.push(...res);
-        page += 1;
-    }
-
-    const map = new Map();
-    for (const issue of issues) {
-        const labels = (issue.labels || []).map(l => (typeof l === "string" ? l : l.name));
-        for (const label of labels) {
-            if (label.startsWith("ticket:")) {
-                map.set(label, issue);
-                break;
-            }
-        }
-    }
-
-    return map;
-}
-
 /* =========================================================
  * FILE SELECTION
  * ======================================================= */
@@ -306,7 +282,6 @@ async function runSync() {
     }
 
     const projectMeta = await loadProjectMeta();
-    const issueMap = await loadAllIssues();
 
     for (const file of files) {
         if (!fs.existsSync(file) || fs.statSync(file).isDirectory()) continue;
@@ -323,7 +298,9 @@ async function runSync() {
         const statusLabel = ticket.status ? `status:${ticket.status}` : null;
         if (statusLabel) await ensureLabel(statusLabel);
 
-        const existing = issueMap.get(ticketLabel) || null;
+        const q = encodeURIComponent(`repo:${OWNER}/${REPO} is:issue label:"${ticketLabel}"`);
+        const search = await ghRest(`/search/issues?q=${q}`, { method: "GET" });
+        const existing = search.items?.[0] || null;
 
         const link = `https://github.com/${OWNER}/${REPO}/blob/${DEFAULT_BRANCH}/${ticket.filePath}`;
         const body = `Ticket je veden v repozitáři.\n\n➡ ${link}\n`;
@@ -389,7 +366,6 @@ async function runMerge() {
     await ensureLabel("status:Merged");
 
     const projectMeta = await loadProjectMeta();
-    const issueMap = await loadAllIssues();
     const touchedForCommit = [];
 
     for (const filePath of files) {
@@ -397,7 +373,9 @@ async function runMerge() {
 
         if (id) {
             const ticketLabel = `ticket:${id}`;
-            const found = issueMap.get(ticketLabel);
+            const q = encodeURIComponent(`repo:${OWNER}/${REPO} is:issue label:"${ticketLabel}"`);
+            const search = await ghRest(`/search/issues?q=${q}`, { method: "GET" });
+            const found = (search.items || [])[0];
 
             if (found) {
                 const issueNum = found.number;

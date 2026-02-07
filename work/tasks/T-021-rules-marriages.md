@@ -7,7 +7,7 @@
 - Depends on: T-014
 
 ## Goal
-Document marriage (hláška) rules in docs/rules/R-007-marriages.md.
+Document marriage (hláška) rules in docs/rules/R-008-marriages.md.
 
 ## Scope
 
@@ -38,6 +38,6 @@ Document marriage (hláška) rules in docs/rules/R-007-marriages.md.
 - Need to track announced marriages for scoring
 
 ## Definition of Done
-- Marriage rules complete in docs/rules/R-007-marriages.md
+- Marriage rules complete in docs/rules/R-008-marriages.md
 - Values and timing documented
 - Restrictions documented

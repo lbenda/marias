@@ -1,5 +1,7 @@
 # Mariash
 
+basic rules: https://cs.wikipedia.org/wiki/Mari%C3%A1%C5%A1
+
 A modular, extensible card game engine for **Mariash** (Czech trick-taking card game) with a deterministic core and multiple UI clients.
 
 Mariash is a traditional Czech card game for 3 players using a 32-card deck. It features bidding, trump selection, and various contract types including Game, Seven, Hundred, Misère, and Slam.

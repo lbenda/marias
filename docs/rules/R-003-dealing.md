@@ -1,5 +1,7 @@
 # R003 -  Dealing
 
+- Phase: Dealing
+
 ## Cutting (Not Shuffling)
 In tournament play, cards are **cut, not shuffled**:
 - Cutter (player before dealer) cuts with one hand only

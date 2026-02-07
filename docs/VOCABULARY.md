@@ -15,15 +15,15 @@ Source: [Czech Mariash Association Rules](https://www.talon.cz/pravidla/mariáš
 
 ## Players & Positions
 
-| Czech | English | Code | Notes |
-|-------|---------|------|-------|
-| aktér | declarer | `declarerId` | Player who won the bid and plays against defense |
-| obrana | defense | - | The two players opposing the declarer |
-| rozdávající | dealer | `dealerIndex` | Deals the cards, rotates each round |
-| volič | chooser | `chooserId` | Player after dealer; first to decide on trump |
-| zadák | cutter | - | Player who cuts the deck (before dealer) |
-| pauzírující | sitting out | - | 4th player not playing current hand (4-player variant) |
-| spoluhráč | partner | - | Teammate (in defense) |
+| Czech         | English     | Code          | Notes                                                  |
+|---------------|-------------|---------------|--------------------------------------------------------|
+| aktér         | declarer    | `declarerId`  | Player who won the bid and plays against defense       |
+| obrana        | defense     | -             | The two players opposing the declarer                  |
+| rozdávající   | dealer      | `dealerIndex` | Deals the cards, rotates each round                    |
+| forhont/volič | chooser     | `chooserId`   | Player after dealer; first to decide on trump          |
+| zadák         | cutter      | -             | Player who cuts the deck (before dealer)               |
+| pauzírující   | sitting out | -             | 4th player not playing current hand (4-player variant) |
+| spoluhráč     | partner     | -             | Teammate (in defense)                                  |
 
 ## Game Phases
 
@@ -63,15 +63,15 @@ Similar to bridge doubling, but with 4 levels:
 
 ## Contracts & Game Types
 
-| Czech | English | Code | Notes |
-|-------|---------|------|-------|
-| hra | game | `HRA` | Basic contract: declarer needs >50 points |
-| sedma | seven | `SEDMA` | Win last trick with trump 7 |
-| sto, stovka, (kilo) | hundred | `HUNDRED` | Declarer needs ≥100 points |
-| stosedma | hundred-seven | `HUNDRED_SEVEN` | Both Hundred and Seven combined |
-| betl | misère | `MISERE` | Declarer must take NO tricks (standard card game term) |
-| durch | slam | `SLAM` | Declarer must take ALL tricks (bridge/tarot term) |
-| dvě sedmy | two sevens | `TWO_SEVENS` | Both trump 7s must be controlled |
+| Czech               | English       | Code            | Notes                                                  |
+|---------------------|---------------|-----------------|--------------------------------------------------------|
+| hra / barva         | trump game    | `TRUMP_GAME`    | Basic contract: declarer needs >50 points              |
+| sedma               | seven         | `SEDMA`         | Win last trick with trump 7                            |
+| sto, stovka, (kilo) | hundred       | `HUNDRED`       | Declarer needs ≥100 points                             |
+| stosedma            | hundred-seven | `HUNDRED_SEVEN` | Both Hundred and Seven combined                        |
+| betl                | misère        | `MISERE`        | Declarer must take NO tricks (standard card game term) |
+| durch               | slam          | `SLAM`          | Declarer must take ALL tricks (bridge/tarot term)      |
+| dvě sedmy           | two sevens    | `TWO_SEVENS`    | Both trump 7s must be controlled                       |
 
 ### Contract Modifiers
 
@@ -120,13 +120,13 @@ Similar to bridge doubling, but with 4 levels:
 
 ## Special Terms
 
-| Czech | English | Notes |
-|-------|---------|-------|
-| hláška | marriage | King + Queen of same suit; bonus points |
-| pomocná | helper card | Non-trump 7 in Two Sevens contract |
-| ložená hra | lay-down hand | Unbeatable hand; must show, not play |
-| vynesení | lead | First card played in a trick |
-| přebití | overtrump | Playing higher trump than previous |
+| Czech | English        | Notes |
+|-------|----------------|-------|
+| hláška | marriage       | King + Queen of same suit; bonus points |
+| pomocná | helper card    | Non-trump 7 in Two Sevens contract |
+| ložená hra | open hand      | Unbeatable hand; must show, not play |
+| vynesení | lead           | First card played in a trick |
+| přebití | overtrump      | Playing higher trump than previous |
 | přiznání barvy | following suit | Playing same suit as led |
 
 ## Violations & Penalties
