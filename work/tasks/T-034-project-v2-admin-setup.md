@@ -1,7 +1,7 @@
 # T-034: Set up GitHub Project v2 + tokens for automation
 
 * Type: Task
-* Status: Done
+* Status: Merged
 * Source: F-012
 
 ## Goal

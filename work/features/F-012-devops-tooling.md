@@ -1,7 +1,7 @@
 # F-012: DevOps Tooling & Project Synchronization
 
 * Type: Feature
-* Status: Done
+* Status: Merged
 * Source: Repository-driven project management
 
 ## Description

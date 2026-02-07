@@ -1,7 +1,7 @@
 # T-033: Implement GitHub Actions ticket sync (Markdown → Issue → Project v2)
 
 * Type: Task
-* Status: Done 
+* Status: Merged
 * Source: F-012
 
 ## Goal
