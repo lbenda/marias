@@ -3,15 +3,15 @@ name: Tickets - sync (issues + project v2)
 on:
   push:
     paths:
-      - "project/work/bugs/**"
-      - "project/work/features/**"
-      - "project/work/tasks/**"
+      - "work/bugs/**"
+      - "work/features/**"
+      - "work/tasks/**"
   pull_request:
     types: [opened, synchronize, reopened]
     paths:
-      - "project/work/bugs/**"
-      - "project/work/features/**"
-      - "project/work/tasks/**"
+      - "work/bugs/**"
+      - "work/features/**"
+      - "work/tasks/**"
   workflow_dispatch:
     inputs:
       mode:
@@ -41,6 +41,7 @@ jobs:
 
       - name: Sync issues + project items from changed tickets
         env:
+          TICKETS_MODE: sync
           SYNC_MODE: ${{ github.event.inputs.mode || 'changed' }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -57,4 +58,4 @@ jobs:
 
           PROJECT_FIELD_STATUS: Status
           PROJECT_FIELD_AREA: Area
-        run: node .github/scripts/tickets-sync.js
+        run: node .github/scripts/tickets.js
