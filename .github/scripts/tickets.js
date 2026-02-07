@@ -25,6 +25,7 @@ const PROJECT_NUMBER = process.env.PROJECT_NUMBER;
 
 const FIELD_STATUS = process.env.PROJECT_FIELD_STATUS || "Status";
 const FIELD_AREA = process.env.PROJECT_FIELD_AREA || "Area";
+const STATUS_MERGED = process.env.PROJECT_STATUS_MERGED || "Merged";
 
 const WATCH_ROOTS = [
     "work/bugs/",
@@ -140,7 +141,8 @@ function extractTicketIdFromPathOrFile(filePath) {
 
 function setStatusMergedInFile(filePath) {
     const txt = fs.readFileSync(filePath, "utf8");
-    const replaced = txt.replace(/^([\-\*]\s+Status:\s*)Done\s*$/mi, "$1Merged");
+    // Match "Status: Done" with any casing and optional trailing spaces/comments
+    const replaced = txt.replace(/^([\-\*]\s+Status:\s*)Done(\s*)$/mi, "$1Merged$2");
     if (replaced !== txt) {
         fs.writeFileSync(filePath, replaced, "utf8");
         return true;
@@ -202,9 +204,9 @@ async function syncToProject(projectMeta, issueNodeId, statusName, areaName) {
 
 async function syncMergedToProject(projectMeta, issueNodeId) {
     if (!projectMeta?.statusFieldId) return;
-    const opt = projectMeta.statusOptions.get("Merged");
+    const opt = projectMeta.statusOptions.get(STATUS_MERGED);
     if (!opt) {
-        console.warn(`[ProjectV2] Status option not found: "Merged"`);
+        console.warn(`[ProjectV2] Status option not found: "${STATUS_MERGED}"`);
         return;
     }
     const itemId = await ensureItemInProject({
@@ -249,7 +251,7 @@ async function collectMergeFiles() {
         return files.filter(f => {
             if (!fs.existsSync(f) || fs.statSync(f).isDirectory()) return false;
             const content = fs.readFileSync(f, "utf8");
-            return content.includes("Status: Merged");
+            return content.includes("Status: Merged") || content.includes("Status: Done");
         });
     }
 
@@ -402,7 +404,10 @@ async function runMerge() {
 
         if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
             const changed = setStatusMergedInFile(filePath);
-            if (changed) touchedForCommit.push(filePath);
+            if (changed) {
+                console.log(`Updated status to Merged in file: ${filePath}`);
+                touchedForCommit.push(filePath);
+            }
         }
     }
 
