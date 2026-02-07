@@ -41,11 +41,11 @@ From Article II rules 14-18:
 - Player can double based on any card reasoning
 - Maximum 4 levels (beyond is not a violation but invalid)
 
-### Lay-down Hand
+### Open Hand
 Rules 19-22:
-- If hand is unbeatable, must show and not play
-- Playing a lay-down is considered "card shuffling" violation
-- Lay-down criteria by contract type:
+- If the hand is unbeatable, must show and not play
+- Playing an open hand is considered "card shuffling" violation
+- Open hand criteria by contract type:
   - Game/Hundred: Can't lose and won't lose any of 90 possible points
   - Seven: Won't give up any trick
   - Two Sevens: Can't lose regardless of defense play
@@ -54,10 +54,10 @@ Rules 19-22:
 
 ## Implementation Features
 - Doubling system needs implementation
-- Lay-down detection (optional advanced feature)
+- Open hand detection (optional advanced feature)
 
 ## Definition of Done
 - Trump selection rules complete (reference T-013)
 - Doubling system documented
 - Doubling levels table
-- Lay-down rules documented
+- Open hand rules documented

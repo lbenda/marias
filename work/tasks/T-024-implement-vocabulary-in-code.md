@@ -9,7 +9,7 @@
 ## Summary of Changes
 
 - Renamed GameType enum values to English:
-  - `HRA` → `GAME`
+  - `HRA` → `TRUMP_GAME`
   - `SEDMA` → `SEVEN`
   - `KILO` → `HUNDRED`
   - `BETL` → `MISERE`
