@@ -40,16 +40,18 @@ Source: [Czech Mariash Association Rules](https://www.talon.cz/pravidla/mariáš
 
 Similar to bridge doubling, but with 4 levels:
 
-| Czech | English | Code | Multiplier | Notes |
-|-------|---------|------|------------|-------|
-| flek | double | `DOUBLE` | 2x | First level, like bridge |
-| re | redouble | `REDOUBLE` | 4x | Second level, like bridge |
-| tutti, výš, víc | raise | `RAISE` | 8x | Third level (higher/more) |
-| boty | final raise | `FINAL_RAISE` | 16x | Maximum level |
+| Czech           | English  | Code       | Multiplier | Notes                     |
+|-----------------|----------|------------|------------|---------------------------|
+| flek            | double   | `DOUBLE`   | 2x         | First level, like bridge  |
+| re              | redouble | `REDOUBLE` | 4x         | Second level, like bridge |
+| tutti, výš, víc | raise    | `RAISE`    | 8x         | Third level (higher/more) |
+| boty (retuti)   | reraise  | `RERAISE`  | 16x        | Fourth level              |
+| kalhoty         | surge    | `SURGE`    | 32x        | Fifth level               |
+| kaiser          | resurge  | `RESURGE`  | 64x        | Sixth level               |
 
 - Doubling follows clockwise order strictly
 - Must be expressed clearly with words
-- Maximum 4 levels (beyond is invalid but not penalized)
+- Maximum 6 levels (beyond is invalid but not penalized)
 
 ## Other Game Actions
 
