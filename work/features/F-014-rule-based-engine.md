@@ -1,7 +1,7 @@
 # F-014: Rule-Based Engine and Multi-Game Support
 
 - Type: Feature
-- Status: Todo
+- Status: Completed
 - Source: Repository-driven project management
 
 ## Summary
@@ -22,8 +22,8 @@ This feature introduces a shift from a hardcoded Mariash engine to a generic, ru
 - Decouple `GameState` from Mariash-specific fields.
 
 ## Tasks
-- [ ] T-043: Define RuleSet interface and Registry
-- [ ] T-044: Implement possibleActions for Mariash trick-taking
-- [ ] T-045: GameState refactoring for polymorphism/generics
-- [ ] T-046: Update Server API for action delivery
-- [ ] T-050: Migrate existing "Fancy" Web UI to Rule-Based API
+- [x] T-043: Define RuleSet interface and Registry
+- [x] T-044: Implement possibleActions for Mariash trick-taking
+- [x] T-045: GameState refactoring for polymorphism/generics
+- [x] T-046: Update Server API for action delivery
+- [x] T-050: Migrate existing "Fancy" Web UI to Rule-Based API

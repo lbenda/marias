@@ -77,3 +77,8 @@ server/
 - work/tasks/T-004-engine-redux-state-container.md
 - work/tasks/T-005-openapi-generation-and-docs.md
 - work/tasks/T-006-web-ui-prototype-rest-game-flow.md
+- work/tasks/T-043-ruleset-interface-and-registry.md
+- work/tasks/T-044-marias-possible-actions.md
+- work/tasks/T-045-gamestate-refactoring-for-polymorphism.md
+- work/tasks/T-046-server-api-for-actions.md
+- work/tasks/T-050-migrate-existing-web-ui-to-rules-api.md
