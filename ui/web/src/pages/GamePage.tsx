@@ -256,8 +256,8 @@ export default function GamePage() {
         setHand([]);
     };
 
-    const canStart = game?.phase === "WAITING_FOR_PLAYERS" && game.players.length === 3;
-    const canDeal = game?.phase === "DEALING" && !game.dealing?.isWaitingForChooser;
+    const canStart = game?.possibleActions.some(a => a.type === "start") ?? false;
+    const canDeal = game?.possibleActions.some(a => a.type === "deal") ?? false;
     const isWaitingForChooser = game?.dealing?.isWaitingForChooser ?? false;
     const isChooser = playerId === game?.dealing?.chooserId;
     const showHand = game && playerId && (
@@ -265,12 +265,8 @@ export default function GamePage() {
         isWaitingForChooser
     );
 
-    const canSelectTrump = decision?.hasDecision &&
-        decision.playerId === playerId &&
-        decision.availableDecisions.includes("SELECT_TRUMP");
-    const canPass = decision?.hasDecision &&
-        decision.playerId === playerId &&
-        decision.availableDecisions.includes("PASS");
+    const canSelectTrump = game?.possibleActions.some(a => a.type === "choosetrump") ?? false;
+    const canPass = game?.possibleActions.some(a => a.type === "chooserpass") ?? false;
 
     // Talon exchange state
     const isTalonExchange = game?.phase === "TALON_EXCHANGE";
@@ -279,7 +275,14 @@ export default function GamePage() {
 
     // Trump selection phase state
     const isTrumpSelection = game?.phase === "TRUMP_SELECTION";
-    const canSelectTrumpPhase = isTrumpSelection && isDeclarer;
+    const canSelectTrumpPhase = game?.possibleActions.some(a => a.type === "trump") ?? false;
+
+    // Available trump suits from possibleActions
+    const availableTrumpSuits = useMemo(() => {
+        return game?.possibleActions
+            .filter((a): a is any => a.type === "trump")
+            .map(a => a.trump as Suit) ?? [];
+    }, [game?.possibleActions]);
 
     // Helper to check if card is selected for discard
     const isSelectedForDiscard = (card: Card) =>
@@ -294,6 +297,30 @@ export default function GamePage() {
     // Validation: check if selection contains invalid cards
     const hasInvalidDiscard = !allowsAnyDiscard && selectedDiscards.some(isAceOrTen);
 
+    // Play card available?
+    const playableCards = useMemo(() => {
+        return game?.possibleActions
+            .filter((a): a is any => a.type === "play")
+            .map(a => a.card as Card) ?? [];
+    }, [game?.possibleActions]);
+
+    const submitPlayCard = useCallback(async (card: Card) => {
+        if (!gameId || !playerId) return;
+        setError(null);
+        setLoading(true);
+        try {
+            const resp = await apiRequest<GameResponse>(`/games/${gameId}/actions`, "POST", {
+                action: { type: "play", playerId, card }
+            });
+            setGame(resp);
+            await loadHand();
+        } catch (e: unknown) {
+            setError(e instanceof Error ? e.message : String(e));
+        } finally {
+            setLoading(false);
+        }
+    }, [gameId, playerId, loadHand]);
+
     const handleCardClick = (card: Card) => {
         if (canExchange) {
             // Toggle card selection for discard
@@ -302,6 +329,10 @@ export default function GamePage() {
             } else if (selectedDiscards.length < 2) {
                 setSelectedDiscards(prev => [...prev, card]);
             }
+            return;
+        }
+        if (playableCards.some(c => c.suit === card.suit && c.rank === card.rank)) {
+            void submitPlayCard(card);
             return;
         }
         if (!canSelectTrump) return;
@@ -569,7 +600,7 @@ export default function GamePage() {
                         Choose the trump suit for this round.
                     </p>
                     <div style={{ display: "flex", gap: 8 }}>
-                        {(["HEARTS", "DIAMONDS", "CLUBS", "SPADES"] as Suit[]).map(suit => (
+                        {availableTrumpSuits.map(suit => (
                             <button
                                 key={suit}
                                 onClick={() => handleSelectTrumpSuit(suit)}
