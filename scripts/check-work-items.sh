@@ -42,6 +42,38 @@ check_metadata() {
   fi
 }
 
+check_status() {
+  local file="$1"
+  shift
+  local valid_statuses=("$@")
+
+  # Extract the FIRST status value from the file (head -1)
+  local status_line
+  status_line=$(grep "^- Status:" "$file" | head -1 || true)
+
+  if [ -z "$status_line" ]; then
+    error "Missing '- Status:' metadata in $file"
+    return
+  fi
+
+  # Extract just the status value (everything after "- Status: ")
+  local status_value
+  status_value=$(echo "$status_line" | sed 's/^- Status: *//')
+
+  # Check if status is in the valid list
+  local valid=0
+  for valid_status in "${valid_statuses[@]}"; do
+    if [ "$status_value" = "$valid_status" ]; then
+      valid=1
+      break
+    fi
+  done
+
+  if [ $valid -eq 0 ]; then
+    error "Invalid status '$status_value' in $file (valid: ${valid_statuses[*]})"
+  fi
+}
+
 info "Checking rules (R-###)..."
 check_id_filename '^R-[0-9]{3}-.*\.md$' docs/rules
 
@@ -52,6 +84,7 @@ for f in work/features/F-*.md; do
   check_metadata "$f" "Type"
   check_metadata "$f" "Status"
   check_metadata "$f" "Source"
+  check_status "$f" "Todo" "In Progress" "Done" "Merged" "Blocked"
 done
 
 info "Checking tasks (T-###)..."
@@ -60,6 +93,8 @@ for f in work/tasks/T-*.md; do
   check_section "$f" "Definition of Done"
   check_section "$f" "Goal"
   check_section "$f" "Scope"
+  check_metadata "$f" "Status"
+  check_status "$f" "Todo" "In Progress" "Done" "Merged" "Blocked"
 done
 
 info "Checking bugs (B-###)..."
@@ -67,6 +102,8 @@ check_id_filename '^B-[0-9]{3}-.*\.md$' work/bugs
 for f in work/bugs/B-*.md; do
   check_section "$f" "Steps to reproduce"
   check_section "$f" "Actual behavior"
+  check_metadata "$f" "Status"
+  check_status "$f" "Todo" "In Progress" "Done" "Merged" "Blocked"
 done
 
 info "Checking ADRs (A-###)..."

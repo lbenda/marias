@@ -64,10 +64,26 @@ Interfaces are used as **context compression**, not for polymorphism by default.
 ## 6) Rules for changes
 - Features are defined in `work/features/`
   - Features must include metadata: `- Type: Feature`, `- Status: ...`, `- Source: ...`
-- Tasks and bugs live in `work/tasks/` and `work/bugs/`
+  - **Required sections**: `## Description`
+- Tasks live in `work/tasks/`
+  - Tasks must include metadata: `- Type: Task`, `- Status: ...`, `- Feature: ...`
+  - **Required sections**: `## Goal`, `## Scope`, `## Definition of Done`
+- Bugs live in `work/bugs/`
+  - Bugs must include metadata: `- Status: ...`
+  - **Required sections**: `## Steps to reproduce`, `## Actual behavior`
 - Always read the referenced task / bug before implementing
 - Minimize changes outside the requested scope
 - Preserve public APIs unless explicitly instructed otherwise
+
+### Status Field Requirements
+All Features (F-xxx), Tasks (T-xxx), and Bugs (B-xxx) **must** include `- Status:` with one of these values:
+- `Todo` - Not yet started
+- `In Progress` - Currently being worked on
+- `Done` - Implementation complete, awaiting review/merge
+- `Merged` - Merged into main branch
+- `Blocked` - Cannot proceed due to dependency or blocker
+
+**Never use any other status value** for B/F/T items. The `scripts/check-work-items.sh` script validates this.
 
 Progress tracking and status updates belong in the corresponding work item,
 not in this file.
