@@ -19,11 +19,12 @@ Content-Type: application/json
 
 > {% client.global.set("gameId", response.body.gameId); %}
 
+### Get game state (as Alice)
+### Should include 'start' in possibleActions
+GET http://localhost:8080/games/{{gameId}}?playerId=p1
+
 ### List all games
 GET http://localhost:8080/games
-
-### Get game state
-GET http://localhost:8080/games/{{gameId}}
 
 ### Delete a game
 DELETE http://localhost:8080/games/{{gameId}}
@@ -39,8 +40,7 @@ Content-Type: application/json
 {"action": {"type": "join", "playerId": "p2", "playerName": "Bob"}}
 
 ### Player 3 joins
-# POST http://localhost:8080/games/{{gameId}}/actions
-POST http://localhost:8080/games/e9167d3f-1881-46b7-91f5-7e02cc846744/actions
+POST http://localhost:8080/games/{{gameId}}/actions
 Content-Type: application/json
 
 {"action": {"type": "join", "playerId": "p3", "playerName": "Charlie"}}
@@ -56,8 +56,7 @@ Content-Type: application/json
 {"action": {"type": "start", "playerId": "p1"}}
 
 ### Deal cards (two-phase mode - default)
-# POST http://localhost:8080/games/{{gameId}}/actions
-POST http://localhost:8080/games/440f4b13-f9b6-4e07-ac9e-180349af8bfe/actions
+POST http://localhost:8080/games/{{gameId}}/actions
 Content-Type: application/json
 
 {"action": {"type": "deal", "playerId": "p1"}}
