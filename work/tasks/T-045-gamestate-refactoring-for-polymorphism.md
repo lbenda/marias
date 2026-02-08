@@ -1,7 +1,7 @@
 # T-045: GameState refactoring for polymorphism
 
 - Parent: F-014
-- Status: Planned
+- Status: Todo
 - Owner: engine
 - Related modules: engine, server
 
@@ -25,6 +25,6 @@ Introduce a state abstraction that allows different games to plug in their own d
 - `server/src/main/kotlin/.../dto/*` (ensure DTOs support polymorphism)
 
 ## Definition of Done
-- [ ] Base abstraction introduced and used by Mariáš.
+- [ ] Base abstraction introduced and used by Mariash.
 - [ ] Serialization verified for polymorphic state over REST/WebSocket.
 - [ ] No regressions in existing reducers and rule validations.

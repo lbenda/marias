@@ -7,7 +7,7 @@
 - Depends on: T-018
 
 ## Goal
-Document the rules for contract selection in volený mariáš.
+Document the rules for contract selection in auction mariash.
 
 Contract selection applies only to the Trump Game type and defines
 the specific obligations of the declarer before bidding begins.

@@ -15,7 +15,7 @@ enum class DealingPhase {
 /**
  * Represents a dealing pattern - how cards are distributed in chunks.
  * Each entry is (playerOffset, cardCount) where playerOffset is relative to dealer.
- * Default Mariáš pattern: chooser gets 7, others get 5, talon gets 2, then remaining 3+5+5.
+ * Default Mariash pattern: chooser gets 7, others get 5, talon gets 2, then remaining 3+5+5.
  */
 @Serializable
 data class DealPattern(

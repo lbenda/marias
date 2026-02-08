@@ -1,7 +1,7 @@
 # T-047: Create GenericActionRenderer component
 
 - Parent: F-015
-- Status: Planned
+- Status: Todo
 - Owner: ui
 - Related modules: ui/web
 

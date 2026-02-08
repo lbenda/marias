@@ -1,12 +1,12 @@
 # T-050: Migrate existing Web UI to Rule-Based API
 
 - Parent: F-014
-- Status: Planned
+- Status: Todo
 - Owner: ui
 - Related modules: ui/web, server
 
 ## Summary
-Update the existing Mariáš Web UI to use the new `possibleActions` from the server for validation and interaction, replacing any duplicated rule logic in the frontend.
+Update the existing Mariash Web UI to use the new `possibleActions` from the server for validation and interaction, replacing any duplicated rule logic in the frontend.
 
 ## Goal
 Ensure the existing Fancy UI remains feature-rich while delegating all rule validation to the server via the new endpoints.

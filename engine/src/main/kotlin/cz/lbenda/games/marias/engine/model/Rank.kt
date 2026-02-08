@@ -5,8 +5,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 enum class Rank(
     val symbol: String,
-    val points: Int,      // Mariáš point value
-    val strength: Int     // Mariáš trick-taking strength
+    val points: Int,      // Mariash point value
+    val strength: Int     // Mariash trick-taking strength
 ) {
     SEVEN("7", 0, 1),
     EIGHT("8", 0, 2),

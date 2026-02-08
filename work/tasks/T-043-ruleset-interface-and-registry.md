@@ -16,6 +16,9 @@ Provide a stable, versioned abstraction to select and execute game logic per rul
     - `possibleActions(state, playerId)`
     - `reduce(state, action)`
     - `validate(state, action)`
+- [ ] Define **Universal Card Model**:
+    - `CardPosition`: `placeId` (String), `visibility` (List<PlayerId>), `order` (Int).
+    - `Place`: Configuration for a location (name, capacity, ordered/unordered).
 - [ ] Define `RuleSetRegistry` (mapping `ruleSetId` to `GameRuleSet` implementation).
 - [ ] Define versioning naming convention: `game:variant:vX` (e.g., `marias:three-player:v1`).
 
@@ -25,5 +28,6 @@ Provide a stable, versioned abstraction to select and execute game logic per rul
 
 ## Definition of Done
 - [ ] `GameRuleSet` interface defined with `possibleActions`, `reduce`, and `validate`.
+- [ ] **Universal Card Model** (Positions and Places) defined and serializable.
 - [ ] `RuleSetRegistry` implemented and supports versioned rule-set IDs.
 - [ ] Unit tests for registry lookup and version parsing.
