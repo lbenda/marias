@@ -1,7 +1,6 @@
 # A-013: Rule-Based Engine and Action Provider
 
-## Status
-Proposed
+- Status: Proposed
 
 ## Context
 The current game logic is split between validation in the engine (`GameRules.validate`) and action preparation in the UI. This leads to:
@@ -39,15 +38,15 @@ Key technical details:
 ## Consequences
 
 ### Positive
-*   **Thin Clients:** UI logic is significantly simplified. It only needs to know how to render an action and send its payload back.
-*   **Single Source of Truth:** All game rules are strictly in the `engine` module.
-*   **Guaranteed Consistency:** All clients (Web, Android) will always show the same valid moves.
-*   **Better Testing:** We can unit test the "possibility generator" independently of any UI.
+-   **Thin Clients:** UI logic is significantly simplified. It only needs to know how to render an action and send its payload back.
+-   **Single Source of Truth:** All game rules are strictly in the `engine` module.
+-   **Guaranteed Consistency:** All clients (Web, Android) will always show the same valid moves.
+-   **Better Testing:** We can unit test the "possibility generator" independently of any UI.
 
 ### Negative
-*   **Payload Size:** The game state response will be slightly larger as it now contains the list of possible actions.
-*   **Initial Refactoring:** Requires a shift in how current validation logic is structured (from "validate input" to "generate valid outputs").
+-   **Payload Size:** The game state response will be slightly larger as it now contains the list of possible actions.
+-   **Initial Refactoring:** Requires a shift in how current validation logic is structured (from "validate input" to "generate valid outputs").
 
 ## Alternatives Considered
-*   **External Rule Engines (Drools/Easy Rules):** Rejected as they are too heavy, add unnecessary dependencies, and don't leverage Kotlin's type system as effectively as a custom implementation.
-*   **JavaScript Rule Mirroring:** Rejected as it leads to "split-brain" bugs where the client and server disagree on rules.
+-   **External Rule Engines (Drools/Easy Rules):** Rejected as they are too heavy, add unnecessary dependencies, and don't leverage Kotlin's type system as effectively as a custom implementation.
+-   **JavaScript Rule Mirroring:** Rejected as it leads to "split-brain" bugs where the client and server disagree on rules.

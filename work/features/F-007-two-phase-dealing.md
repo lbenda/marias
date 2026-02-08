@@ -1,8 +1,8 @@
 # F-007: Two-phase dealing with chooser decision
 
-* Type: Feature
-* Status: Merged
-* Source: Article II, rules 1-13 of https://www.talon.cz/pravidla/mariáš_pravidla_licitovaný_2014.pdf
+- Type: Feature
+- Status: Merged
+- Source: Article II, rules 1-13 of https://www.talon.cz/pravidla/mariáš_pravidla_licitovaný_2014.pdf
 
 ## Description
 Implement mariash-style two-phase dealing where the chooser receives

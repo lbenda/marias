@@ -1,7 +1,7 @@
 # A-003: OpenAPI strategy
 
-Status: Accepted
-Date: 2026-02-02
+- Status: Accepted
+- Date: 2026-02-02
 
 ## Decision
 We adopt a code-first OpenAPI approach during early development:

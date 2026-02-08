@@ -1,8 +1,8 @@
 # F-008: Complete Rules Documentation
 
-* Type: Feature
-* Status: In Progress
-* Source: https://www.talon.cz/pravidla/mariáš_pravidla_licitovaný_2014.pdf (Czech Mariash Association, 2014)
+- Type: Feature
+- Status: In Progress
+- Source: https://www.talon.cz/pravidla/mariáš_pravidla_licitovaný_2014.pdf (Czech Mariash Association, 2014)
 
 ## Description
 Translate and document the complete official mariash rules from Czech to English

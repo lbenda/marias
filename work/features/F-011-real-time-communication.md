@@ -1,8 +1,8 @@
 # F-011: Real-time Communication
 
-* Type: Feature
-* Status: Merged
-* Source: A-012 (Real-time communication strategy)
+- Type: Feature
+- Status: Merged
+- Source: A-012 (Real-time communication strategy)
 
 ## Description
 Implement real-time game state updates using progressive enhancement:

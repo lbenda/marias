@@ -1,8 +1,8 @@
 # F-009: Red Trump Color Multiplier
 
-* Type: Feature
-* Status: Todo
-* Source: T-015 (Equipment and Card Values), docs/rules/R-001-equipment.md
+- Type: Feature
+- Status: Todo
+- Source: T-015 (Equipment and Card Values), docs/rules/R-001-equipment.md
 
 ## Description
 Implement the rule that red trump suits (Hearts, Diamonds) double all payment rates.

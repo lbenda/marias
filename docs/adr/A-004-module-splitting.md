@@ -1,7 +1,7 @@
 # A-004: Module splitting
 
-Status: Accepted
-Date: 2026-02-02
+- Status: Accepted
+- Date: 2026-02-02
 
 ## Decision
 We split the project into modules:

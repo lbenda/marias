@@ -1,8 +1,8 @@
 # T-033: Implement GitHub Actions ticket sync (Markdown → Issue → Project v2)
 
-* Type: Task
-* Status: Merged
-* Source: F-012
+- Type: Task
+- Status: Merged
+- Source: F-012
 
 ## Goal
 Implement the automation that keeps GitHub Issues and GitHub Project (v2) in sync with ticket Markdown files stored in the repository.

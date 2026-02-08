@@ -1,8 +1,8 @@
 # F-010: Talon Discard Validation
 
-* Type: Feature
-* Status: Merged
-* Source: T-016 (Dealing and Talon Rules), docs/rules/R-004-talon.md
+- Type: Feature
+- Status: Merged
+- Source: T-016 (Dealing and Talon Rules), docs/rules/R-004-talon.md
 
 ## Description
 Implement validation rules for discarding cards to the talon. Currently the engine
