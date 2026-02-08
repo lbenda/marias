@@ -15,6 +15,7 @@ interface UseTransportResult {
  */
 export function useTransport(
     gameId: string | null,
+    playerId?: string | null,
     options?: Partial<TransportOptions>
 ): UseTransportResult {
     const [state, setState] = useState<GameResponse | null>(null);
@@ -50,13 +51,13 @@ export function useTransport(
         });
 
         clientRef.current = client;
-        client.connect(gameId).catch(handleError);
+        client.connect(gameId, playerId).catch(handleError);
 
         return () => {
             client.disconnect();
             clientRef.current = null;
         };
-    }, [gameId, options, handleStateChange, handleConnectionChange, handleError]);
+    }, [gameId, playerId, options, handleStateChange, handleConnectionChange, handleError]);
 
     return { state, connectionStatus, error };
 }

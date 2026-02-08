@@ -1,7 +1,7 @@
 # T-050: Migrate existing Web UI to Rule-Based API
 
 - Parent: F-014
-- Status: Completed
+- Status: Done
 - Owner: ui
 - Related modules: ui/web, server
 

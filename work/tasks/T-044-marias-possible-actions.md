@@ -1,7 +1,7 @@
 # T-044: Implement possibleActions for Mariash trick-taking
 
 - Parent: F-014
-- Status: Completed
+- Status: Done
 - Owner: engine
 - Related modules: engine, docs
 

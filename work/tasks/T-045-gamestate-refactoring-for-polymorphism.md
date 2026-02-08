@@ -1,7 +1,7 @@
 # T-045: GameState refactoring for polymorphism
 
 - Parent: F-014
-- Status: Completed
+- Status: Done
 - Owner: engine
 - Related modules: engine, server
 

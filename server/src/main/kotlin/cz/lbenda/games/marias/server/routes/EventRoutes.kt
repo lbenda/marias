@@ -46,8 +46,9 @@ fun Route.eventRoutes(service: GameService) {
 
             // If no client version or client is outdated, return current state immediately
             if (clientVersion == null || currentState.version > clientVersion) {
+                val playerId = call.request.queryParameters["playerId"]
                 call.response.headers.append(HttpHeaders.ETag, "v${currentState.version}")
-                return@get call.respond(currentState.toResponse())
+                return@get call.respond(currentState.toResponse(playerId))
             }
 
             // Client is up to date
@@ -62,8 +63,9 @@ fun Route.eventRoutes(service: GameService) {
             val newState = service.waitForChange(gameId, clientVersion, timeoutMs)
 
             if (newState != null) {
+                val playerId = call.request.queryParameters["playerId"]
                 call.response.headers.append(HttpHeaders.ETag, "v${newState.version}")
-                call.respond(newState.toResponse())
+                call.respond(newState.toResponse(playerId))
             } else {
                 // Timeout, no changes
                 call.response.headers.append(HttpHeaders.ETag, "v${currentState.version}")

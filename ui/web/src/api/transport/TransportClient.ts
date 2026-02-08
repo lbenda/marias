@@ -10,6 +10,7 @@ import { DEFAULT_OPTIONS } from "./types";
  */
 export class TransportClient {
     private gameId: string | null = null;
+    private playerId: string | null = null;
     private options: Required<Omit<TransportOptions, "onStateChange" | "onConnectionChange" | "onError">> & TransportOptions;
     private connectionState: ConnectionState = "disconnected";
     private wsTransport: WebSocketTransport;
@@ -30,8 +31,9 @@ export class TransportClient {
     /**
      * Connect to a game and start receiving updates.
      */
-    async connect(gameId: string): Promise<void> {
+    async connect(gameId: string, playerId?: string | null): Promise<void> {
         this.gameId = gameId;
+        this.playerId = playerId ?? null;
         this.isDestroyed = false;
         this.reconnectAttempts = 0;
 
@@ -44,6 +46,7 @@ export class TransportClient {
     disconnect(): void {
         this.isDestroyed = true;
         this.gameId = null;
+        this.playerId = null;
         this.stopPolling();
         this.wsTransport.close();
         this.setConnectionState("disconnected");
@@ -107,7 +110,7 @@ export class TransportClient {
             }
         });
 
-        await this.wsTransport.connect(this.gameId);
+        await this.wsTransport.connect(this.gameId, this.playerId);
         this.reconnectAttempts = 0;
         this.setConnectionState("connected-websocket");
     }
@@ -122,7 +125,8 @@ export class TransportClient {
                 const state = await this.pollingTransport.poll(
                     this.gameId,
                     tryLongPoll,
-                    this.options.longPollTimeout
+                    this.options.longPollTimeout,
+                    this.playerId
                 );
 
                 if (state) {

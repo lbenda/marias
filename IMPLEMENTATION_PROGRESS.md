@@ -82,3 +82,4 @@ server/
 - work/tasks/T-045-gamestate-refactoring-for-polymorphism.md
 - work/tasks/T-046-server-api-for-actions.md
 - work/tasks/T-050-migrate-existing-web-ui-to-rules-api.md
+- work/tasks/T-051-add-playwright-e2e-tests.md
