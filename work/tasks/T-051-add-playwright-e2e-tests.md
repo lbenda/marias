@@ -1,7 +1,7 @@
 # T-051: Implement Playwright infrastructure and basic game flow test
 
 - Parent: F-016
-- Status: Done
+- Status: Merged
 - Owner: ui
 - Related modules: ui/web
 

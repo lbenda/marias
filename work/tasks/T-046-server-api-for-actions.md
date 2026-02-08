@@ -1,7 +1,7 @@
 # T-046: Server API for action delivery and execution
 
 - Parent: F-014
-- Status: Done
+- Status: Merged
 - Owner: server
 - Related modules: server, engine, ui
 

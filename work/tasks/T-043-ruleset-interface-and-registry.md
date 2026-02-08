@@ -1,7 +1,7 @@
 # T-043: Define RuleSet interface and Registry
 
 - Parent: F-014
-- Status: Done
+- Status: Merged
 - Owner: engine
 - Related modules: engine
 

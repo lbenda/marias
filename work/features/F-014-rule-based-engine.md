@@ -1,7 +1,7 @@
 # F-014: Rule-Based Engine and Multi-Game Support
 
 - Type: Feature
-- Status: Done
+- Status: Merged
 - Source: Repository-driven project management
 
 ## Summary
