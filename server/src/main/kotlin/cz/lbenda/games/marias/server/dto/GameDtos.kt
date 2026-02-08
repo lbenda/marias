@@ -3,9 +3,12 @@ package cz.lbenda.games.marias.server.dto
 import cz.lbenda.games.marias.engine.action.GameAction
 import cz.lbenda.games.marias.engine.model.Card
 import cz.lbenda.games.marias.engine.model.Suit
+import cz.lbenda.games.marias.engine.rules.MariasRuleSet
 import cz.lbenda.games.marias.engine.rules.validCards
 import cz.lbenda.games.marias.engine.state.*
 import kotlinx.serialization.Serializable
+
+private val mariasRuleSet = MariasRuleSet()
 
 @Serializable
 data class CreateGameRequest(val playerId: String, val playerName: String)
@@ -29,7 +32,8 @@ data class GameResponse(
     val trick: TrickDto,
     val tricksPlayed: Int,
     val roundNumber: Int,
-    val error: String?
+    val error: String?,
+    val possibleActions: List<GameAction> = emptyList()
 )
 
 @Serializable
@@ -91,7 +95,7 @@ data class DecisionRequest(
     val card: Card? = null // Required for SELECT_TRUMP
 )
 
-fun GameState.toResponse() = GameResponse(
+fun GameState.toResponse(requesterId: String? = null) = GameResponse(
     gameId = gameId,
     version = version,
     phase = phase,
@@ -106,7 +110,8 @@ fun GameState.toResponse() = GameResponse(
     trick = trick.toDto(),
     tricksPlayed = tricksPlayed,
     roundNumber = roundNumber,
-    error = error
+    error = error,
+    possibleActions = requesterId?.let { mariasRuleSet.possibleActions(this, it) } ?: emptyList()
 )
 
 fun DealingState.toDto() = DealingDto(
