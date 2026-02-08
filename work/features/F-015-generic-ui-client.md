@@ -1,5 +1,9 @@
 # F-015: Generic Data-Driven UI
 
+- Type: Feature
+- Status: Todo
+- Source: Repository-driven project management
+
 ## Summary
 Create a simplified, generic UI client that can render any game supported by the engine without knowing the specific rules. It relies entirely on the `possibleActions` provided by the server.
 

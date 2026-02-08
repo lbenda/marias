@@ -1,8 +1,8 @@
 # F-013: Game type selection
 
-* Type: Feature
-* Status: Todo
-* Source: R-005
+- Type: Feature
+- Status: Todo
+- Source: R-005
 
 ## Description
 

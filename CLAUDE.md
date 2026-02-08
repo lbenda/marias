@@ -63,6 +63,7 @@ Interfaces are used as **context compression**, not for polymorphism by default.
 
 ## 6) Rules for changes
 - Features are defined in `work/features/`
+  - Features must include metadata: `- Type: Feature`, `- Status: ...`, `- Source: ...`
 - Tasks and bugs live in `work/tasks/` and `work/bugs/`
 - Always read the referenced task / bug before implementing
 - Minimize changes outside the requested scope

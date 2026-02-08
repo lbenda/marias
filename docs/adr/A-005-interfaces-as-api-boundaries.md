@@ -1,7 +1,7 @@
 # A-002: Interfaces as API boundaries
 
-Status: Accepted
-Date: 2026-02-02
+- Status: Accepted
+- Date: 2026-02-02
 
 ## Decision
 We use Kotlin interfaces as explicit API boundaries for:

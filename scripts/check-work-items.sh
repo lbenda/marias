@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+ERRORS_FOUND=0
+
 error() {
   echo "❌ $1"
-  exit 1
+  ERRORS_FOUND=1
 }
 
 info() {
@@ -32,6 +34,14 @@ check_section() {
   fi
 }
 
+check_metadata() {
+  local file="$1"
+  local key="$2"
+  if ! grep -q "^- $key:" "$file"; then
+    error "Missing metadata '- $key:' in $file"
+  fi
+}
+
 info "Checking rules (R-###)..."
 check_id_filename '^R-[0-9]{3}-.*\.md$' docs/rules
 
@@ -39,6 +49,9 @@ info "Checking features (F-###)..."
 check_id_filename '^F-[0-9]{3}-.*\.md$' work/features
 for f in work/features/F-*.md; do
   check_section "$f" "Description"
+  check_metadata "$f" "Type"
+  check_metadata "$f" "Status"
+  check_metadata "$f" "Source"
 done
 
 info "Checking tasks (T-###)..."
@@ -62,4 +75,10 @@ for f in docs/adr/A-*.md; do
   check_section "$f" "Decision"
 done
 
-echo "✅ All work items look good."
+if [ $ERRORS_FOUND -eq 0 ]; then
+  echo "✅ All work items look good."
+  exit 0
+else
+  echo "❌ Some checks failed."
+  exit 1
+fi

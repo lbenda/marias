@@ -1,7 +1,7 @@
 # A-012: Real-time communication strategy
 
-Status: Accepted
-Date: 2026-02-05
+- Status: Accepted
+- Date: 2026-02-05
 
 ## Decision
 The server will support real-time game state updates using a progressive enhancement strategy:

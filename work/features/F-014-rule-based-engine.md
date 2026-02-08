@@ -1,5 +1,9 @@
 # F-014: Rule-Based Engine and Multi-Game Support
 
+- Type: Feature
+- Status: Todo
+- Source: Repository-driven project management
+
 ## Summary
 Redesign the game engine to use a rule-based "Action Provider" pattern. This centralizes all game logic in the engine, allowing the server to tell clients exactly what actions are possible at any moment.
 

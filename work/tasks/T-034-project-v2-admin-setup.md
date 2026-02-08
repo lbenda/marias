@@ -1,8 +1,8 @@
 # T-034: Set up GitHub Project v2 + tokens for automation
 
-* Type: Task
-* Status: Merged
-* Source: F-012
+- Type: Task
+- Status: Merged
+- Source: F-012
 
 ## Goal
 Prepare GitHub configuration so that ticket synchronization workflows can run reliably:
