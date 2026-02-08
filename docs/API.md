@@ -12,7 +12,7 @@ http://localhost:8080
 | GET | `/health` | Health check |
 | POST | `/games` | Create game |
 | GET | `/games` | List games |
-| GET | `/games/{id}` | Get game state |
+| GET | `/games/{id}` | Get game state (optional `?playerId={id}` for possible actions) |
 | DELETE | `/games/{id}` | Delete game |
 | POST | `/games/{id}/actions` | Dispatch action |
 | GET | `/games/{id}/players/{playerId}/hand` | Get player's hand (in deal/custom order) |
@@ -48,6 +48,52 @@ POST /games
 Content-Type: application/json
 
 {"playerId": "p1", "playerName": "Alice"}
+```
+
+### Get Game State
+
+```http
+GET /games/{id}?playerId={playerId}
+```
+
+Returns the full state of the game. If `playerId` is provided, includes `possibleActions` for that player.
+
+Response:
+```json
+{
+  "gameId": "game-123",
+  "version": 5,
+  "phase": "PLAYING",
+  "players": [
+    {"playerId": "p1", "name": "Alice", "cardCount": 10, "points": 20, "isDealer": true},
+    ...
+  ],
+  "currentPlayerId": "p2",
+  "dealerId": "p1",
+  "trump": "HEARTS",
+  "trumpCard": {"suit": "HEARTS", "rank": "ACE"},
+  "gameType": "GAME",
+  "declarerId": "p2",
+  "dealing": {
+    "phase": "COMPLETE",
+    "chooserId": "p2",
+    "pendingCardsCount": 0,
+    "isWaitingForChooser": false
+  },
+  "trick": {
+    "cards": [
+      {"playerId": "p1", "card": {"suit": "HEARTS", "rank": "TEN"}}
+    ],
+    "leadPlayerId": "p1"
+  },
+  "tricksPlayed": 3,
+  "roundNumber": 1,
+  "error": null,
+  "possibleActions": [
+    {"type": "play", "playerId": "p2", "card": {"suit": "HEARTS", "rank": "KING"}},
+    {"type": "leave", "playerId": "p2"}
+  ]
+}
 ```
 
 ## Actions
@@ -214,7 +260,7 @@ Content-Type: application/json
 - For `SELECT_TRUMP`: `card` is required (the card placed for trump)
 - For `PASS`: no additional fields needed
 
-Response: Full game state (same as `/games/{id}`)
+Response: Full game state (same as `/games/{id}?playerId={playerId}`)
 
 ## Card Reference
 

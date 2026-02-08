@@ -14,15 +14,17 @@ fun Route.gameRoutes(service: GameService) {
         post {
             val req = call.receive<CreateGameRequest>()
             val state = service.create(req.playerId, req.playerName)
-            call.respond(HttpStatusCode.Created, state.toResponse())
+            call.respond(HttpStatusCode.Created, state.toResponse(req.playerId))
         }
 
         get { call.respond(service.all().map { it.toListItem() }) }
 
         get("/{id}") {
-            val state = service.get(call.parameters["id"]!!)
+            val gameId = call.parameters["id"]!!
+            val state = service.get(gameId)
                 ?: return@get call.respond(HttpStatusCode.NotFound, "Game not found")
-            call.respond(state.toResponse())
+            val playerId = call.request.queryParameters["playerId"]
+            call.respond(state.toResponse(playerId))
         }
 
         delete("/{id}") {
@@ -34,7 +36,7 @@ fun Route.gameRoutes(service: GameService) {
             val req = call.receive<ActionRequest>()
             val state = service.dispatch(call.parameters["id"]!!, req.action)
                 ?: return@post call.respond(HttpStatusCode.NotFound, "Game not found")
-            call.respond(state.toResponse())
+            call.respond(state.toResponse(req.action.playerId))
         }
 
         get("/{id}/players/{playerId}/hand") {
@@ -113,7 +115,7 @@ fun Route.gameRoutes(service: GameService) {
                 return@post call.respond(HttpStatusCode.BadRequest, mapOf("error" to state.error))
             }
 
-            call.respond(state.toResponse())
+            call.respond(state.toResponse(req.playerId))
         }
     }
 }

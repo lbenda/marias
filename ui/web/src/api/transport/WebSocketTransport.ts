@@ -22,11 +22,13 @@ export class WebSocketTransport {
     /**
      * Connect to WebSocket endpoint.
      * @param gameId Game ID to connect to
+     * @param playerId Optional player ID to get possible actions
      * @returns Promise that resolves when connected
      */
-    connect(gameId: string): Promise<void> {
+    connect(gameId: string, playerId?: string | null): Promise<void> {
         return new Promise((resolve, reject) => {
-            const wsUrl = `${this.baseUrl}/games/${gameId}/ws`;
+            const query = playerId ? `?playerId=${playerId}` : "";
+            const wsUrl = `${this.baseUrl}/games/${gameId}/ws${query}`;
 
             try {
                 this.ws = new WebSocket(wsUrl);

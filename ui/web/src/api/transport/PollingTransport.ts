@@ -11,12 +11,14 @@ export class PollingTransport {
      * @param gameId Game ID to poll
      * @param longPoll Whether to use long polling (with Prefer header)
      * @param timeout Long poll timeout in seconds
+     * @param playerId Optional player ID to get possible actions
      * @returns Game state if changed, null if no changes (304)
      */
     async poll(
         gameId: string,
         longPoll: boolean = false,
-        timeout: number = 30
+        timeout: number = 30,
+        playerId?: string | null
     ): Promise<GameResponse | null> {
         const headers: Record<string, string> = {
             "Cache-Control": "no-cache",
@@ -33,8 +35,9 @@ export class PollingTransport {
         this.abortController = new AbortController();
 
         try {
+            const query = playerId ? `?playerId=${playerId}` : "";
             const response = await fetch(
-                `${this.baseUrl}/games/${gameId}/events`,
+                `${this.baseUrl}/games/${gameId}/events${query}`,
                 {
                     headers,
                     signal: this.abortController.signal,

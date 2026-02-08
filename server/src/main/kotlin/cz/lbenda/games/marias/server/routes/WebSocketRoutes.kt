@@ -38,7 +38,8 @@ fun Route.webSocketRoutes(service: GameService) {
          */
         webSocket("/{id}/ws") {
             val gameId = call.parameters["id"]!!
-            println("WebSocket connection attempt for game: $gameId")
+            val playerId = call.request.queryParameters["playerId"]
+            println("WebSocket connection attempt for game: $gameId, player: $playerId")
 
             // Check if game exists
             val initialState = service.get(gameId)
@@ -50,12 +51,12 @@ fun Route.webSocketRoutes(service: GameService) {
                 return@webSocket
             }
 
-            println("WebSocket: Sending initial state for game: $gameId")
+            println("WebSocket: Sending initial state for game: $gameId, player: $playerId")
             // Send initial state
             val initialMsg = WebSocketMessage(
                 type = "state",
                 version = initialState.version,
-                data = initialState.toResponse()
+                data = initialState.toResponse(playerId)
             )
             send(Frame.Text(json.encodeToString(initialMsg)))
 
@@ -66,7 +67,7 @@ fun Route.webSocketRoutes(service: GameService) {
                         val msg = WebSocketMessage(
                             type = "state",
                             version = state.version,
-                            data = state.toResponse()
+                            data = state.toResponse(playerId)
                         )
                         send(Frame.Text(json.encodeToString(msg)))
                     }

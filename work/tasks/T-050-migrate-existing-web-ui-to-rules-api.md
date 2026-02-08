@@ -1,7 +1,7 @@
 # T-050: Migrate existing Web UI to Rule-Based API
 
 - Parent: F-014
-- Status: Todo
+- Status: Done
 - Owner: ui
 - Related modules: ui/web, server
 
@@ -12,11 +12,11 @@ Update the existing Mariash Web UI to use the new `possibleActions` from the ser
 Ensure the existing Fancy UI remains feature-rich while delegating all rule validation to the server via the new endpoints.
 
 ## Scope
-- [ ] Update `ui/web/src/api` to support the new GET state with actions and POST action endpoints.
-- [ ] Refactor card playing logic to only allow cards present in the `PlayCard` actions from the server.
-- [ ] Refactor bidding and trump selection to use the server-provided options.
-- [ ] Remove hardcoded validation logic from the React components.
-- [ ] Ensure the "fancy" UI elements (card animations, desk layout) are preserved while driven by the new data model.
+- [x] Update `ui/web/src/api` to support the new GET state with actions and POST action endpoints.
+- [x] Refactor card playing logic to only allow cards present in the `PlayCard` actions from the server.
+- [x] Refactor bidding and trump selection to use the server-provided options.
+- [x] Remove hardcoded validation logic from the React components.
+- [x] Ensure the "fancy" UI elements (card animations, desk layout) are preserved while driven by the new data model.
 
 ## Files to Create/Modify
 - `ui/web/src/api/gameApi.ts` (modify)
@@ -25,6 +25,6 @@ Ensure the existing Fancy UI remains feature-rich while delegating all rule vali
 - Other relevant React components in `ui/web/src/components/`
 
 ## Definition of Done
-- [ ] Hand UI only allows clicks on cards present in `PlayCard` actions.
-- [ ] Bidding/trump selection driven by server-provided options.
-- [ ] No duplicated rule logic remains in UI—server is authoritative.
+- [x] Hand UI only allows clicks on cards present in `PlayCard` actions.
+- [x] Bidding/trump selection driven by server-provided options.
+- [x] No duplicated rule logic remains in UI—server is authoritative.

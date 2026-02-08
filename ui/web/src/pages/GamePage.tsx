@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { apiRequest } from "../api/client";
 import { useTransport } from "../hooks/useTransport";
 import { ConnectionIndicator } from "../components/ConnectionIndicator";
-import type { Card, GameResponse, HandResponse, Suit, Rank, DecisionResponse, TalonResponse, GameType } from "../types";
+import type { Card, GameResponse, HandResponse, Suit, Rank, DecisionResponse, TalonResponse, GameType, SelectTrumpAction, PlayCardAction } from "../types";
 
 const SUIT_SYMBOLS: Record<Suit, string> = {
     SPADES: "♠",
@@ -80,7 +80,7 @@ export default function GamePage() {
     const [selectedDiscards, setSelectedDiscards] = useState<Card[]>([]);
 
     // Real-time transport for game state updates
-    const { state: transportState, connectionStatus } = useTransport(gameId ?? null);
+    const { state: transportState, connectionStatus } = useTransport(gameId ?? null, activePlayerId);
 
     // Update local game state when transport receives updates
     useEffect(() => {
@@ -105,19 +105,24 @@ export default function GamePage() {
     // The effective player ID used for all operations
     const playerId = activePlayerId;
 
-    const loadGame = useCallback(async () => {
+    const loadGame = useCallback(async (currentPlayerId: string | null) => {
         if (!gameId) return;
         setError(null);
-        setLoading(true);
+        // Don't show global loading if we already have game data (e.g. from transport)
+        setLoading(prev => {
+            if (!game) return true;
+            return prev;
+        });
         try {
-            const resp = await apiRequest<GameResponse>(`/games/${gameId}`, "GET");
+            const url = currentPlayerId ? `/games/${gameId}?playerId=${currentPlayerId}` : `/games/${gameId}`;
+            const resp = await apiRequest<GameResponse>(url, "GET");
             setGame(resp);
         } catch (e: unknown) {
             setError(e instanceof Error ? e.message : String(e));
         } finally {
             setLoading(false);
         }
-    }, [gameId]);
+    }, [gameId, game]);
 
     const loadHand = useCallback(async () => {
         if (!gameId || !playerId) return;
@@ -132,12 +137,13 @@ export default function GamePage() {
     const loadDecision = useCallback(async () => {
         if (!gameId) return;
         try {
-            const resp = await apiRequest<DecisionResponse>(`/games/${gameId}/decision`, "GET");
+            const url = playerId ? `/games/${gameId}/decision?playerId=${playerId}` : `/games/${gameId}/decision`;
+            const resp = await apiRequest<DecisionResponse>(url, "GET");
             setDecision(resp);
         } catch {
             setDecision(null);
         }
-    }, [gameId]);
+    }, [gameId, playerId]);
 
     const loadTalon = useCallback(async () => {
         if (!gameId || !playerId) return;
@@ -228,8 +234,8 @@ export default function GamePage() {
 
     // Load game on mount
     useEffect(() => {
-        void loadGame();
-    }, [loadGame]);
+        void loadGame(playerId);
+    }, [gameId, playerId, loadGame]);
 
     // Load hand when player changes or game state changes
     useEffect(() => {
@@ -254,10 +260,14 @@ export default function GamePage() {
         setSelectedDiscards([]);
         setTalon([]);
         setHand([]);
+        setError(null);
+        if (gameId) {
+            localStorage.setItem(`playerId:${gameId}`, newPlayerId);
+        }
     };
 
-    const canStart = game?.phase === "WAITING_FOR_PLAYERS" && game.players.length === 3;
-    const canDeal = game?.phase === "DEALING" && !game.dealing?.isWaitingForChooser;
+    const canStart = (game?.possibleActions ?? []).some(a => a.type === "start") ?? false;
+    const canDeal = (game?.possibleActions ?? []).some(a => a.type === "deal") ?? false;
     const isWaitingForChooser = game?.dealing?.isWaitingForChooser ?? false;
     const isChooser = playerId === game?.dealing?.chooserId;
     const showHand = game && playerId && (
@@ -265,12 +275,8 @@ export default function GamePage() {
         isWaitingForChooser
     );
 
-    const canSelectTrump = decision?.hasDecision &&
-        decision.playerId === playerId &&
-        decision.availableDecisions.includes("SELECT_TRUMP");
-    const canPass = decision?.hasDecision &&
-        decision.playerId === playerId &&
-        decision.availableDecisions.includes("PASS");
+    const canSelectTrump = (game?.possibleActions ?? []).some(a => a.type === "choosetrump") ?? false;
+    const canPass = (game?.possibleActions ?? []).some(a => a.type === "chooserpass") ?? false;
 
     // Talon exchange state
     const isTalonExchange = game?.phase === "TALON_EXCHANGE";
@@ -279,7 +285,14 @@ export default function GamePage() {
 
     // Trump selection phase state
     const isTrumpSelection = game?.phase === "TRUMP_SELECTION";
-    const canSelectTrumpPhase = isTrumpSelection && isDeclarer;
+    const canSelectTrumpPhase = (game?.possibleActions ?? []).some(a => a.type === "trump") ?? false;
+
+    // Avilable trump suits from possibleActions
+    const availableTrumpSuits = useMemo(() => {
+        return (game?.possibleActions ?? [])
+            .filter((a): a is SelectTrumpAction => a.type === "trump")
+            .map(a => a.trump);
+    }, [game?.possibleActions]);
 
     // Helper to check if card is selected for discard
     const isSelectedForDiscard = (card: Card) =>
@@ -294,6 +307,30 @@ export default function GamePage() {
     // Validation: check if selection contains invalid cards
     const hasInvalidDiscard = !allowsAnyDiscard && selectedDiscards.some(isAceOrTen);
 
+    // Play card available?
+    const playableCards = useMemo(() => {
+        return (game?.possibleActions ?? [])
+            .filter((a): a is PlayCardAction => a.type === "play")
+            .map(a => a.card);
+    }, [game?.possibleActions]);
+
+    const submitPlayCard = useCallback(async (card: Card) => {
+        if (!gameId || !playerId) return;
+        setError(null);
+        setLoading(true);
+        try {
+            const resp = await apiRequest<GameResponse>(`/games/${gameId}/actions`, "POST", {
+                action: { type: "play", playerId, card }
+            });
+            setGame(resp);
+            await loadHand();
+        } catch (e: unknown) {
+            setError(e instanceof Error ? e.message : String(e));
+        } finally {
+            setLoading(false);
+        }
+    }, [gameId, playerId, loadHand]);
+
     const handleCardClick = (card: Card) => {
         if (canExchange) {
             // Toggle card selection for discard
@@ -302,6 +339,10 @@ export default function GamePage() {
             } else if (selectedDiscards.length < 2) {
                 setSelectedDiscards(prev => [...prev, card]);
             }
+            return;
+        }
+        if (playableCards.some(c => c.suit === card.suit && c.rank === card.rank)) {
+            void submitPlayCard(card);
             return;
         }
         if (!canSelectTrump) return;
@@ -331,6 +372,27 @@ export default function GamePage() {
     };
 
     const activePlayer = game?.players.find(p => p.playerId === playerId);
+
+    if (loading && !game) {
+        return (
+            <div style={{ display: "flex", justifyContent: "center", padding: 40 }}>
+                <h3>Loading game...</h3>
+            </div>
+        );
+    }
+
+    if (!game) {
+        return (
+            <div style={{ padding: 20 }}>
+                <h2 style={{ margin: 0 }}>Game {gameId}</h2>
+                <div style={{ marginTop: 20 }}>
+                    <h3>Game not found or failed to load.</h3>
+                    {error && <p style={{ color: "crimson" }}>{error}</p>}
+                    <button onClick={loadGame}>Retry</button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div>
@@ -569,7 +631,7 @@ export default function GamePage() {
                         Choose the trump suit for this round.
                     </p>
                     <div style={{ display: "flex", gap: 8 }}>
-                        {(["HEARTS", "DIAMONDS", "CLUBS", "SPADES"] as Suit[]).map(suit => (
+                        {availableTrumpSuits.map(suit => (
                             <button
                                 key={suit}
                                 onClick={() => handleSelectTrumpSuit(suit)}

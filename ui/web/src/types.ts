@@ -52,6 +52,7 @@ export type GameResponse = {
     tricksPlayed: number;
     roundNumber: number;
     error: string | null;
+    possibleActions: GameAction[];
 };
 
 export type HandResponse = {
@@ -85,7 +86,28 @@ export type ChooseTrumpAction = { type: "choosetrump"; playerId: string; card: C
 export type ChooserPassAction = { type: "chooserpass"; playerId: string };
 export type ExchangeTalonAction = { type: "exchange"; playerId: string; cardsToDiscard: Card[] };
 export type SelectTrumpAction = { type: "trump"; playerId: string; trump: Suit };
-export type GameAction = JoinAction | LeaveAction | StartAction | DealAction | ChooseTrumpAction | ChooserPassAction | ExchangeTalonAction | SelectTrumpAction;
+export type PlaceBidAction = { type: "bid"; playerId: string; gameType: GameType };
+export type PassAction = { type: "pass"; playerId: string };
+export type PlayCardAction = { type: "play"; playerId: string; card: Card };
+export type DeclareMarriageAction = { type: "marriage"; playerId: string; suit: Suit };
+export type StartNewRoundAction = { type: "newround"; playerId: string };
+export type ReorderHandAction = { type: "reorderhand"; playerId: string; cards: Card[] };
+
+export type GameAction =
+    | JoinAction
+    | LeaveAction
+    | StartAction
+    | DealAction
+    | ChooseTrumpAction
+    | ChooserPassAction
+    | ExchangeTalonAction
+    | SelectTrumpAction
+    | PlaceBidAction
+    | PassAction
+    | PlayCardAction
+    | DeclareMarriageAction
+    | StartNewRoundAction
+    | ReorderHandAction;
 
 // Talon response
 export type TalonResponse = { cards: Card[] };
