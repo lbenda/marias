@@ -2,6 +2,7 @@ package cz.lbenda.games.engine.rules
 
 import cz.lbenda.games.marias.engine.action.GameAction
 import cz.lbenda.games.marias.engine.state.GameState
+import cz.lbenda.games.engine.state.BaseGameState
 
 /**
  * Interface for game rules.
@@ -11,19 +12,19 @@ interface GameRuleSet {
     /**
      * Returns a list of possible actions for the given player in the current state.
      */
-    fun possibleActions(state: GameState, playerId: String): List<GameAction>
+    fun possibleActions(state: BaseGameState, playerId: String): List<GameAction>
 
     /**
      * Reduces the state by applying the given action.
      * Returns the new state.
      * Should throw an exception or return an error state if the action is invalid.
      */
-    fun reduce(state: GameState, action: GameAction): GameState
+    fun reduce(state: BaseGameState, action: GameAction): BaseGameState
 
     /**
      * Validates if the given action is valid for the current state.
      */
-    fun validate(state: GameState, action: GameAction): Boolean {
+    fun validate(state: BaseGameState, action: GameAction): Boolean {
         return possibleActions(state, action.playerId).contains(action)
     }
 }

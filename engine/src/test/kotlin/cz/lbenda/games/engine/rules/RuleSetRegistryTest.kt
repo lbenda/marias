@@ -2,14 +2,15 @@ package cz.lbenda.games.engine.rules
 
 import cz.lbenda.games.marias.engine.action.GameAction
 import cz.lbenda.games.marias.engine.state.GameState
+import cz.lbenda.games.engine.state.BaseGameState
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
 class RuleSetRegistryTest {
 
     private val dummyRuleSet = object : GameRuleSet {
-        override fun possibleActions(state: GameState, playerId: String): List<GameAction> = emptyList()
-        override fun reduce(state: GameState, action: GameAction): GameState = state
+        override fun possibleActions(state: BaseGameState, playerId: String): List<GameAction> = emptyList()
+        override fun reduce(state: BaseGameState, action: GameAction): BaseGameState = state
     }
 
     @Test

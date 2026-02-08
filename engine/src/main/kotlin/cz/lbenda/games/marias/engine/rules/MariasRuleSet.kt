@@ -1,6 +1,7 @@
 package cz.lbenda.games.marias.engine.rules
 
 import cz.lbenda.games.engine.rules.GameRuleSet
+import cz.lbenda.games.engine.state.BaseGameState
 import cz.lbenda.games.marias.engine.action.GameAction
 import cz.lbenda.games.marias.engine.model.Suit
 import cz.lbenda.games.marias.engine.reducer.reduce
@@ -18,48 +19,49 @@ import cz.lbenda.games.marias.engine.state.GameType
  */
 class MariasRuleSet : GameRuleSet {
 
-    override fun possibleActions(state: GameState, playerId: String): List<GameAction> {
+    override fun possibleActions(state: BaseGameState, playerId: String): List<GameAction> {
+        val mState = state as? GameState ?: return emptyList()
         val actions = mutableListOf<GameAction>()
 
         // Turn-independent actions
         actions.add(GameAction.LeaveGame(playerId))
-        state.players[playerId]?.let { player ->
+        mState.players[playerId]?.let { player ->
             actions.add(GameAction.ReorderHand(playerId, player.hand))
         }
 
-        when (state.phase) {
+        when (mState.phase) {
             GamePhase.WAITING_FOR_PLAYERS -> {
-                if (!state.players.containsKey(playerId)) {
+                if (!mState.players.containsKey(playerId)) {
                     // This is a bit tricky since we don't know the name here.
                     // But for the sake of possibleActions, we can say JoinGame is possible.
                 }
-                if (state.players.size == 3 && playerId == state.playerOrder.firstOrNull()) {
+                if (mState.players.size == 3 && playerId == mState.playerOrder.firstOrNull()) {
                     actions.add(GameAction.StartGame(playerId))
                 }
             }
             GamePhase.DEALING -> {
-                if (state.dealing.phase == DealingPhase.NOT_STARTED) {
+                if (mState.dealing.phase == DealingPhase.NOT_STARTED) {
                     // Usually the dealer or system deals. Assuming dealer for now.
-                    if (state.playerOrder[state.dealerIndex] == playerId) {
+                    if (mState.playerOrder[mState.dealerIndex] == playerId) {
                         actions.add(GameAction.DealCards(playerId))
                     }
-                } else if (state.dealing.decisionGate != null && state.dealing.decisionGate.playerId == playerId) {
-                    if (state.dealing.canMakeDecision(ChooserDecisionType.SELECT_TRUMP)) {
-                        state.players[playerId]?.hand?.forEach { card ->
+                } else if (mState.dealing.decisionGate != null && mState.dealing.decisionGate.playerId == playerId) {
+                    if (mState.dealing.canMakeDecision(ChooserDecisionType.SELECT_TRUMP)) {
+                        mState.players[playerId]?.hand?.forEach { card ->
                             actions.add(GameAction.ChooseTrump(playerId, card))
                         }
                     }
-                    if (state.dealing.canMakeDecision(ChooserDecisionType.PASS)) {
+                    if (mState.dealing.canMakeDecision(ChooserDecisionType.PASS)) {
                         actions.add(GameAction.ChooserPass(playerId))
                     }
                 }
             }
             GamePhase.BIDDING -> {
-                if (state.playerOrder.getOrNull(state.currentPlayerIndex) == playerId) {
-                    if (playerId !in state.bidding.passedPlayers) {
+                if (mState.playerOrder.getOrNull(mState.currentPlayerIndex) == playerId) {
+                    if (playerId !in mState.bidding.passedPlayers) {
                         actions.add(GameAction.Pass(playerId))
                         GameType.entries.forEach { gameType ->
-                            if (state.bidding.currentBid == null || gameType.ordinal > state.bidding.currentBid.ordinal) {
+                            if (mState.bidding.currentBid == null || gameType.ordinal > mState.bidding.currentBid.ordinal) {
                                 actions.add(GameAction.PlaceBid(playerId, gameType))
                             }
                         }
@@ -67,29 +69,29 @@ class MariasRuleSet : GameRuleSet {
                 }
             }
             GamePhase.TALON_EXCHANGE -> {
-                if (state.declarerId == playerId) {
-                    val hand = state.players[playerId]?.hand ?: emptyList()
+                if (mState.declarerId == playerId) {
+                    val hand = mState.players[playerId]?.hand ?: emptyList()
                     // This can be a LOT of combinations (Hand size is 12, pick 2)
                     // For now, let's just indicate it's possible if we have enough cards.
                     // In a real UI, the client would pick 2 cards.
                 }
             }
             GamePhase.TRUMP_SELECTION -> {
-                if (state.declarerId == playerId) {
+                if (mState.declarerId == playerId) {
                     Suit.entries.forEach { suit ->
-                        if (canAnnounceSevenVariant(state.gameType, suit, state.talon)) {
+                        if (canAnnounceSevenVariant(mState.gameType, suit, mState.talon)) {
                             actions.add(GameAction.SelectTrump(playerId, suit))
                         }
                     }
                 }
             }
             GamePhase.PLAYING -> {
-                if (state.playerOrder.getOrNull(state.currentPlayerIndex) == playerId) {
-                    validCards(state, playerId).forEach { card ->
+                if (mState.playerOrder.getOrNull(mState.currentPlayerIndex) == playerId) {
+                    validCards(mState, playerId).forEach { card ->
                         actions.add(GameAction.PlayCard(playerId, card))
                     }
                     // Marriage declaration
-                    val hand = state.players[playerId]?.hand ?: emptyList()
+                    val hand = mState.players[playerId]?.hand ?: emptyList()
                     Suit.entries.forEach { suit ->
                         if (hasMarriage(hand, suit)) {
                             actions.add(GameAction.DeclareMarriage(playerId, suit))
@@ -105,13 +107,15 @@ class MariasRuleSet : GameRuleSet {
         return actions
     }
 
-    override fun reduce(state: GameState, action: GameAction): GameState {
+    override fun reduce(state: BaseGameState, action: GameAction): BaseGameState {
+        val mState = state as? GameState ?: return state
         // Delegate to existing global reduce function
-        return reduce(state, action)
+        return reduce(mState, action)
     }
 
-    override fun validate(state: GameState, action: GameAction): Boolean {
+    override fun validate(state: BaseGameState, action: GameAction): Boolean {
+        val mState = state as? GameState ?: return false
         // Delegate to existing global validate function
-        return cz.lbenda.games.marias.engine.rules.validate(state, action) == null
+        return cz.lbenda.games.marias.engine.rules.validate(mState, action) == null
     }
 }
